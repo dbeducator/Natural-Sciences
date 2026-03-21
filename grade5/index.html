@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grade 5 Natural Sciences & Technology</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --primary:#1565c0; --bg:#07070c; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.08); --text:#fff; --subtext:#aaa; }
+body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
+body.light-mode { --bg:#f5f5f5; --card:#fff; --border:#e0e0e0; --text:#222; --subtext:#666; background:#f5f5f5; color:#222; }
+
+/* HEADER */
+header { background:linear-gradient(135deg,#1565c0,#0d47a1); padding:20px; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(0,0,0,0.3); }
+.header-content { display:flex; justify-content:space-between; align-items:center; max-width:800px; margin:0 auto; }
+.logo-area { display:flex; align-items:center; gap:12px; }
+.logo-area img { width:40px; height:40px; border-radius:10px; }
+.logo-text h1 { font-size:1rem; font-weight:700; color:#fff; }
+.logo-text p { font-size:0.75rem; color:rgba(255,255,255,0.8); }
+.header-actions { display:flex; align-items:center; gap:8px; }
+.theme-btn { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 12px; border-radius:16px; font-size:0.8rem; cursor:pointer; font-family:inherit; }
+
+/* HERO */
+.hero { background:linear-gradient(135deg,#1565c0,#4caf50); padding:24px 20px; text-align:center; }
+.hero h2 { font-size:1.3rem; color:#fff; margin-bottom:6px; }
+.hero p { color:rgba(255,255,255,0.85); font-size:0.9rem; }
+.stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:400px; margin:16px auto 0; }
+.stat { background:rgba(255,255,255,0.15); border-radius:10px; padding:10px; text-align:center; }
+.stat h3 { font-size:1.3rem; font-weight:800; color:#fff; }
+.stat p { font-size:0.65rem; color:rgba(255,255,255,0.85); }
+
+/* VIEW TOGGLE */
+.view-toggle { display:flex; gap:0; margin:16px 20px 0; background:rgba(255,255,255,0.05); border-radius:10px; overflow:hidden; max-width:800px; }
+body.light-mode .view-toggle { background:#e0e0e0; }
+.view-btn { flex:1; padding:10px; text-align:center; background:transparent; border:none; color:var(--subtext); font-size:0.85rem; font-weight:600; cursor:pointer; font-family:inherit; }
+.view-btn.active { background:linear-gradient(135deg,#1565c0,#0d47a1); color:#fff; border-radius:8px; }
+
+/* CONTENT */
+.content { max-width:800px; margin:0 auto; padding:16px 20px 80px; }
+.view-section { display:none; }
+.view-section.active { display:block; }
+.section-header { display:flex; align-items:center; gap:10px; margin:20px 0 12px; padding-left:12px; border-left:4px solid; }
+.section-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.section-header h2 { font-size:1rem; font-weight:700; }
+body.light-mode .section-header h2 { color:#222; }
+.section-line { flex:1; height:1px; }
+
+/* TOPIC CARDS */
+.topics-grid { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+a.topic-card { display:flex; align-items:flex-start; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; text-decoration:none; color:inherit; }
+.topic-num { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; color:#fff; flex-shrink:0; }
+.topic-info { flex:1; }
+.topic-title { font-size:0.95rem; font-weight:700; margin-bottom:2px; color:var(--text); }
+.topic-strand { font-size:0.72rem; color:#888; margin-bottom:4px; }
+body.light-mode .topic-strand { color:#888; }
+.topic-desc { font-size:0.8rem; color:var(--subtext); line-height:1.5; margin-bottom:6px; }
+.topic-meta { display:flex; justify-content:space-between; font-size:0.78rem; color:#888; }
+
+/* RESULTS FAB */
+.results-fab { position:fixed; bottom:20px; right:16px; padding:11px 18px; background:linear-gradient(135deg,#f093fb,#f5576c); color:#fff; border-radius:28px; font-size:0.85rem; font-weight:600; box-shadow:0 4px 16px rgba(240,147,251,0.4); text-decoration:none; display:block; z-index:50; }
+
+/* NAME MODAL */
+#nameModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:200; align-items:center; justify-content:center; }
+.modal-box { background:#12121f; border-radius:20px; padding:30px 24px; max-width:340px; width:90%; text-align:center; }
+body.light-mode .modal-box { background:#fff; }
+.modal-box h2 { font-size:1.3rem; margin-bottom:8px; color:#fff; }
+body.light-mode .modal-box h2 { color:#222; }
+.modal-box p { color:#aaa; font-size:0.9rem; margin-bottom:20px; }
+.modal-box input { width:100%; padding:12px 16px; background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.15); border-radius:10px; color:#fff; font-size:1rem; margin-bottom:16px; font-family:inherit; }
+body.light-mode .modal-box input { background:#f5f5f5; border-color:#e0e0e0; color:#222; }
+.modal-btn { width:100%; padding:14px; background:linear-gradient(135deg,#1565c0,#0d47a1); color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; font-family:inherit; }
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('ns_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<!-- NAME MODAL -->
+<div id="nameModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:200;align-items:center;justify-content:center;">
+  <div class="modal-box">
+    <div style="font-size:2.5rem;margin-bottom:12px;">🔬</div>
+    <h2>Welcome!</h2>
+    <p>What is your first name?</p>
+    <input type="text" id="learnerName" placeholder="Your first name" maxlength="30">
+    <button class="modal-btn" onclick="saveName()">Start Learning →</button>
+  </div>
+</div>
+
+<header>
+  <div class="header-content">
+    <div class="logo-area">
+      <img src="favicon.png" alt="Logo">
+      <div class="logo-text">
+        <h1>Grade 5 Natural Sciences</h1>
+        <p>& Technology — CAPS</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">☀️</button>
+      <div id="userAvatar" style="width:34px;height:34px;background:linear-gradient(135deg,#4caf50,#1565c0);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;">?</div>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <h2>🔬 Explore Natural Sciences & Technology</h2>
+  <p>Grade 5 CAPS — Department of Basic Education</p>
+  <div class="stats-row">
+    <div class="stat"><h3>19</h3><p>Topics</p></div>
+    <div class="stat"><h3>4</h3><p>Terms</p></div>
+    <div class="stat"><h3>7</h3><p>Strands</p></div>
+  </div>
+</div>
+
+<div class="view-toggle">
+  <button class="view-btn active" id="btn-term" onclick="switchView('term')">📅 By Term</button>
+  <button class="view-btn" id="btn-strand" onclick="switchView('strand')">🔬 By Strand</button>
+</div>
+
+<div class="content">
+  <div id="view-term" class="view-section active">
+    
+        <div class="section-header" style="border-color:#4caf50;">
+          <span class="section-dot" style="background:#4caf50;"></span>
+          <h2>Term 1</h2>
+          <div class="section-line" style="background:#4caf50;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic1.html" class="topic-card">
+              <div class="topic-num" style="background:#4caf50;">T1</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Plants and Animals on Earth</h3>
+                <p class="topic-strand">Life and Living</p>
+                <p class="topic-desc">Explore the diversity of plants and animals, their habitats and adaptations.</p>
+                <div class="topic-meta"><span>3 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic2.html" class="topic-card">
+              <div class="topic-num" style="background:#4caf50;">T2</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Animal Skeletons</h3>
+                <p class="topic-strand">Life and Living</p>
+                <p class="topic-desc">Discover the different types of skeletons and how they support and protect animals.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic3.html" class="topic-card">
+              <div class="topic-num" style="background:#f44336;">T3</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Skeletons as Structures</h3>
+                <p class="topic-strand">Technology: Structures</p>
+                <p class="topic-desc">Investigate how skeleton structures work and design your own supportive structure.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic4.html" class="topic-card">
+              <div class="topic-num" style="background:#4caf50;">T4</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Food Chains</h3>
+                <p class="topic-strand">Life and Living</p>
+                <p class="topic-desc">Understand how energy moves through ecosystems via food chains and webs.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic5.html" class="topic-card">
+              <div class="topic-num" style="background:#4caf50;">T5</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Life Cycles</h3>
+                <p class="topic-strand">Life and Living</p>
+                <p class="topic-desc">Explore the life cycles of plants, insects, amphibians and mammals.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+        <div class="section-header" style="border-color:#2196f3;">
+          <span class="section-dot" style="background:#2196f3;"></span>
+          <h2>Term 2</h2>
+          <div class="section-line" style="background:#2196f3;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic6.html" class="topic-card">
+              <div class="topic-num" style="background:#2196f3;">T6</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Metals and Non-metals</h3>
+                <p class="topic-strand">Matter and Materials</p>
+                <p class="topic-desc">Classify materials as metals or non-metals and investigate their properties.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic7.html" class="topic-card">
+              <div class="topic-num" style="background:#2196f3;">T7</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Uses of Metals</h3>
+                <p class="topic-strand">Matter and Materials</p>
+                <p class="topic-desc">Explore how the properties of metals make them useful in everyday life.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic8.html" class="topic-card">
+              <div class="topic-num" style="background:#2196f3;">T8</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Processing Materials</h3>
+                <p class="topic-strand">Matter and Materials</p>
+                <p class="topic-desc">Investigate how raw materials are processed to make useful products.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic9.html" class="topic-card">
+              <div class="topic-num" style="background:#2196f3;">T9</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Properties of Processed Materials</h3>
+                <p class="topic-strand">Matter and Materials</p>
+                <p class="topic-desc">Compare the properties of processed materials and evaluate their uses.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic10.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T10</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Cells and Batteries</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Understand how cells and batteries store and release electrical energy.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic11.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T11</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Electric Circuits</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Build and investigate simple electric circuits and their components.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+        <div class="section-header" style="border-color:#ff9800;">
+          <span class="section-dot" style="background:#ff9800;"></span>
+          <h2>Term 3</h2>
+          <div class="section-line" style="background:#ff9800;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic12.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T12</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Energy and Movement</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Explore how different forms of energy cause movement and do work.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic13.html" class="topic-card">
+              <div class="topic-num" style="background:#00bcd4;">T13</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Systems for Moving Things</h3>
+                <p class="topic-strand">Technology: Systems</p>
+                <p class="topic-desc">Design and evaluate systems that use energy to move objects.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic14.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T14</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Safety with Electricity</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Learn about electrical hazards and how to stay safe around electricity.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic15.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T15</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Sources of Energy</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Investigate renewable and non-renewable energy sources and their impact.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+        <div class="section-header" style="border-color:#9c27b0;">
+          <span class="section-dot" style="background:#9c27b0;"></span>
+          <h2>Term 4</h2>
+          <div class="section-line" style="background:#9c27b0;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic16.html" class="topic-card">
+              <div class="topic-num" style="background:#9c27b0;">T16</div>
+              <div class="topic-info">
+                <h3 class="topic-title">The Earth Moves</h3>
+                <p class="topic-strand">Planet Earth and Beyond</p>
+                <p class="topic-desc">Explore the rotation and revolution of the Earth and seasonal changes.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic17.html" class="topic-card">
+              <div class="topic-num" style="background:#9c27b0;">T17</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Surface of the Earth</h3>
+                <p class="topic-strand">Planet Earth and Beyond</p>
+                <p class="topic-desc">Investigate the layers, landforms and physical features of the Earth.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic18.html" class="topic-card">
+              <div class="topic-num" style="background:#9c27b0;">T18</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Sedimentary Rocks</h3>
+                <p class="topic-strand">Planet Earth and Beyond</p>
+                <p class="topic-desc">Discover how sedimentary rocks form and what they tell us about Earth's history.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic19.html" class="topic-card">
+              <div class="topic-num" style="background:#9c27b0;">T19</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Fossils</h3>
+                <p class="topic-strand">Planet Earth and Beyond</p>
+                <p class="topic-desc">Learn how fossils form and what they reveal about prehistoric life.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+  </div>
+  <div id="view-strand" class="view-section">
+    
+        <div class="section-header" style="border-color:#4caf50;">
+          <span class="section-dot" style="background:#4caf50;"></span>
+          <h2>🌿 Life and Living</h2>
+          <div class="section-line" style="background:#4caf50;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic1.html" class="topic-card">
+              <div class="topic-num" style="background:#4caf50;">T1</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Plants and Animals on Earth</h3>
+                <p class="topic-strand">Life and Living</p>
+                <p class="topic-desc">Explore the diversity of plants and animals, their habitats and adaptations.</p>
+                <div class="topic-meta"><span>3 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic2.html" class="topic-card">
+              <div class="topic-num" style="background:#4caf50;">T2</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Animal Skeletons</h3>
+                <p class="topic-strand">Life and Living</p>
+                <p class="topic-desc">Discover the different types of skeletons and how they support and protect animals.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic4.html" class="topic-card">
+              <div class="topic-num" style="background:#4caf50;">T4</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Food Chains</h3>
+                <p class="topic-strand">Life and Living</p>
+                <p class="topic-desc">Understand how energy moves through ecosystems via food chains and webs.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic5.html" class="topic-card">
+              <div class="topic-num" style="background:#4caf50;">T5</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Life Cycles</h3>
+                <p class="topic-strand">Life and Living</p>
+                <p class="topic-desc">Explore the life cycles of plants, insects, amphibians and mammals.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+        <div class="section-header" style="border-color:#f44336;">
+          <span class="section-dot" style="background:#f44336;"></span>
+          <h2>🏗️ Technology: Structures</h2>
+          <div class="section-line" style="background:#f44336;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic3.html" class="topic-card">
+              <div class="topic-num" style="background:#f44336;">T3</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Skeletons as Structures</h3>
+                <p class="topic-strand">Technology: Structures</p>
+                <p class="topic-desc">Investigate how skeleton structures work and design your own supportive structure.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+        <div class="section-header" style="border-color:#2196f3;">
+          <span class="section-dot" style="background:#2196f3;"></span>
+          <h2>⚗️ Matter and Materials</h2>
+          <div class="section-line" style="background:#2196f3;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic6.html" class="topic-card">
+              <div class="topic-num" style="background:#2196f3;">T6</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Metals and Non-metals</h3>
+                <p class="topic-strand">Matter and Materials</p>
+                <p class="topic-desc">Classify materials as metals or non-metals and investigate their properties.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic7.html" class="topic-card">
+              <div class="topic-num" style="background:#2196f3;">T7</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Uses of Metals</h3>
+                <p class="topic-strand">Matter and Materials</p>
+                <p class="topic-desc">Explore how the properties of metals make them useful in everyday life.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic8.html" class="topic-card">
+              <div class="topic-num" style="background:#2196f3;">T8</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Processing Materials</h3>
+                <p class="topic-strand">Matter and Materials</p>
+                <p class="topic-desc">Investigate how raw materials are processed to make useful products.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic9.html" class="topic-card">
+              <div class="topic-num" style="background:#2196f3;">T9</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Properties of Processed Materials</h3>
+                <p class="topic-strand">Matter and Materials</p>
+                <p class="topic-desc">Compare the properties of processed materials and evaluate their uses.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+        <div class="section-header" style="border-color:#ff9800;">
+          <span class="section-dot" style="background:#ff9800;"></span>
+          <h2>⚡ Energy and Change</h2>
+          <div class="section-line" style="background:#ff9800;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic10.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T10</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Cells and Batteries</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Understand how cells and batteries store and release electrical energy.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic11.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T11</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Electric Circuits</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Build and investigate simple electric circuits and their components.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic12.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T12</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Energy and Movement</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Explore how different forms of energy cause movement and do work.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic14.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T14</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Safety with Electricity</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Learn about electrical hazards and how to stay safe around electricity.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic15.html" class="topic-card">
+              <div class="topic-num" style="background:#ff9800;">T15</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Sources of Energy</h3>
+                <p class="topic-strand">Energy and Change</p>
+                <p class="topic-desc">Investigate renewable and non-renewable energy sources and their impact.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+        <div class="section-header" style="border-color:#00bcd4;">
+          <span class="section-dot" style="background:#00bcd4;"></span>
+          <h2>⚙️ Technology: Systems</h2>
+          <div class="section-line" style="background:#00bcd4;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic13.html" class="topic-card">
+              <div class="topic-num" style="background:#00bcd4;">T13</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Systems for Moving Things</h3>
+                <p class="topic-strand">Technology: Systems</p>
+                <p class="topic-desc">Design and evaluate systems that use energy to move objects.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+        <div class="section-header" style="border-color:#9c27b0;">
+          <span class="section-dot" style="background:#9c27b0;"></span>
+          <h2>🌍 Planet Earth and Beyond</h2>
+          <div class="section-line" style="background:#9c27b0;"></div>
+        </div>
+        <div class="topics-grid">
+          <a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic16.html" class="topic-card">
+              <div class="topic-num" style="background:#9c27b0;">T16</div>
+              <div class="topic-info">
+                <h3 class="topic-title">The Earth Moves</h3>
+                <p class="topic-strand">Planet Earth and Beyond</p>
+                <p class="topic-desc">Explore the rotation and revolution of the Earth and seasonal changes.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic17.html" class="topic-card">
+              <div class="topic-num" style="background:#9c27b0;">T17</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Surface of the Earth</h3>
+                <p class="topic-strand">Planet Earth and Beyond</p>
+                <p class="topic-desc">Investigate the layers, landforms and physical features of the Earth.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic18.html" class="topic-card">
+              <div class="topic-num" style="background:#9c27b0;">T18</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Sedimentary Rocks</h3>
+                <p class="topic-strand">Planet Earth and Beyond</p>
+                <p class="topic-desc">Discover how sedimentary rocks form and what they tell us about Earth's history.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic19.html" class="topic-card">
+              <div class="topic-num" style="background:#9c27b0;">T19</div>
+              <div class="topic-info">
+                <h3 class="topic-title">Fossils</h3>
+                <p class="topic-strand">Planet Earth and Beyond</p>
+                <p class="topic-desc">Learn how fossils form and what they reveal about prehistoric life.</p>
+                <div class="topic-meta"><span>2 Weeks</span><span>→</span></div>
+              </div>
+            </a>
+        </div>
+  </div>
+</div>
+
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/results.html" class="results-fab">📊 My Results</a>
+
+<script>
+function switchView(v) {
+  document.getElementById('view-term').classList.toggle('active', v==='term');
+  document.getElementById('view-strand').classList.toggle('active', v==='strand');
+  document.getElementById('btn-term').classList.toggle('active', v==='term');
+  document.getElementById('btn-strand').classList.toggle('active', v==='strand');
+  localStorage.setItem('ns_view', v);
+}
+
+function toggleTheme() {
+  var isLight = document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('ns_theme', isLight?'light':'dark');
+  document.getElementById('themeToggle').textContent = isLight?'🌙':'☀️';
+}
+
+function saveName() {
+  var name = document.getElementById('learnerName').value.trim();
+  if(!name) { alert('Please enter your name.'); return; }
+  localStorage.setItem('ns_firstName', name);
+  document.getElementById('nameModal').style.display = 'none';
+  document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+}
+
+// Init
+window.onload = function() {
+  var name = localStorage.getItem('ns_firstName');
+  if(!name) {
+    document.getElementById('nameModal').style.display = 'flex';
+  } else {
+    document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+  }
+  if(localStorage.getItem('ns_theme')==='light') document.getElementById('themeToggle').textContent='🌙';
+  var savedView = localStorage.getItem('ns_view') || 'term';
+  switchView(savedView);
+};
+</script>
+</body>
+</html>
