@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Skeletons as Structures — Grade 5 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png">
+<style>
+
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #07070c;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #f44336 0%, #f44336cc 100%);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .course-title h1 { font-size: 1.8rem; margin-bottom: 5px; }
+  .course-title p { font-size: 0.9rem; opacity: 0.9; }
+
+  .user-info { display: flex; align-items: center; gap: 15px; }
+
+  .avatar {
+    width: 45px; height: 45px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: bold;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+  .progress-overview {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .progress-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #f44336 0%, #f44336cc 100%);
+    color: white; padding: 20px; border-radius: 12px; text-align: center;
+  }
+  .stat-card h3 { font-size: 2rem; margin-bottom: 5px; }
+  .stat-card p { font-size: 0.9rem; opacity: 0.9; }
+
+  .progress-bar {
+    width: 100%; height: 25px; background: #e0e0e0;
+    border-radius: 15px; overflow: hidden; margin: 20px 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f44336 0%, #f44336cc 100%);
+    border-radius: 15px; transition: width 0.5s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 10px; color: white; font-weight: 600; font-size: 0.9rem;
+    min-width: 45px;
+  }
+
+  .tabs {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0; flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 12px 25px; background: #12121f; border: none;
+    border-radius: 10px 10px 0 0; cursor: pointer;
+    font-size: 1rem; font-weight: 600; color: #aaa; transition: all 0.3s ease;
+  }
+  .tab.active { background: linear-gradient(135deg, #f44336 0%, #f44336cc 100%); color: white; }
+
+  .module-selector {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    overflow-x: auto; padding-bottom: 10px;
+  }
+
+  .module-btn {
+    padding: 12px 25px; background: #12121f;
+    border: 2px solid #f44336; border-radius: 25px;
+    cursor: pointer; font-size: 1rem; font-weight: 600;
+    color: #f44336; white-space: nowrap; transition: all 0.3s ease;
+  }
+  .module-btn.active {
+    background: linear-gradient(135deg, #f44336 0%, #f44336cc 100%);
+    color: white; border-color: transparent;
+  }
+  .module-btn.completed { background: #4caf50; color: white; border-color: #4caf50; }
+
+  .content-section { display: block; height: 0; overflow: hidden; }
+  .content-section.active { height: auto; overflow: visible; }
+
+  .video-section {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .video-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px; margin-top: 20px;
+  }
+
+  .video-player {
+    background: #000; border-radius: 12px; overflow: hidden;
+    position: relative; padding-top: 56.25%;
+  }
+
+  .video-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  }
+
+  .play-btn {
+    width: 70px; height: 70px;
+    background: rgba(102, 126, 234, 0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .play-btn:hover { background: #f44336; transform: scale(1.1); }
+  .play-btn::after { content: '▶'; color: white; font-size: 2rem; margin-left: 5px; }
+
+  .video-title { margin-top: 15px; font-size: 1.1rem; font-weight: 600; color: #fff; }
+  body.light-mode .video-title { color: #333; }
+
+  .lesson-content {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+  .lesson-content h2 { color: #f44336; margin-bottom: 20px; font-size: 1.8rem; }
+  .lesson-content h3 { color: #f44336cc; margin-top: 25px; margin-bottom: 15px; font-size: 1.3rem; }
+  .lesson-content h4 { color: #f44336; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+  .lesson-content p { line-height: 1.8; margin-bottom: 15px; color: #ccc; }
+  .lesson-content ul { margin-left: 25px; margin-bottom: 15px; }
+  .lesson-content li { margin-bottom: 10px; line-height: 1.6; color: #ccc; }
+
+  .assessment-section {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .quiz-question {
+    background: #1a1a2e; padding: 20px; border-radius: 12px;
+    margin-bottom: 20px; border-left: 4px solid #f44336;
+  }
+  .quiz-question h4 { margin-bottom: 15px; color: #fff; font-size: 1.1rem; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .quiz-option {
+    padding: 12px 20px; background: #12121f; border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .quiz-option:hover { border-color: #f44336; background: #f0f4ff; }
+  .quiz-option input { margin-right: 10px; }
+
+  .submit-btn {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #f44336 0%, #f44336cc 100%);
+    color: white; border: none; border-radius: 25px;
+    font-size: 1.1rem; font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; margin-top: 20px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+  .already-passed-notice {
+    background: #e8f5e9; border: 2px solid #4caf50; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; text-align: center;
+  }
+  .already-passed-notice h3 { color: #2e7d32; margin-bottom: 8px; }
+  .already-passed-notice p { color: #388e3c; }
+
+  .resources-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  a.resource-card { display: block; text-decoration: none; color: inherit; cursor: pointer; }
+  .resource-card {
+    display: block; text-decoration: none; color: inherit;
+    background: #12121f; border-radius: 12px; padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;
+    cursor: pointer; border: 2px solid transparent;
+  }
+  .resource-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: #f44336; }
+
+  .resource-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #f44336 0%, #f44336cc 100%);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.5rem; margin-bottom: 15px;
+  }
+  .resource-card h4 { margin-bottom: 10px; color: #fff; }
+  .resource-card p { color: #aaa; font-size: 0.9rem; }
+
+  .download-badge {
+    display: inline-block; padding: 5px 12px; background: #4caf50;
+    color: white; border-radius: 15px; font-size: 0.75rem; margin-top: 10px;
+  }
+
+  .admin-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white; border: none; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(240,147,251,0.4); z-index: 50; transition: all 0.3s ease;
+  }
+  .admin-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(240,147,251,0.6); }
+
+  @media (max-width: 768px) {
+    .header-content { flex-direction: column; gap: 15px; text-align: center; }
+    .video-grid { grid-template-columns: 1fr; }
+    .module-selector { flex-wrap: wrap; }
+    .resources-grid { grid-template-columns: 1fr; }
+  }
+
+/* ── DARK THEME ADDITIONS ── */
+.lesson-content h2, .lesson-content h3, .lesson-content h4 { color: #c4b5fd; }
+.lesson-content p, .lesson-content li { color: #ccc; }
+.lesson-content strong { color: #e0d7ff; }
+.quiz-option { color: #ccc; }
+.quiz-option:hover { background: rgba(102,126,234,0.15); border-color: #f44336; }
+.resource-card h4 { color: #fff; }
+.resource-card p { color: #aaa; }
+.already-passed-notice { background: rgba(76,175,80,0.1); border: 2px solid #4caf50; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.already-passed-notice h3 { color: #4caf50; }
+.already-passed-notice p { color: #aaa; }
+
+
+/* ── LIGHT MODE ── */
+body.light-mode { background: #ffffff !important; color: #222 !important; }
+body.light-mode .header { background: linear-gradient(135deg, #f44336 0%, #f44336cc 100%) !important; }
+body.light-mode .progress-overview { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .tabs { background: #f5f5f5 !important; }
+body.light-mode .tab { color: #666 !important; background: transparent !important; }
+body.light-mode .tab.active { background: linear-gradient(135deg, #f44336, #f44336cc) !important; color: #fff !important; }
+body.light-mode .module-selector { background: #f5f5f5 !important; }
+body.light-mode .module-btn { background: #fff !important; color: #f44336 !important; border-color: #f44336 !important; }
+body.light-mode .module-btn.active { background: linear-gradient(135deg, #f44336, #f44336cc) !important; color: #fff !important; }
+body.light-mode .module-btn.completed { background: #4caf50 !important; color: #fff !important; border-color: #4caf50 !important; }
+body.light-mode .video-section { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .lesson-content { background: #fff !important; color: #333 !important; }
+body.light-mode .lesson-content h2, body.light-mode .lesson-content h3, body.light-mode .lesson-content h4 { color: #f44336 !important; }
+body.light-mode .lesson-content p, body.light-mode .lesson-content li { color: #444 !important; }
+body.light-mode .resource-card { background: #fff !important; border-color: #e0e0e0 !important; }
+body.light-mode .resource-card h4 { color: #222 !important; }
+body.light-mode .resource-card p { color: #666 !important; }
+body.light-mode .quiz-question { background: #f8f9fa !important; }
+body.light-mode .quiz-question h4 { color: #333 !important; }
+body.light-mode .quiz-option { background: #fff !important; border-color: #e0e0e0 !important; color: #333 !important; }
+body.light-mode .live-section { background: #fff !important; }
+body.light-mode .support-card { background: #f8f9fa !important; }
+
+
+.resource-card { display:block; text-decoration:none; color:inherit; }
+.resource-icon { font-size:1.5rem; margin-bottom:8px; }
+.resources-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.already-passed-notice { background:rgba(76,175,80,0.1); border:2px solid #4caf50; border-radius:10px; padding:16px; margin-bottom:20px; }
+.already-passed-notice h3 { color:#4caf50; }
+.assess-week {}
+.theme-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-family:inherit; }
+body.light-mode .theme-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.2); color:#333; }
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="https://dbeducator.github.io/Natural-Sciences/grade5/index.html" style="color:#fff;font-size:1.5rem;text-decoration:none;" title="Back to Topics">←</a>
+      <img src="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png" alt="Logo" style="width:36px;height:36px;border-radius:8px;" onerror="this.style.display='none'">
+      <div class="course-title">
+        <h1>Skeletons as Structures</h1>
+        <p>Grade 5 Natural Sciences · Term 1 · Technology: Structures</p>
+      </div>
+    </div>
+    <div class="user-info">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀️ Light</button>
+      <div class="avatar" id="avatar">?</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-overview">
+    <h2>📊 Your Progress — <span id="studentName"></span></h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%">0%</div>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-card"><h3 id="weeksComplete">0/2</h3><p>Weeks Complete</p></div>
+      <div class="stat-card"><h3 id="videosWatched">0/4</h3><p>Videos</p></div>
+      <div class="stat-card"><h3 id="assessmentsPassed">0/2</h3><p>Passed</p></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('content', this)">📖 Content</button>
+    <button class="tab" onclick="showTab('resources', this)">📚 Resources</button>
+    <button class="tab" onclick="showTab('assessment', this)">📝 Assessment</button>
+  </div>
+
+  <div class="module-selector">
+    <button class="module-btn active" onclick="selectModule(1)">Week 1</button>
+    <button class="module-btn" onclick="selectModule(2)">Week 2</button>
+  </div>
+
+  <div id="content" class="content-section active">
+    <div class="video-grid" id="videoSection">
+      <div>
+        <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+          <iframe id="tutorialVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
+        </div>
+        <p id="tutorialTitle" style="margin-top:8px;font-weight:600;font-size:0.9rem;"></p>
+      </div>
+      <div>
+        <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+          <iframe id="basicVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
+        </div>
+        <p id="basicTitle" style="margin-top:8px;font-weight:600;font-size:0.9rem;"></p>
+      </div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+
+  <div id="resources" class="content-section">
+    <h2 id="resourcesTitle" style="margin-bottom:20px;">📚 Resources</h2>
+  <div class="week-resources" data-week="1">
+    <h3 style="color:#f44336;margin-bottom:16px;">📚 Week 1 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/sks-w1-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts, definitions and summaries for this week</p><span class="download-badge">📖 View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/sks-w1-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">📖 View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/sks-w1-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation</h4><p>Hands-on practical investigation guide</p><span class="download-badge">📖 View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/sks-w1-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice questions</p><span class="download-badge">📖 View PDF</span></a>
+    </div>
+  </div>
+  <div class="week-resources" data-week="2" style="display:none;">
+    <h3 style="color:#f44336;margin-bottom:16px;">📚 Week 2 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/sks-w2-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts, definitions and summaries for this week</p><span class="download-badge">📖 View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/sks-w2-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">📖 View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/sks-w2-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation</h4><p>Hands-on practical investigation guide</p><span class="download-badge">📖 View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/sks-w2-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice questions</p><span class="download-badge">📖 View PDF</span></a>
+    </div>
+  </div>
+  </div>
+
+  <div id="assessment" class="content-section">
+    <div id="assessmentContent">
+<div class="assess-week" data-week="1" style="display:block;">
+<h2>📝 Week 1 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions — You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: What is the main purpose of a structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q0" value="0" onchange="saveAnswer(1,0,0)"> To look beautiful</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="1" onchange="saveAnswer(1,0,1)"> To support a load or force</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="2" onchange="saveAnswer(1,0,2)"> To create jobs</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="3" onchange="saveAnswer(1,0,3)"> To use up materials</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: Which of the following is a FRAME structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q1" value="0" onchange="saveAnswer(1,1,0)"> An egg shell</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="1" onchange="saveAnswer(1,1,1)"> A tortoise shell</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="2" onchange="saveAnswer(1,1,2)"> The human skeleton</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="3" onchange="saveAnswer(1,1,3)"> A tin can</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: Which of the following is a SHELL structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q2" value="0" onchange="saveAnswer(1,2,0)"> A bicycle frame</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="1" onchange="saveAnswer(1,2,1)"> An electricity pylon</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="2" onchange="saveAnswer(1,2,2)"> A roof truss</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="3" onchange="saveAnswer(1,2,3)"> A snail shell</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: The human skeleton has 206 bones. What type of structure is it?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q3" value="0" onchange="saveAnswer(1,3,0)"> Shell structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="1" onchange="saveAnswer(1,3,1)"> Frame structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="2" onchange="saveAnswer(1,3,2)"> Solid structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="3" onchange="saveAnswer(1,3,3)"> Flat structure</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: What connects bones to other bones?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q4" value="0" onchange="saveAnswer(1,4,0)"> Tendons</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="1" onchange="saveAnswer(1,4,1)"> Muscles</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="2" onchange="saveAnswer(1,4,2)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="3" onchange="saveAnswer(1,4,3)"> Cartilage</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: Which South African structure is an example of a shell structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q5" value="0" onchange="saveAnswer(1,5,0)"> Orlando Towers</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="1" onchange="saveAnswer(1,5,1)"> Bloukrans Bridge</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="2" onchange="saveAnswer(1,5,2)"> FNB Stadium</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="3" onchange="saveAnswer(1,5,3)"> Electricity pylons</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: What does "rigid" mean?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q6" value="0" onchange="saveAnswer(1,6,0)"> Can bend easily</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="1" onchange="saveAnswer(1,6,1)"> Stiff and does not change shape</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="2" onchange="saveAnswer(1,6,2)"> Very heavy</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="3" onchange="saveAnswer(1,6,3)"> Made of metal</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: Bones are hollow inside. Why is this important?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q7" value="0" onchange="saveAnswer(1,7,0)"> To make them look nice</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="1" onchange="saveAnswer(1,7,1)"> So they can bend</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="2" onchange="saveAnswer(1,7,2)"> To make them lightweight but still strong</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="3" onchange="saveAnswer(1,7,3)"> To store food</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: What is a "load" in terms of structures?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q8" value="0" onchange="saveAnswer(1,8,0)"> A truck on the road</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="1" onchange="saveAnswer(1,8,1)"> A force or weight on a structure</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="2" onchange="saveAnswer(1,8,2)"> The material used to build</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="3" onchange="saveAnswer(1,8,3)"> The colour of a structure</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: What do muscles attach to in order to allow movement?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q9" value="0" onchange="saveAnswer(1,9,0)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="1" onchange="saveAnswer(1,9,1)"> Other muscles</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="2" onchange="saveAnswer(1,9,2)"> Bones via tendons</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="3" onchange="saveAnswer(1,9,3)"> Skin</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_SKS_1.html" onclick="localStorage.setItem('cl_submit_course','SKS');localStorage.setItem('cl_submit_week','1');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment →</a>
+</div>
+<div class="assess-week" data-week="2" style="display:none;">
+<h2>📝 Week 2 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions — You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: Why is a triangle the strongest shape for structures?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q0" value="0" onchange="saveAnswer(2,0,0)"> It looks the best</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="1" onchange="saveAnswer(2,0,1)"> It cannot change shape without changing the length of its sides</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="2" onchange="saveAnswer(2,0,2)"> It uses the least material</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="3" onchange="saveAnswer(2,0,3)"> It is the heaviest shape</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: A square frame can collapse sideways. How can you make it stronger?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q1" value="0" onchange="saveAnswer(2,1,0)"> Add more weight to the top</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="1" onchange="saveAnswer(2,1,1)"> Add a diagonal brace to make triangles</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="2" onchange="saveAnswer(2,1,2)"> Remove some sides</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="3" onchange="saveAnswer(2,1,3)"> Paint it a bright colour</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: What is the first step in the Technology design process?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q2" value="0" onchange="saveAnswer(2,2,0)"> Make the product</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="1" onchange="saveAnswer(2,2,1)"> Evaluate the product</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="2" onchange="saveAnswer(2,2,2)"> Investigate the problem</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="3" onchange="saveAnswer(2,2,3)"> Communicate your findings</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: Which of the following structures uses triangles to be strong?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q3" value="0" onchange="saveAnswer(2,3,0)"> A cylinder</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="1" onchange="saveAnswer(2,3,1)"> A sphere</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="2" onchange="saveAnswer(2,3,2)"> A roof truss</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="3" onchange="saveAnswer(2,3,3)"> A wall</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: How is a helmet similar to a skull?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q4" value="0" onchange="saveAnswer(2,4,0)"> Both are made of bone</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="1" onchange="saveAnswer(2,4,1)"> Both are shell structures that protect what is inside</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="2" onchange="saveAnswer(2,4,2)"> Both are frame structures</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="3" onchange="saveAnswer(2,4,3)"> Both are made of metal</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: What does "evaluate" mean in the design process?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q5" value="0" onchange="saveAnswer(2,5,0)"> To build the structure</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="1" onchange="saveAnswer(2,5,1)"> To draw the design</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="2" onchange="saveAnswer(2,5,2)"> To test and judge how well something works</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="3" onchange="saveAnswer(2,5,3)"> To present to the class</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: Which factor makes a structure MORE stable?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q6" value="0" onchange="saveAnswer(2,6,0)"> A narrower base</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="1" onchange="saveAnswer(2,6,1)"> A wider base</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="2" onchange="saveAnswer(2,6,2)"> Being taller</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="3" onchange="saveAnswer(2,6,3)"> Being made of lighter material</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: A spine in the human body is similar to what man-made structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q7" value="0" onchange="saveAnswer(2,7,0)"> A bridge</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="1" onchange="saveAnswer(2,7,1)"> A roof</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="2" onchange="saveAnswer(2,7,2)"> A steel column in a building</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="3" onchange="saveAnswer(2,7,3)"> A window</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: What holds joints in the human skeleton together?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q8" value="0" onchange="saveAnswer(2,8,0)"> Tendons</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="1" onchange="saveAnswer(2,8,1)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="2" onchange="saveAnswer(2,8,2)"> Muscles</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="3" onchange="saveAnswer(2,8,3)"> Cartilage</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: In Technology, what does "communicate" mean?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q9" value="0" onchange="saveAnswer(2,9,0)"> To telephone someone</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="1" onchange="saveAnswer(2,9,1)"> To argue with a partner</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="2" onchange="saveAnswer(2,9,2)"> To present and share your findings and design</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="3" onchange="saveAnswer(2,9,3)"> To write a letter</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_SKS_2.html" onclick="localStorage.setItem('cl_submit_course','SKS');localStorage.setItem('cl_submit_week','2');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment →</a>
+</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:30px;">
+    <a href="https://dbeducator.github.io/Natural-Sciences/grade5/results.html" class="admin-btn" style="text-decoration:none;display:inline-block;">📊 View My Results</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'coachL_SKS_';
+const TOTAL_WEEKS = 2;
+const COURSE_NAME = 'Skeletons as Structures';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz89hcA4Z70ZyOKnk2MBBc5kVWKG5aXljNgSzpXZbfXDOhGvtpeZXGSOadoZB_RdyPK/exec';
+const SECRET_KEY = 'CoachL2025SecureKey';
+const BASE_URL = 'https://dbeducator.github.io/Natural-Sciences/grade5/';
+const coursePrefixForSubmit = 'SKS';
+
+const CORRECT_ANSWERS = {
+  1: [1, 2, 3, 1, 2, 2, 1, 2, 1, 2],
+  2: [1, 1, 2, 2, 1, 2, 1, 2, 1, 2],
+};
+Object.keys(CORRECT_ANSWERS).forEach(function(w) {
+  localStorage.setItem(STORAGE_PREFIX + 'correct_' + w, JSON.stringify(CORRECT_ANSWERS[parseInt(w)]));
+});
+
+let currentWeek = 1;
+let completedWeeks = new Set(JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'completedWeeks') || '[]'));
+let studentInfo = { name: '', email: '' };
+
+function toggleTheme() {
+  const isLight = document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isLight ? '🌙 Dark' : '☀️ Light';
+}
+
+function saveAnswer(week, q, val) {
+  var k = STORAGE_PREFIX + 'answers_' + week;
+  var saved = JSON.parse(localStorage.getItem(k) || '{}');
+  saved['q' + q] = val;
+  localStorage.setItem(k, JSON.stringify(saved));
+}
+
+function selectModule(week) {
+  currentWeek = week;
+  refreshModuleButtons();
+  updateWeekContent();
+}
+
+function refreshModuleButtons() {
+  document.querySelectorAll('.module-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (completedWeeks.has(i+1)) {
+      btn.classList.add('completed');
+      btn.textContent = 'Week ' + (i+1) + ' ✓';
+    } else {
+      btn.textContent = 'Week ' + (i+1);
+    }
+  });
+  document.querySelectorAll('.module-btn')[currentWeek - 1].classList.add('active');
+}
+
+function showTab(tabName, tabBtn) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  if (tabBtn) tabBtn.classList.add('active');
+}
+
+function updateWeekContent() {
+  const week = weekData[currentWeek];
+  document.getElementById('tutorialVideo').src = 'https://www.youtube.com/embed/' + week.tutorialVideoId + '?rel=0&modestbranding=1';
+  document.getElementById('tutorialTitle').textContent = week.tutorialTitle;
+  document.getElementById('basicVideo').src = 'https://www.youtube.com/embed/' + week.basicVideoId + '?rel=0&modestbranding=1';
+  document.getElementById('basicTitle').textContent = week.basicTitle;
+  document.getElementById('lessonContent').innerHTML = week.content;
+  document.getElementById('resourcesTitle').textContent = '📚 Resources — Week ' + currentWeek;
+  document.querySelectorAll('.week-resources').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.assess-week').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+}
+
+function updateProgress() {
+  const done = completedWeeks.size;
+  const pct = Math.round(done / TOTAL_WEEKS * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').textContent = pct + '%';
+  document.getElementById('weeksComplete').textContent = done + '/' + TOTAL_WEEKS;
+  document.getElementById('videosWatched').textContent = (done*2) + '/' + (TOTAL_WEEKS*2);
+  document.getElementById('assessmentsPassed').textContent = done + '/' + TOTAL_WEEKS;
+}
+
+window.onload = function() {
+  studentInfo.name = localStorage.getItem('cl_firstName') || 'Learner';
+  document.getElementById('studentName').textContent = studentInfo.name;
+  document.getElementById('avatar').textContent = studentInfo.name.charAt(0).toUpperCase();
+  const isLight = localStorage.getItem('cl_theme') === 'light';
+  if(isLight) { document.getElementById('body').classList.add('light-mode'); document.getElementById('themeBtn').textContent = '🌙 Dark'; }
+  updateProgress();
+  selectModule(1);
+};
+
+const weekData = {
+  1: {
+    title: "Week 1: Skeletons as Structures",
+    tutorialVideoId: "yMOLkDEGYdw",
+    tutorialTitle: "Week 1: Frame & Shell Structures",
+    basicVideoId: "r7x-RGfd0Yk",
+    basicTitle: "Week 1: Strong Structures",
+    content: `<h2 style="color:#f44336;">🏗️ Skeletons as Structures — Week 1</h2>
+<div style="background:linear-gradient(135deg,#b71c1c,#d32f2f);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">🦴🏗️</div>
+  <h3 style="color:#fff;margin:8px 0;">Structures in Nature and Technology</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Nature's skeletons inspire human engineering</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul>
+  <li>What a structure is and its purpose</li>
+  <li>The difference between frame and shell structures</li>
+  <li>How animal skeletons work as structures</li>
+  <li>Examples of structures in South Africa</li>
+</ul>
+<h3>🏗️ What is a Structure?</h3>
+<p>A <strong>structure</strong> is something that is built to support a load or force. Structures must be strong, stable and rigid enough to do their job without collapsing.</p>
+<div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:14px;margin:12px 0;border-left:4px solid #f44336;">
+  <h4 style="color:#f44336;">Every structure must:</h4>
+  <p>✅ <strong>Support</strong> a load (weight)</p>
+  <p>✅ <strong>Withstand</strong> forces (wind, water, gravity)</p>
+  <p>✅ <strong>Maintain</strong> its shape</p>
+  <p>✅ Be made from suitable <strong>materials</strong></p>
+</div>
+<h3>🦴 Frame Structures vs Shell Structures</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;">
+  <div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:12px;border:1px solid #f44336;">
+    <h4 style="color:#f44336;">🏗️ Frame Structures</h4>
+    <p style="font-size:0.85rem;">Made of a network of parts joined together. Strong but lightweight.</p>
+    <p style="font-size:0.8rem;color:#aaa;margin-top:6px;">Examples: human skeleton, Eiffel Tower, roof trusses, bicycle frame, power line pylons</p>
+  </div>
+  <div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:12px;border:1px solid #f44336;">
+    <h4 style="color:#f44336;">🐚 Shell Structures</h4>
+    <p style="font-size:0.85rem;">A curved or hollow outer layer that carries the load. Strong outer surface.</p>
+    <p style="font-size:0.8rem;color:#aaa;margin-top:6px;">Examples: tortoise shell, snail shell, egg shell, car body, helmet, tin can</p>
+  </div>
+</div>
+<h3>🦴 The Human Skeleton as a Frame Structure</h3>
+<p>The human skeleton is nature's perfect frame structure. It is lightweight (bones are hollow inside) but incredibly strong. The skeleton supports the body's weight, protects organs and allows movement.</p>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🦴 <strong>206 bones</strong> make up the adult human skeleton</p>
+  <p>🔗 Bones are connected by <strong>ligaments</strong></p>
+  <p>💪 <strong>Muscles</strong> are attached to bones by tendons</p>
+  <p>⚙️ <strong>Joints</strong> allow movement between bones</p>
+  <p>🩸 <strong>Bone marrow</strong> inside bones produces blood cells</p>
+</div>
+<h3>🌍 Structures in South Africa</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🏟️ <strong>FNB Stadium</strong> — a shell structure (Johannesburg)</p>
+  <p>🌉 <strong>Bloukrans Bridge</strong> — a frame arch structure (Garden Route)</p>
+  <p>🗼 <strong>Orlando Towers</strong> — frame structures (Soweto)</p>
+  <p>🏠 <strong>Traditional rondavel</strong> — cone shell roof on cylindrical walls</p>
+  <p>⚡ <strong>Electricity pylons</strong> — frame structures across SA</p>
+</div>
+<h3>🔬 Activity: Identify Structures</h3>
+<div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #f44336;">
+  <p><strong>What to do:</strong> Look around your home and school. Find 5 structures. For each one, write: (1) Name, (2) Frame or Shell structure, (3) What load it supports, (4) What material it is made from.</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Structure</strong> — something built to support a load</p>
+  <p>🔑 <strong>Frame structure</strong> — network of parts joined together</p>
+  <p>🔑 <strong>Shell structure</strong> — hollow curved outer surface carries load</p>
+  <p>🔑 <strong>Load</strong> — force or weight on a structure</p>
+  <p>🔑 <strong>Rigid</strong> — stiff, does not bend or collapse</p>
+  <p>🔑 <strong>Stable</strong> — does not fall over or tip easily</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:16px 0;"><div style="text-align:center;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Fnb_stadium2010.jpg/400px-Fnb_stadium2010.jpg" alt="FNB Stadium — shell structure SA" style="width:100%;border-radius:10px;max-height:180px;object-fit:cover;" onerror="this.parentElement.style.display='none'"><p style="font-size:0.72rem;color:#888;margin-top:4px;">FNB Stadium — shell structure SA</p></div><div style="text-align:center;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Human_skeleton_front_en.svg/200px-Human_skeleton_front_en.svg.png" alt="Skeleton — frame structure" style="width:100%;border-radius:10px;max-height:180px;object-fit:cover;" onerror="this.parentElement.style.display='none'"><p style="font-size:0.72rem;color:#888;margin-top:4px;">Skeleton — frame structure</p></div></div>`,
+    assessment: [
+      { question: "What is the main purpose of a structure?", options: ["To look beautiful", "To support a load or force", "To create jobs", "To use up materials"], correct: 1 },
+      { question: "Which of the following is a FRAME structure?", options: ["An egg shell", "A tortoise shell", "The human skeleton", "A tin can"], correct: 2 },
+      { question: "Which of the following is a SHELL structure?", options: ["A bicycle frame", "An electricity pylon", "A roof truss", "A snail shell"], correct: 3 },
+      { question: "The human skeleton has 206 bones. What type of structure is it?", options: ["Shell structure", "Frame structure", "Solid structure", "Flat structure"], correct: 1 },
+      { question: "What connects bones to other bones?", options: ["Tendons", "Muscles", "Ligaments", "Cartilage"], correct: 2 },
+      { question: "Which South African structure is an example of a shell structure?", options: ["Orlando Towers", "Bloukrans Bridge", "FNB Stadium", "Electricity pylons"], correct: 2 },
+      { question: "What does \"rigid\" mean?", options: ["Can bend easily", "Stiff and does not change shape", "Very heavy", "Made of metal"], correct: 1 },
+      { question: "Bones are hollow inside. Why is this important?", options: ["To make them look nice", "So they can bend", "To make them lightweight but still strong", "To store food"], correct: 2 },
+      { question: "What is a \"load\" in terms of structures?", options: ["A truck on the road", "A force or weight on a structure", "The material used to build", "The colour of a structure"], correct: 1 },
+      { question: "What do muscles attach to in order to allow movement?", options: ["Ligaments", "Other muscles", "Bones via tendons", "Skin"], correct: 2 },
+    ]
+  },
+  2: {
+    title: "Week 2: Skeletons as Structures",
+    tutorialVideoId: "yMOLkDEGYdw",
+    tutorialTitle: "Week 2: Frame & Shell Structures",
+    basicVideoId: "r7x-RGfd0Yk",
+    basicTitle: "Week 2: Strong Structures",
+    content: `<h2 style="color:#f44336;">🏗️ Skeletons as Structures — Week 2</h2>
+<div style="background:linear-gradient(135deg,#b71c1c,#c62828);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">⚙️</div>
+  <h3 style="color:#fff;margin:8px 0;">Making Structures Strong</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Designing and evaluating your own structure</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul>
+  <li>What makes a structure strong and stable</li>
+  <li>How triangles make structures stronger</li>
+  <li>How to design and build a structure</li>
+  <li>How to evaluate and improve a design</li>
+</ul>
+<h3>💪 What Makes a Structure Strong?</h3>
+<p>Engineers and designers think carefully about how to make structures strong. There are several key principles:</p>
+<div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:14px;margin:12px 0;border-left:4px solid #f44336;">
+  <p>📐 <strong>Shape</strong> — triangles are the strongest shape (used in roof trusses, bridges)</p>
+  <p>🧱 <strong>Material</strong> — the right material for the job (steel for bridges, bone for skeletons)</p>
+  <p>🔗 <strong>Joints</strong> — how parts are connected affects strength</p>
+  <p>⚖️ <strong>Base</strong> — a wider base gives more stability</p>
+  <p>📏 <strong>Symmetry</strong> — balanced shapes are more stable</p>
+</div>
+<h3>📐 Why Triangles are the Strongest Shape</h3>
+<p>A <strong>triangle</strong> cannot change shape without changing the length of its sides. This makes triangular frames very rigid and strong. Squares and rectangles can collapse sideways — triangles cannot!</p>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;text-align:center;">
+  <p>🔲 Square → Can collapse sideways ❌</p>
+  <p>🔺 Triangle → Cannot collapse — always rigid ✅</p>
+  <p style="font-size:0.85rem;color:#aaa;margin-top:8px;">This is why roof trusses, bridges and electricity pylons use triangular shapes</p>
+</div>
+<h3>🔬 The Design Process (Technology)</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>1️⃣ <strong>Investigate</strong> — research the problem</p>
+  <p>2️⃣ <strong>Design</strong> — draw and plan your solution</p>
+  <p>3️⃣ <strong>Make</strong> — build your structure</p>
+  <p>4️⃣ <strong>Evaluate</strong> — test it and see if it works</p>
+  <p>5️⃣ <strong>Communicate</strong> — present your findings</p>
+</div>
+<h3>🦴 Comparing Skeletons to Man-Made Structures</h3>
+<div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #f44336;">
+  <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+      <th style="text-align:left;padding:6px;color:#f44336;">Skeleton</th>
+      <th style="text-align:left;padding:6px;color:#f44336;">Man-Made Structure</th>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+      <td style="padding:6px;">Skull (shell)</td><td style="padding:6px;">Helmet / hard hat</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+      <td style="padding:6px;">Rib cage (frame)</td><td style="padding:6px;">Safety cage in a car</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+      <td style="padding:6px;">Spine (column)</td><td style="padding:6px;">Steel column in building</td>
+    </tr>
+    <tr>
+      <td style="padding:6px;">Leg bones (pillars)</td><td style="padding:6px;">Table legs / bridge supports</td>
+    </tr>
+  </table>
+</div>
+<h3>🔬 Design Activity: Build a Bridge</h3>
+<div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #f44336;">
+  <p><strong>Challenge:</strong> Using only 10 strips of newspaper and tape, build a bridge that spans 20cm and holds as many books as possible. Draw your design first. Test it. Write down: How many books did it hold? What would you change to make it stronger?</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Triangle</strong> — strongest shape for structures</p>
+  <p>🔑 <strong>Rigid</strong> — stiff, does not change shape</p>
+  <p>🔑 <strong>Stability</strong> — ability to stay upright without falling</p>
+  <p>🔑 <strong>Design process</strong> — investigate, design, make, evaluate, communicate</p>
+  <p>🔑 <strong>Evaluate</strong> — test and judge how well something works</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:16px 0;"><div style="text-align:center;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Bloukrans_Bridge_bungee.jpg/400px-Bloukrans_Bridge_bungee.jpg" alt="Bloukrans Bridge SA" style="width:100%;border-radius:10px;max-height:180px;object-fit:cover;" onerror="this.parentElement.style.display='none'"><p style="font-size:0.72rem;color:#888;margin-top:4px;">Bloukrans Bridge SA</p></div></div>`,
+    assessment: [
+      { question: "Why is a triangle the strongest shape for structures?", options: ["It looks the best", "It cannot change shape without changing the length of its sides", "It uses the least material", "It is the heaviest shape"], correct: 1 },
+      { question: "A square frame can collapse sideways. How can you make it stronger?", options: ["Add more weight to the top", "Add a diagonal brace to make triangles", "Remove some sides", "Paint it a bright colour"], correct: 1 },
+      { question: "What is the first step in the Technology design process?", options: ["Make the product", "Evaluate the product", "Investigate the problem", "Communicate your findings"], correct: 2 },
+      { question: "Which of the following structures uses triangles to be strong?", options: ["A cylinder", "A sphere", "A roof truss", "A wall"], correct: 2 },
+      { question: "How is a helmet similar to a skull?", options: ["Both are made of bone", "Both are shell structures that protect what is inside", "Both are frame structures", "Both are made of metal"], correct: 1 },
+      { question: "What does \"evaluate\" mean in the design process?", options: ["To build the structure", "To draw the design", "To test and judge how well something works", "To present to the class"], correct: 2 },
+      { question: "Which factor makes a structure MORE stable?", options: ["A narrower base", "A wider base", "Being taller", "Being made of lighter material"], correct: 1 },
+      { question: "A spine in the human body is similar to what man-made structure?", options: ["A bridge", "A roof", "A steel column in a building", "A window"], correct: 2 },
+      { question: "What holds joints in the human skeleton together?", options: ["Tendons", "Ligaments", "Muscles", "Cartilage"], correct: 1 },
+      { question: "In Technology, what does \"communicate\" mean?", options: ["To telephone someone", "To argue with a partner", "To present and share your findings and design", "To write a letter"], correct: 2 },
+    ]
+  }
+};
+</script>
+</body>
+</html>
