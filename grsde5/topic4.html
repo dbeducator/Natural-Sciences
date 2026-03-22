@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Food Chains — Grade 5 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png">
+<style>
+
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #07070c;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .course-title h1 { font-size: 1.8rem; margin-bottom: 5px; }
+  .course-title p { font-size: 0.9rem; opacity: 0.9; }
+
+  .user-info { display: flex; align-items: center; gap: 15px; }
+
+  .avatar {
+    width: 45px; height: 45px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: bold;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+  .progress-overview {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .progress-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    color: white; padding: 20px; border-radius: 12px; text-align: center;
+  }
+  .stat-card h3 { font-size: 2rem; margin-bottom: 5px; }
+  .stat-card p { font-size: 0.9rem; opacity: 0.9; }
+
+  .progress-bar {
+    width: 100%; height: 25px; background: #e0e0e0;
+    border-radius: 15px; overflow: hidden; margin: 20px 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50 0%, #4caf50cc 100%);
+    border-radius: 15px; transition: width 0.5s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 10px; color: white; font-weight: 600; font-size: 0.9rem;
+    min-width: 45px;
+  }
+
+  .tabs {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0; flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 12px 25px; background: #12121f; border: none;
+    border-radius: 10px 10px 0 0; cursor: pointer;
+    font-size: 1rem; font-weight: 600; color: #aaa; transition: all 0.3s ease;
+  }
+  .tab.active { background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%); color: white; }
+
+  .module-selector {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    overflow-x: auto; padding-bottom: 10px;
+  }
+
+  .module-btn {
+    padding: 12px 25px; background: #12121f;
+    border: 2px solid #4caf50; border-radius: 25px;
+    cursor: pointer; font-size: 1rem; font-weight: 600;
+    color: #4caf50; white-space: nowrap; transition: all 0.3s ease;
+  }
+  .module-btn.active {
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    color: white; border-color: transparent;
+  }
+  .module-btn.completed { background: #4caf50; color: white; border-color: #4caf50; }
+
+  .content-section { display: block; height: 0; overflow: hidden; }
+  .content-section.active { height: auto; overflow: visible; }
+
+  .video-section {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .video-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px; margin-top: 20px;
+  }
+
+  .video-player {
+    background: #000; border-radius: 12px; overflow: hidden;
+    position: relative; padding-top: 56.25%;
+  }
+
+  .video-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  }
+
+  .play-btn {
+    width: 70px; height: 70px;
+    background: rgba(102, 126, 234, 0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .play-btn:hover { background: #4caf50; transform: scale(1.1); }
+  .play-btn::after { content: '▶'; color: white; font-size: 2rem; margin-left: 5px; }
+
+  .video-title { margin-top: 15px; font-size: 1.1rem; font-weight: 600; color: #fff; }
+  body.light-mode .video-title { color: #333; }
+
+  .lesson-content {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+  .lesson-content h2 { color: #4caf50; margin-bottom: 20px; font-size: 1.8rem; }
+  .lesson-content h3 { color: #4caf50cc; margin-top: 25px; margin-bottom: 15px; font-size: 1.3rem; }
+  .lesson-content h4 { color: #4caf50; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+  .lesson-content p { line-height: 1.8; margin-bottom: 15px; color: #ccc; }
+  .lesson-content ul { margin-left: 25px; margin-bottom: 15px; }
+  .lesson-content li { margin-bottom: 10px; line-height: 1.6; color: #ccc; }
+
+  .assessment-section {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .quiz-question {
+    background: #1a1a2e; padding: 20px; border-radius: 12px;
+    margin-bottom: 20px; border-left: 4px solid #4caf50;
+  }
+  .quiz-question h4 { margin-bottom: 15px; color: #fff; font-size: 1.1rem; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .quiz-option {
+    padding: 12px 20px; background: #12121f; border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .quiz-option:hover { border-color: #4caf50; background: #f0f4ff; }
+  .quiz-option input { margin-right: 10px; }
+
+  .submit-btn {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    color: white; border: none; border-radius: 25px;
+    font-size: 1.1rem; font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; margin-top: 20px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+  .already-passed-notice {
+    background: #e8f5e9; border: 2px solid #4caf50; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; text-align: center;
+  }
+  .already-passed-notice h3 { color: #2e7d32; margin-bottom: 8px; }
+  .already-passed-notice p { color: #388e3c; }
+
+  .resources-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  a.resource-card { display: block; text-decoration: none; color: inherit; cursor: pointer; }
+  .resource-card {
+    display: block; text-decoration: none; color: inherit;
+    background: #12121f; border-radius: 12px; padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;
+    cursor: pointer; border: 2px solid transparent;
+  }
+  .resource-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: #4caf50; }
+
+  .resource-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.5rem; margin-bottom: 15px;
+  }
+  .resource-card h4 { margin-bottom: 10px; color: #fff; }
+  .resource-card p { color: #aaa; font-size: 0.9rem; }
+
+  .download-badge {
+    display: inline-block; padding: 5px 12px; background: #4caf50;
+    color: white; border-radius: 15px; font-size: 0.75rem; margin-top: 10px;
+  }
+
+  .admin-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white; border: none; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(240,147,251,0.4); z-index: 50; transition: all 0.3s ease;
+  }
+  .admin-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(240,147,251,0.6); }
+
+  @media (max-width: 768px) {
+    .header-content { flex-direction: column; gap: 15px; text-align: center; }
+    .video-grid { grid-template-columns: 1fr; }
+    .module-selector { flex-wrap: wrap; }
+    .resources-grid { grid-template-columns: 1fr; }
+  }
+
+/* ── DARK THEME ADDITIONS ── */
+.lesson-content h2, .lesson-content h3, .lesson-content h4 { color: #c4b5fd; }
+.lesson-content p, .lesson-content li { color: #ccc; }
+.lesson-content strong { color: #e0d7ff; }
+.quiz-option { color: #ccc; }
+.quiz-option:hover { background: rgba(102,126,234,0.15); border-color: #4caf50; }
+.resource-card h4 { color: #fff; }
+.resource-card p { color: #aaa; }
+.already-passed-notice { background: rgba(76,175,80,0.1); border: 2px solid #4caf50; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.already-passed-notice h3 { color: #4caf50; }
+.already-passed-notice p { color: #aaa; }
+
+
+/* ── LIGHT MODE ── */
+body.light-mode { background: #ffffff !important; color: #222 !important; }
+body.light-mode .header { background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%) !important; }
+body.light-mode .progress-overview { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .tabs { background: #f5f5f5 !important; }
+body.light-mode .tab { color: #666 !important; background: transparent !important; }
+body.light-mode .tab.active { background: linear-gradient(135deg, #4caf50, #4caf50cc) !important; color: #fff !important; }
+body.light-mode .module-selector { background: #f5f5f5 !important; }
+body.light-mode .module-btn { background: #fff !important; color: #4caf50 !important; border-color: #4caf50 !important; }
+body.light-mode .module-btn.active { background: linear-gradient(135deg, #4caf50, #4caf50cc) !important; color: #fff !important; }
+body.light-mode .module-btn.completed { background: #4caf50 !important; color: #fff !important; border-color: #4caf50 !important; }
+body.light-mode .video-section { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .lesson-content { background: #fff !important; color: #333 !important; }
+body.light-mode .lesson-content h2, body.light-mode .lesson-content h3, body.light-mode .lesson-content h4 { color: #4caf50 !important; }
+body.light-mode .lesson-content p, body.light-mode .lesson-content li { color: #444 !important; }
+body.light-mode .resource-card { background: #fff !important; border-color: #e0e0e0 !important; }
+body.light-mode .resource-card h4 { color: #222 !important; }
+body.light-mode .resource-card p { color: #666 !important; }
+body.light-mode .quiz-question { background: #f8f9fa !important; }
+body.light-mode .quiz-question h4 { color: #333 !important; }
+body.light-mode .quiz-option { background: #fff !important; border-color: #e0e0e0 !important; color: #333 !important; }
+body.light-mode .live-section { background: #fff !important; }
+body.light-mode .support-card { background: #f8f9fa !important; }
+
+
+.resource-card { display:block; text-decoration:none; color:inherit; }
+.resource-icon { font-size:1.5rem; margin-bottom:8px; }
+.resources-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.already-passed-notice { background:rgba(76,175,80,0.1); border:2px solid #4caf50; border-radius:10px; padding:16px; margin-bottom:20px; }
+.already-passed-notice h3 { color:#4caf50; }
+.assess-week {}
+.theme-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-family:inherit; }
+body.light-mode .theme-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.2); color:#333; }
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button onclick="window.location.href='https://dbeducator.github.io/Natural-Sciences/grade5/index.html'" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:0;">&#8592;</button>
+      <img src="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png" alt="Logo" style="width:36px;height:36px;border-radius:8px;" onerror="this.style.display=&quot;none&quot;">
+      <div class="course-title">
+        <h1>Food Chains</h1>
+        <p>Grade 5 Natural Sciences · Term 1 · Life and Living</p>
+      </div>
+    </div>
+    <div class="user-info">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#9728; Light</button>
+      <div class="avatar" id="avatar">?</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-overview">
+    <h2>Your Progress — <span id="studentName"></span></h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%">0%</div>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-card"><h3 id="weeksComplete">0/2</h3><p>Weeks Complete</p></div>
+      <div class="stat-card"><h3 id="videosWatched">0/4</h3><p>Videos</p></div>
+      <div class="stat-card"><h3 id="assessmentsPassed">0/2</h3><p>Passed</p></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('content', this)">Content</button>
+    <button class="tab" onclick="showTab('resources', this)">Resources</button>
+    <button class="tab" onclick="showTab('assessment', this)">Assessment</button>
+  </div>
+
+  <div class="module-selector">
+    <button class="module-btn active" onclick="selectModule(1)">Week 1</button>
+    <button class="module-btn" onclick="selectModule(2)">Week 2</button>
+  </div>
+
+  <div id="content" class="content-section active">
+    <div class="video-section">
+      <h2 id="weekTitle" style="margin-bottom:15px;">Videos</h2>
+      <div class="video-grid">
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="tutorialVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="tutorialTitle">Loading...</div>
+        </div>
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="basicVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="basicTitle">Loading...</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+
+  <div id="resources" class="content-section">
+    <h2 id="resourcesTitle" style="margin-bottom:20px;">Resources</h2>
+  <div class="week-resources" data-week="1">
+    <h3 style="color:#4caf50;margin-bottom:16px;">📚 Week 1 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/fch-w1-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts and definitions</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/fch-w1-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/fch-w1-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation Guide</h4><p>Hands-on practical investigation</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/fch-w1-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  <div class="week-resources" data-week="2" style="display:none;">
+    <h3 style="color:#4caf50;margin-bottom:16px;">📚 Week 2 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/fch-w2-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts and definitions</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/fch-w2-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/fch-w2-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation Guide</h4><p>Hands-on practical investigation</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/fch-w2-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  </div>
+
+  <div id="assessment" class="content-section">
+    <div id="assessmentContent">
+<div class="assess-week" data-week="1" style="display:block;">
+<h2>Week 1 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: In a food chain, arrows show...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q0" value="0" onchange="saveAnswer(1,0,0)"> Where animals live</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="1" onchange="saveAnswer(1,0,1)"> The direction of energy flow</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="2" onchange="saveAnswer(1,0,2)"> Which animals are friends</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="3" onchange="saveAnswer(1,0,3)"> The size of animals</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: Which organism is ALWAYS found at the START of a food chain?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q1" value="0" onchange="saveAnswer(1,1,0)"> Lion</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="1" onchange="saveAnswer(1,1,1)"> Eagle</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="2" onchange="saveAnswer(1,1,2)"> Green plant</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="3" onchange="saveAnswer(1,1,3)"> Frog</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: A grasshopper eats grass. The grasshopper is a...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q2" value="0" onchange="saveAnswer(1,2,0)"> Producer</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="1" onchange="saveAnswer(1,2,1)"> Decomposer</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="2" onchange="saveAnswer(1,2,2)"> Primary consumer</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="3" onchange="saveAnswer(1,2,3)"> Apex predator</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: Decomposers are important because they...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q3" value="0" onchange="saveAnswer(1,3,0)"> Hunt prey</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="1" onchange="saveAnswer(1,3,1)"> Make their own food</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="2" onchange="saveAnswer(1,3,2)"> Recycle nutrients back into the soil</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="3" onchange="saveAnswer(1,3,3)"> Protect plants from insects</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: Which of these is an APEX PREDATOR in the South African savanna?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q4" value="0" onchange="saveAnswer(1,4,0)"> Zebra</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="1" onchange="saveAnswer(1,4,1)"> Grass</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="2" onchange="saveAnswer(1,4,2)"> Impala</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="3" onchange="saveAnswer(1,4,3)"> Lion</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: What is the SOURCE of all energy in a food chain?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q5" value="0" onchange="saveAnswer(1,5,0)"> The soil</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="1" onchange="saveAnswer(1,5,1)"> The water</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="2" onchange="saveAnswer(1,5,2)"> The sun</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="3" onchange="saveAnswer(1,5,3)"> The plants</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: A mushroom growing on a dead log is a...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q6" value="0" onchange="saveAnswer(1,6,0)"> Producer</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="1" onchange="saveAnswer(1,6,1)"> Primary consumer</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="2" onchange="saveAnswer(1,6,2)"> Decomposer</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="3" onchange="saveAnswer(1,6,3)"> Apex predator</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: What do we call an animal that eats BOTH plants and animals?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q7" value="0" onchange="saveAnswer(1,7,0)"> Herbivore</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="1" onchange="saveAnswer(1,7,1)"> Carnivore</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="2" onchange="saveAnswer(1,7,2)"> Omnivore</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="3" onchange="saveAnswer(1,7,3)"> Decomposer</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: In the food chain: Grass → Zebra → Lion, what is the ZEBRA?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q8" value="0" onchange="saveAnswer(1,8,0)"> A producer</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="1" onchange="saveAnswer(1,8,1)"> A primary consumer</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="2" onchange="saveAnswer(1,8,2)"> A secondary consumer</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="3" onchange="saveAnswer(1,8,3)"> A decomposer</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: Why are producers essential to ALL food chains?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q9" value="0" onchange="saveAnswer(1,9,0)"> They are the biggest organisms</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="1" onchange="saveAnswer(1,9,1)"> They capture the sun's energy and make food available to all other organisms</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="2" onchange="saveAnswer(1,9,2)"> They eat decomposers</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="3" onchange="saveAnswer(1,9,3)"> They produce water</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_FCH_1.html" onclick="localStorage.setItem('cl_submit_course','FCH');localStorage.setItem('cl_submit_week','1');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+<div class="assess-week" data-week="2" style="display:none;">
+<h2>Week 2 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: A food WEB is different from a food CHAIN because a food web...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q0" value="0" onchange="saveAnswer(2,0,0)"> Has fewer organisms</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="1" onchange="saveAnswer(2,0,1)"> Shows many interconnected feeding relationships</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="2" onchange="saveAnswer(2,0,2)"> Only shows plants</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="3" onchange="saveAnswer(2,0,3)"> Only shows predators</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: If all the lions in a savanna were removed, what would most likely happen?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q1" value="0" onchange="saveAnswer(2,1,0)"> More grass would grow</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="1" onchange="saveAnswer(2,1,1)"> The zebra population would decrease</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="2" onchange="saveAnswer(2,1,2)"> The zebra population would increase too much</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="3" onchange="saveAnswer(2,1,3)"> Nothing would change</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: Which human activity most directly breaks ocean food chains?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q2" value="0" onchange="saveAnswer(2,2,0)"> Swimming in the sea</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="1" onchange="saveAnswer(2,2,1)"> Overfishing</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="2" onchange="saveAnswer(2,2,2)"> Building sandcastles</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="3" onchange="saveAnswer(2,2,3)"> Visiting the beach</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: Bioaccumulation means...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q3" value="0" onchange="saveAnswer(2,3,0)"> Animals eating too much</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="1" onchange="saveAnswer(2,3,1)"> Toxins building up in a food chain</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="2" onchange="saveAnswer(2,3,2)"> Plants growing too fast</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="3" onchange="saveAnswer(2,3,3)"> Decomposers breaking down food</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: Which of the following would DISRUPT a food chain the most?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q4" value="0" onchange="saveAnswer(2,4,0)"> Adding more decomposers</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="1" onchange="saveAnswer(2,4,1)"> Removing all the producers (plants)</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="2" onchange="saveAnswer(2,4,2)"> Adding more herbivores</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="3" onchange="saveAnswer(2,4,3)"> Adding more apex predators</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: In a food web, one animal eats many different prey. This makes the ecosystem...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q5" value="0" onchange="saveAnswer(2,5,0)"> More unstable</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="1" onchange="saveAnswer(2,5,1)"> More stable — if one prey disappears, the animal can eat another</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="2" onchange="saveAnswer(2,5,2)"> Less diverse</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="3" onchange="saveAnswer(2,5,3)"> Less productive</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: What is the Benguela Current?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q6" value="0" onchange="saveAnswer(2,6,0)"> A river in South Africa</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="1" onchange="saveAnswer(2,6,1)"> A cold ocean current off the West Coast that supports a rich food web</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="2" onchange="saveAnswer(2,6,2)"> A type of food chain</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="3" onchange="saveAnswer(2,6,3)"> A national park</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: Phytoplankton are microscopic plants in the ocean. They are...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q7" value="0" onchange="saveAnswer(2,7,0)"> Consumers</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="1" onchange="saveAnswer(2,7,1)"> Apex predators</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="2" onchange="saveAnswer(2,7,2)"> Decomposers</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="3" onchange="saveAnswer(2,7,3)"> Producers — the base of ocean food chains</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: Pesticides sprayed on crops kill insects. How does this affect birds that eat insects?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q8" value="0" onchange="saveAnswer(2,8,0)"> Birds eat more insects</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="1" onchange="saveAnswer(2,8,1)"> Birds are unaffected</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="2" onchange="saveAnswer(2,8,2)"> Birds lose a food source and their population may decline</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="3" onchange="saveAnswer(2,8,3)"> Birds eat the pesticides directly</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: What would happen if ALL the decomposers in a forest disappeared?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q9" value="0" onchange="saveAnswer(2,9,0)"> Plants would grow faster</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="1" onchange="saveAnswer(2,9,1)"> Dead matter would pile up and nutrients would not be recycled back into the soil</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="2" onchange="saveAnswer(2,9,2)"> Animals would find more food</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="3" onchange="saveAnswer(2,9,3)"> Nothing would change</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_FCH_2.html" onclick="localStorage.setItem('cl_submit_course','FCH');localStorage.setItem('cl_submit_week','2');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:30px;">
+    <a href="https://dbeducator.github.io/Natural-Sciences/grade5/results.html" class="admin-btn" style="text-decoration:none;display:inline-block;">View My Results</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'coachL_FCH_';
+const TOTAL_WEEKS = 2;
+const COURSE_NAME = 'Food Chains';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz89hcA4Z70ZyOKnk2MBBc5kVWKG5aXljNgSzpXZbfXDOhGvtpeZXGSOadoZB_RdyPK/exec';
+const SECRET_KEY = 'CoachL2025SecureKey';
+const BASE_URL = 'https://dbeducator.github.io/Natural-Sciences/grade5/';
+const coursePrefixForSubmit = 'FCH';
+
+const CORRECT_ANSWERS = {
+  1: [1, 2, 2, 2, 3, 2, 2, 2, 1, 1],
+  2: [1, 2, 1, 1, 1, 1, 1, 3, 2, 1],
+};
+Object.keys(CORRECT_ANSWERS).forEach(function(w) {
+  localStorage.setItem(STORAGE_PREFIX + 'correct_' + w, JSON.stringify(CORRECT_ANSWERS[parseInt(w)]));
+});
+
+let currentWeek = 1;
+let completedWeeks = new Set(JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'completedWeeks') || '[]'));
+let studentInfo = { name: '', email: '' };
+
+function toggleTheme() {
+  const isLight = document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').innerHTML = isLight ? '&#9790; Dark' : '&#9728; Light';
+}
+
+function saveAnswer(week, q, val) {
+  var k = STORAGE_PREFIX + 'answers_' + week;
+  var saved = JSON.parse(localStorage.getItem(k) || '{}');
+  saved['q' + q] = val;
+  localStorage.setItem(k, JSON.stringify(saved));
+}
+
+function selectModule(week) {
+  currentWeek = week;
+  refreshModuleButtons();
+  updateWeekContent();
+}
+
+function refreshModuleButtons() {
+  document.querySelectorAll('.module-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (completedWeeks.has(i+1)) {
+      btn.classList.add('completed');
+      btn.textContent = 'Week ' + (i+1) + ' ✓';
+    } else {
+      btn.textContent = 'Week ' + (i+1);
+    }
+  });
+  document.querySelectorAll('.module-btn')[currentWeek - 1].classList.add('active');
+}
+
+function showTab(tabName, tabBtn) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  if (tabBtn) tabBtn.classList.add('active');
+}
+
+function updateVideoSection() {
+  const v = weekVideos[currentWeek];
+  document.getElementById('tutorialVideo').innerHTML = '<iframe src="https://www.youtube.com/embed/' + v.t + '?rel=0&modestbranding=1&iv_load_policy=3" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>';
+  document.getElementById('basicVideo').innerHTML = '<iframe src="https://www.youtube.com/embed/' + v.b + '?rel=0&modestbranding=1&iv_load_policy=3" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>';
+  document.getElementById('tutorialTitle').textContent = v.tTitle;
+  document.getElementById('basicTitle').textContent = v.bTitle;
+  document.getElementById('weekTitle').textContent = 'Videos — Week ' + currentWeek;
+}
+
+function updateWeekContent() {
+  const week = weekData[currentWeek];
+  updateVideoSection();
+  document.getElementById('lessonContent').innerHTML = week.content;
+  document.getElementById('resourcesTitle').textContent = 'Resources — Week ' + currentWeek;
+  document.querySelectorAll('.week-resources').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.assess-week').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+}
+
+function updateProgress() {
+  const done = completedWeeks.size;
+  const pct = Math.round(done / TOTAL_WEEKS * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').textContent = pct + '%';
+  document.getElementById('weeksComplete').textContent = done + '/' + TOTAL_WEEKS;
+  document.getElementById('videosWatched').textContent = (done*2) + '/' + (TOTAL_WEEKS*2);
+  document.getElementById('assessmentsPassed').textContent = done + '/' + TOTAL_WEEKS;
+}
+
+window.onload = function() {
+  studentInfo.name = localStorage.getItem('cl_firstName') || 'Learner';
+  document.getElementById('studentName').textContent = studentInfo.name;
+  document.getElementById('avatar').textContent = studentInfo.name.charAt(0).toUpperCase();
+  const isLight = localStorage.getItem('cl_theme') === 'light';
+  if(isLight) { document.getElementById('body').classList.add('light-mode'); document.getElementById('themeBtn').innerHTML = '&#9790; Dark'; }
+  updateProgress();
+  selectModule(1);
+};
+
+const weekVideos = {
+  1: {t:'x0lauGbQWvQ',tTitle:'Week 1: Food Chains and Energy Flow',b:'x0lauGbQWvQ',bTitle:'Food Chains and Energy Flow — Key Concepts'},
+  2: {t:'x0lauGbQWvQ',tTitle:'Week 2: Food Webs and Ecosystem Balance',b:'x0lauGbQWvQ',bTitle:'Food Webs and Ecosystem Balance — Key Concepts'}
+};
+
+const weekData = {
+  1: {
+    content: `<h2>🌿 Food Chains — Week 1</h2>
+<div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">☀️→🌱→🐛→🐦→🦅</div>
+  <h3 style="color:#fff;margin:8px 0;">Energy Flows Through Living Things</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">All energy comes from the sun</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>What a food chain is and how it works</li><li>The roles of producers, consumers and decomposers</li><li>How to draw and read a food chain</li><li>South African food chain examples</li></ul>
+<h3>☀️ Energy from the Sun</h3>
+<p>All food chains start with the <strong>sun</strong>. The sun's energy is captured by plants through <strong>photosynthesis</strong>. This energy then passes from one organism to the next along the food chain.</p>
+<div style="background:rgba(255,193,7,0.1);border-radius:10px;padding:14px;margin:12px 0;border-left:4px solid #ffc107;">
+  <h4 style="color:#ffc107;">☀️ The Sun is the Source of All Energy</h4>
+  <p>Sun → Plants → Herbivores → Carnivores → Top Predators</p>
+  <p style="font-size:0.85rem;color:#aaa;margin-top:6px;">Each arrow in a food chain means "is eaten by" or "provides energy for"</p>
+</div>
+<h3>🌱 Producers</h3>
+<p><strong>Producers</strong> are plants and algae that make their own food using sunlight. They are ALWAYS at the start of a food chain.</p>
+<div style="background:rgba(76,175,80,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #4caf50;">
+  <p>Examples: grass, trees, algae, phytoplankton, crops, seaweed</p>
+</div>
+<h3>🦁 Consumers</h3>
+<p><strong>Consumers</strong> are animals that eat other organisms. There are different levels:</p>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🌿 <strong>Primary consumers (Herbivores)</strong> — eat plants directly</p>
+  <p style="font-size:0.85rem;color:#aaa;margin-left:16px;">e.g. zebra, rabbit, caterpillar, springbok, grasshopper</p>
+  <p style="margin-top:10px;">🥩 <strong>Secondary consumers (Carnivores/Omnivores)</strong> — eat herbivores</p>
+  <p style="font-size:0.85rem;color:#aaa;margin-left:16px;">e.g. frog, jackal, small birds, fox</p>
+  <p style="margin-top:10px;">👑 <strong>Tertiary consumers (Apex predators)</strong> — at the top, not eaten by others</p>
+  <p style="font-size:0.85rem;color:#aaa;margin-left:16px;">e.g. lion, eagle, shark, crocodile, orca</p>
+</div>
+<h3>🍄 Decomposers</h3>
+<p><strong>Decomposers</strong> break down dead plants and animals and return nutrients to the soil. Without them, nutrients would never be recycled!</p>
+<div style="background:rgba(121,85,72,0.2);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #795548;">
+  <p>Examples: bacteria, fungi (mushrooms and mould), earthworms, millipedes, dung beetles</p>
+</div>
+<h3>🌍 South African Food Chain Examples</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🌾 <strong>Savanna:</strong> Grass → Zebra → Lion → Bacteria (decomposers)</p>
+  <p>🌊 <strong>Ocean:</strong> Phytoplankton → Sardine → Cape Gannet → Great White Shark</p>
+  <p>🌿 <strong>Grassland:</strong> Grass → Grasshopper → Frog → Snake → Eagle</p>
+  <p>🏔️ <strong>Fynbos:</strong> Fynbos plants → Tortoise → Mongoose → Caracal</p>
+</div>
+<h3>🔬 Activity: Draw a Food Chain</h3>
+<div style="background:rgba(76,175,80,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #4caf50;">
+  <p><strong>What to do:</strong> Draw a food chain with at least 4 organisms from the South African savanna. Label each organism as producer, primary consumer, secondary consumer or decomposer. Draw arrows to show energy flow.</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Food chain</strong> — sequence showing how energy passes between organisms</p>
+  <p>🔑 <strong>Producer</strong> — makes own food (plants)</p>
+  <p>🔑 <strong>Consumer</strong> — eats other organisms (animals)</p>
+  <p>🔑 <strong>Decomposer</strong> — breaks down dead matter</p>
+  <p>🔑 <strong>Herbivore</strong> — eats only plants</p>
+  <p>🔑 <strong>Carnivore</strong> — eats only animals</p>
+  <p>🔑 <strong>Omnivore</strong> — eats both plants and animals</p>
+  <p>🔑 <strong>Apex predator</strong> — top predator, not eaten by others</p>
+</div>
+  <h3 style="color:#fff;margin:8px 0;">Food Webs & Ecosystem Balance</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Multiple food chains linked together form a food web</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>The difference between a food chain and a food web</li><li>How removing one species affects the whole ecosystem</li><li>What happens when an apex predator is removed</li><li>Human impact on food chains</li></ul>
+<h3>🕸️ What is a Food Web?</h3>
+<p>A <strong>food web</strong> shows all the feeding relationships in an ecosystem. Most animals eat more than one type of food, so food webs are more realistic than simple food chains.</p>
+<div style="background:rgba(76,175,80,0.1);border-radius:10px;padding:14px;margin:12px 0;border-left:4px solid #4caf50;">
+  <h4 style="color:#4caf50;">Food Chain vs Food Web</h4>
+  <p>🔗 <strong>Food chain</strong> — simple, linear, one path</p>
+  <p>🕸️ <strong>Food web</strong> — complex, many paths, more accurate</p>
+  <p style="font-size:0.85rem;color:#aaa;margin-top:6px;">A lion in the Kruger Park might eat zebra, wildebeest, buffalo or warthog — this is best shown in a food web!</p>
+</div>
+<h3>⚖️ Ecosystem Balance</h3>
+<p>In a healthy ecosystem, populations of predators and prey are <strong>balanced</strong>. If the balance is disturbed, the whole ecosystem is affected.</p>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <h4>Example: What if lions disappeared from the Kruger Park?</h4>
+  <p>🦁 No lions → 🦓 Too many zebra → 🌾 Grass disappears → 🐛 Insects and small animals lose food → 🦅 Eagles lose prey → Whole ecosystem collapses</p>
+</div>
+<h3>👨‍👩‍👧 Human Impact on Food Chains</h3>
+<div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #f44336;">
+  <p>⚠️ <strong>Overfishing</strong> — removing too many fish disrupts ocean food chains</p>
+  <p>⚠️ <strong>Pesticides</strong> — chemicals used in farming kill insects (food for birds)</p>
+  <p>⚠️ <strong>Pollution</strong> — toxins build up in food chains (bioaccumulation)</p>
+  <p>⚠️ <strong>Habitat destruction</strong> — removing habitats destroys food sources</p>
+  <p>⚠️ <strong>Poaching</strong> — removing apex predators destabilises ecosystems</p>
+</div>
+<h3>🌊 South African Food Web Example</h3>
+<div style="background:rgba(33,150,243,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #2196f3;">
+  <p><strong>Benguela Current (West Coast Ocean):</strong></p>
+  <p>Phytoplankton → Zooplankton → Anchovy → Cape Gannet / Hake / Seal → Great White Shark</p>
+  <p style="margin-top:8px;">Phytoplankton → Krill → Whale → nothing (apex)</p>
+  <p style="font-size:0.85rem;color:#aaa;margin-top:8px;">Note how the anchovy appears in multiple food chains — this is what makes a food WEB</p>
+</div>
+<h3>🔬 Activity: Build a Food Web</h3>
+<div style="background:rgba(76,175,80,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #4caf50;">
+  <p><strong>What to do:</strong> Using the Kruger Park animals (grass, acacia tree, zebra, impala, elephant, lion, leopard, hyena, vulture, termites, bacteria), draw a food web connecting at least 8 organisms. Use arrows to show energy flow. Then answer: What would happen if all the lions were removed?</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Food web</strong> — overlapping food chains in an ecosystem</p>
+  <p>🔑 <strong>Ecosystem</strong> — all living and non-living things in an area</p>
+  <p>🔑 <strong>Population</strong> — all organisms of one species in an area</p>
+  <p>🔑 <strong>Bioaccumulation</strong> — build-up of toxins in a food chain</p>
+  <p>🔑 <strong>Overfishing</strong> — catching too many fish, disturbing ocean food chains</p>
+</div>
+</div>`,
+    assessment: [
+      { question: "A food WEB is different from a food CHAIN because a food web...", options: ["Has fewer organisms", "Shows many interconnected feeding relationships", "Only shows plants", "Only shows predators"], correct: 1 },
+      { question: "If all the lions in a savanna were removed, what would most likely happen?", options: ["More grass would grow", "The zebra population would decrease", "The zebra population would increase too much", "Nothing would change"], correct: 2 },
+      { question: "Which human activity most directly breaks ocean food chains?", options: ["Swimming in the sea", "Overfishing", "Building sandcastles", "Visiting the beach"], correct: 1 },
+      { question: "Bioaccumulation means...", options: ["Animals eating too much", "Toxins building up in a food chain", "Plants growing too fast", "Decomposers breaking down food"], correct: 1 },
+      { question: "Which of the following would DISRUPT a food chain the most?", options: ["Adding more decomposers", "Removing all the producers (plants)", "Adding more herbivores", "Adding more apex predators"], correct: 1 },
+      { question: "In a food web, one animal eats many different prey. This makes the ecosystem...", options: ["More unstable", "More stable — if one prey disappears, the animal can eat another", "Less diverse", "Less productive"], correct: 1 },
+      { question: "What is the Benguela Current?", options: ["A river in South Africa", "A cold ocean current off the West Coast that supports a rich food web", "A type of food chain", "A national park"], correct: 1 },
+      { question: "Phytoplankton are microscopic plants in the ocean. They are...", options: ["Consumers", "Apex predators", "Decomposers", "Producers — the base of ocean food chains"], correct: 3 },
+      { question: "Pesticides sprayed on crops kill insects. How does this affect birds that eat insects?", options: ["Birds eat more insects", "Birds are unaffected", "Birds lose a food source and their population may decline", "Birds eat the pesticides directly"], correct: 2 },
+      { question: "What would happen if ALL the decomposers in a forest disappeared?", options: ["Plants would grow faster", "Dead matter would pile up and nutrients would not be recycled back into the soil", "Animals would find more food", "Nothing would change"], correct: 1 },
+    ]
+  }
+};
+</script>
+</body>
+</html>
