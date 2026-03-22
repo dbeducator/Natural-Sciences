@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Uses of Metals — Grade 5 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png">
+<style>
+
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #07070c;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #2196f3 0%, #2196f3cc 100%);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .course-title h1 { font-size: 1.8rem; margin-bottom: 5px; }
+  .course-title p { font-size: 0.9rem; opacity: 0.9; }
+
+  .user-info { display: flex; align-items: center; gap: 15px; }
+
+  .avatar {
+    width: 45px; height: 45px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: bold;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+  .progress-overview {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .progress-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #2196f3 0%, #2196f3cc 100%);
+    color: white; padding: 20px; border-radius: 12px; text-align: center;
+  }
+  .stat-card h3 { font-size: 2rem; margin-bottom: 5px; }
+  .stat-card p { font-size: 0.9rem; opacity: 0.9; }
+
+  .progress-bar {
+    width: 100%; height: 25px; background: #e0e0e0;
+    border-radius: 15px; overflow: hidden; margin: 20px 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2196f3 0%, #2196f3cc 100%);
+    border-radius: 15px; transition: width 0.5s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 10px; color: white; font-weight: 600; font-size: 0.9rem;
+    min-width: 45px;
+  }
+
+  .tabs {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0; flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 12px 25px; background: #12121f; border: none;
+    border-radius: 10px 10px 0 0; cursor: pointer;
+    font-size: 1rem; font-weight: 600; color: #aaa; transition: all 0.3s ease;
+  }
+  .tab.active { background: linear-gradient(135deg, #2196f3 0%, #2196f3cc 100%); color: white; }
+
+  .module-selector {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    overflow-x: auto; padding-bottom: 10px;
+  }
+
+  .module-btn {
+    padding: 12px 25px; background: #12121f;
+    border: 2px solid #2196f3; border-radius: 25px;
+    cursor: pointer; font-size: 1rem; font-weight: 600;
+    color: #2196f3; white-space: nowrap; transition: all 0.3s ease;
+  }
+  .module-btn.active {
+    background: linear-gradient(135deg, #2196f3 0%, #2196f3cc 100%);
+    color: white; border-color: transparent;
+  }
+  .module-btn.completed { background: #4caf50; color: white; border-color: #4caf50; }
+
+  .content-section { display: block; height: 0; overflow: hidden; }
+  .content-section.active { height: auto; overflow: visible; }
+
+  .video-section {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .video-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px; margin-top: 20px;
+  }
+
+  .video-player {
+    background: #000; border-radius: 12px; overflow: hidden;
+    position: relative; padding-top: 56.25%;
+  }
+
+  .video-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  }
+
+  .play-btn {
+    width: 70px; height: 70px;
+    background: rgba(102, 126, 234, 0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .play-btn:hover { background: #2196f3; transform: scale(1.1); }
+  .play-btn::after { content: '▶'; color: white; font-size: 2rem; margin-left: 5px; }
+
+  .video-title { margin-top: 15px; font-size: 1.1rem; font-weight: 600; color: #fff; }
+  body.light-mode .video-title { color: #333; }
+
+  .lesson-content {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+  .lesson-content h2 { color: #2196f3; margin-bottom: 20px; font-size: 1.8rem; }
+  .lesson-content h3 { color: #2196f3cc; margin-top: 25px; margin-bottom: 15px; font-size: 1.3rem; }
+  .lesson-content h4 { color: #2196f3; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+  .lesson-content p { line-height: 1.8; margin-bottom: 15px; color: #ccc; }
+  .lesson-content ul { margin-left: 25px; margin-bottom: 15px; }
+  .lesson-content li { margin-bottom: 10px; line-height: 1.6; color: #ccc; }
+
+  .assessment-section {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .quiz-question {
+    background: #1a1a2e; padding: 20px; border-radius: 12px;
+    margin-bottom: 20px; border-left: 4px solid #2196f3;
+  }
+  .quiz-question h4 { margin-bottom: 15px; color: #fff; font-size: 1.1rem; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .quiz-option {
+    padding: 12px 20px; background: #12121f; border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .quiz-option:hover { border-color: #2196f3; background: #f0f4ff; }
+  .quiz-option input { margin-right: 10px; }
+
+  .submit-btn {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #2196f3 0%, #2196f3cc 100%);
+    color: white; border: none; border-radius: 25px;
+    font-size: 1.1rem; font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; margin-top: 20px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+  .already-passed-notice {
+    background: #e8f5e9; border: 2px solid #4caf50; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; text-align: center;
+  }
+  .already-passed-notice h3 { color: #2e7d32; margin-bottom: 8px; }
+  .already-passed-notice p { color: #388e3c; }
+
+  .resources-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  a.resource-card { display: block; text-decoration: none; color: inherit; cursor: pointer; }
+  .resource-card {
+    display: block; text-decoration: none; color: inherit;
+    background: #12121f; border-radius: 12px; padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;
+    cursor: pointer; border: 2px solid transparent;
+  }
+  .resource-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: #2196f3; }
+
+  .resource-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #2196f3 0%, #2196f3cc 100%);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.5rem; margin-bottom: 15px;
+  }
+  .resource-card h4 { margin-bottom: 10px; color: #fff; }
+  .resource-card p { color: #aaa; font-size: 0.9rem; }
+
+  .download-badge {
+    display: inline-block; padding: 5px 12px; background: #4caf50;
+    color: white; border-radius: 15px; font-size: 0.75rem; margin-top: 10px;
+  }
+
+  .admin-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white; border: none; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(240,147,251,0.4); z-index: 50; transition: all 0.3s ease;
+  }
+  .admin-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(240,147,251,0.6); }
+
+  @media (max-width: 768px) {
+    .header-content { flex-direction: column; gap: 15px; text-align: center; }
+    .video-grid { grid-template-columns: 1fr; }
+    .module-selector { flex-wrap: wrap; }
+    .resources-grid { grid-template-columns: 1fr; }
+  }
+
+/* ── DARK THEME ADDITIONS ── */
+.lesson-content h2, .lesson-content h3, .lesson-content h4 { color: #c4b5fd; }
+.lesson-content p, .lesson-content li { color: #ccc; }
+.lesson-content strong { color: #e0d7ff; }
+.quiz-option { color: #ccc; }
+.quiz-option:hover { background: rgba(102,126,234,0.15); border-color: #2196f3; }
+.resource-card h4 { color: #fff; }
+.resource-card p { color: #aaa; }
+.already-passed-notice { background: rgba(76,175,80,0.1); border: 2px solid #4caf50; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.already-passed-notice h3 { color: #4caf50; }
+.already-passed-notice p { color: #aaa; }
+
+
+/* ── LIGHT MODE ── */
+body.light-mode { background: #ffffff !important; color: #222 !important; }
+body.light-mode .header { background: linear-gradient(135deg, #2196f3 0%, #2196f3cc 100%) !important; }
+body.light-mode .progress-overview { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .tabs { background: #f5f5f5 !important; }
+body.light-mode .tab { color: #666 !important; background: transparent !important; }
+body.light-mode .tab.active { background: linear-gradient(135deg, #2196f3, #2196f3cc) !important; color: #fff !important; }
+body.light-mode .module-selector { background: #f5f5f5 !important; }
+body.light-mode .module-btn { background: #fff !important; color: #2196f3 !important; border-color: #2196f3 !important; }
+body.light-mode .module-btn.active { background: linear-gradient(135deg, #2196f3, #2196f3cc) !important; color: #fff !important; }
+body.light-mode .module-btn.completed { background: #4caf50 !important; color: #fff !important; border-color: #4caf50 !important; }
+body.light-mode .video-section { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .lesson-content { background: #fff !important; color: #333 !important; }
+body.light-mode .lesson-content h2, body.light-mode .lesson-content h3, body.light-mode .lesson-content h4 { color: #2196f3 !important; }
+body.light-mode .lesson-content p, body.light-mode .lesson-content li { color: #444 !important; }
+body.light-mode .resource-card { background: #fff !important; border-color: #e0e0e0 !important; }
+body.light-mode .resource-card h4 { color: #222 !important; }
+body.light-mode .resource-card p { color: #666 !important; }
+body.light-mode .quiz-question { background: #f8f9fa !important; }
+body.light-mode .quiz-question h4 { color: #333 !important; }
+body.light-mode .quiz-option { background: #fff !important; border-color: #e0e0e0 !important; color: #333 !important; }
+body.light-mode .live-section { background: #fff !important; }
+body.light-mode .support-card { background: #f8f9fa !important; }
+
+
+.resource-card { display:block; text-decoration:none; color:inherit; }
+.resource-icon { font-size:1.5rem; margin-bottom:8px; }
+.resources-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.already-passed-notice { background:rgba(76,175,80,0.1); border:2px solid #4caf50; border-radius:10px; padding:16px; margin-bottom:20px; }
+.already-passed-notice h3 { color:#4caf50; }
+.assess-week {}
+.theme-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-family:inherit; }
+body.light-mode .theme-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.2); color:#333; }
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button onclick="window.location.href='https://dbeducator.github.io/Natural-Sciences/grade5/index.html'" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:0;">&#8592;</button>
+      <img src="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png" alt="Logo" style="width:36px;height:36px;border-radius:8px;" onerror="this.style.display=&quot;none&quot;">
+      <div class="course-title">
+        <h1>Uses of Metals</h1>
+        <p>Grade 5 Natural Sciences · Term 2 · Matter and Materials</p>
+      </div>
+    </div>
+    <div class="user-info">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#9728; Light</button>
+      <div class="avatar" id="avatar">?</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-overview">
+    <h2>Your Progress — <span id="studentName"></span></h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%">0%</div>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-card"><h3 id="weeksComplete">0/2</h3><p>Weeks Complete</p></div>
+      <div class="stat-card"><h3 id="videosWatched">0/4</h3><p>Videos</p></div>
+      <div class="stat-card"><h3 id="assessmentsPassed">0/2</h3><p>Passed</p></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('content', this)">Content</button>
+    <button class="tab" onclick="showTab('resources', this)">Resources</button>
+    <button class="tab" onclick="showTab('assessment', this)">Assessment</button>
+  </div>
+
+  <div class="module-selector">
+    <button class="module-btn active" onclick="selectModule(1)">Week 1</button>
+    <button class="module-btn" onclick="selectModule(2)">Week 2</button>
+  </div>
+
+  <div id="content" class="content-section active">
+    <div class="video-section">
+      <h2 id="weekTitle" style="margin-bottom:15px;">Videos</h2>
+      <div class="video-grid">
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="tutorialVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="tutorialTitle">Loading...</div>
+        </div>
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="basicVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="basicTitle">Loading...</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+
+  <div id="resources" class="content-section">
+    <h2 id="resourcesTitle" style="margin-bottom:20px;">Resources</h2>
+  <div class="week-resources" data-week="1">
+    <h3 style="color:#2196f3;margin-bottom:16px;">📚 Week 1 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/uom-w1-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts and definitions</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/uom-w1-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/uom-w1-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation Guide</h4><p>Hands-on practical investigation</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/uom-w1-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  <div class="week-resources" data-week="2" style="display:none;">
+    <h3 style="color:#2196f3;margin-bottom:16px;">📚 Week 2 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/uom-w2-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts and definitions</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/uom-w2-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/uom-w2-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation Guide</h4><p>Hands-on practical investigation</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/uom-w2-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  </div>
+
+  <div id="assessment" class="content-section">
+    <div id="assessmentContent">
+<div class="assess-week" data-week="1" style="display:block;">
+<h2>Week 1 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: Why is copper used for electrical wiring?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q0" value="0" onchange="saveAnswer(1,0,0)"> It is the cheapest metal</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="1" onchange="saveAnswer(1,0,1)"> It is the lightest metal</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="2" onchange="saveAnswer(1,0,2)"> It is an excellent conductor of electricity</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="3" onchange="saveAnswer(1,0,3)"> It is the strongest metal</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: Why is aluminium used to make aeroplanes?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q1" value="0" onchange="saveAnswer(1,1,0)"> It is the cheapest material available</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="1" onchange="saveAnswer(1,1,1)"> It is lightweight and strong</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="2" onchange="saveAnswer(1,1,2)"> It is the hardest metal</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="3" onchange="saveAnswer(1,1,3)"> It is the best conductor of electricity</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: What is an ALLOY?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q2" value="0" onchange="saveAnswer(1,2,0)"> A pure metal found in the earth</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="1" onchange="saveAnswer(1,2,1)"> A mixture of two or more metals</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="2" onchange="saveAnswer(1,2,2)"> A type of non-metal</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="3" onchange="saveAnswer(1,2,3)"> A metal that does not rust</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: Steel is made from iron and which other element?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q3" value="0" onchange="saveAnswer(1,3,0)"> Copper</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="1" onchange="saveAnswer(1,3,1)"> Carbon</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="2" onchange="saveAnswer(1,3,2)"> Gold</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="3" onchange="saveAnswer(1,3,3)"> Zinc</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: What is "galvanising"?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q4" value="0" onchange="saveAnswer(1,4,0)"> Melting metal in a furnace</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="1" onchange="saveAnswer(1,4,1)"> Coating steel with zinc to prevent rust</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="2" onchange="saveAnswer(1,4,2)"> Drawing metal into wires</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="3" onchange="saveAnswer(1,4,3)"> Hammering metal into shapes</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: Gold is used in electronics because it...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q5" value="0" onchange="saveAnswer(1,5,0)"> Is the heaviest metal</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="1" onchange="saveAnswer(1,5,1)"> Is magnetic</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="2" onchange="saveAnswer(1,5,2)"> Does not rust and conducts electricity</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="3" onchange="saveAnswer(1,5,3)"> Is very cheap</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: Where did gold mining begin in South Africa?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q6" value="0" onchange="saveAnswer(1,6,0)"> Cape Town</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="1" onchange="saveAnswer(1,6,1)"> Durban</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="2" onchange="saveAnswer(1,6,2)"> Kimberley</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="3" onchange="saveAnswer(1,6,3)"> The Witwatersrand</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: Which metal is used to coat steel roofing sheets to prevent rust?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q7" value="0" onchange="saveAnswer(1,7,0)"> Copper</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="1" onchange="saveAnswer(1,7,1)"> Aluminium</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="2" onchange="saveAnswer(1,7,2)"> Zinc</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="3" onchange="saveAnswer(1,7,3)"> Gold</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: What property makes steel suitable for building bridges?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q8" value="0" onchange="saveAnswer(1,8,0)"> It is lightweight</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="1" onchange="saveAnswer(1,8,1)"> It is very strong</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="2" onchange="saveAnswer(1,8,2)"> It does not conduct electricity</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="3" onchange="saveAnswer(1,8,3)"> It is flexible</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: Which property of copper makes it good for water pipes?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q9" value="0" onchange="saveAnswer(1,9,0)"> It is magnetic</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="1" onchange="saveAnswer(1,9,1)"> It does not rust easily and is malleable</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="2" onchange="saveAnswer(1,9,2)"> It is very hard</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="3" onchange="saveAnswer(1,9,3)"> It has a high melting point</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_UOM_1.html" onclick="localStorage.setItem('cl_submit_course','UOM');localStorage.setItem('cl_submit_week','1');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+<div class="assess-week" data-week="2" style="display:none;">
+<h2>Week 2 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: A smartphone contains which metals?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q0" value="0" onchange="saveAnswer(2,0,0)"> Only plastic</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="1" onchange="saveAnswer(2,0,1)"> Gold, silver, copper and lithium</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="2" onchange="saveAnswer(2,0,2)"> Only aluminium</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="3" onchange="saveAnswer(2,0,3)"> Only steel</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: Why is aluminium used in aircraft instead of steel?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q1" value="0" onchange="saveAnswer(2,1,0)"> Aluminium is cheaper</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="1" onchange="saveAnswer(2,1,1)"> Aluminium is magnetic</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="2" onchange="saveAnswer(2,1,2)"> Aluminium is lighter than steel but still strong</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="3" onchange="saveAnswer(2,1,3)"> Aluminium has a higher melting point</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: What is stainless steel?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q2" value="0" onchange="saveAnswer(2,2,0)"> Iron + copper alloy</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="1" onchange="saveAnswer(2,2,1)"> Iron + carbon + chromium alloy that does not rust</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="2" onchange="saveAnswer(2,2,2)"> Pure iron</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="3" onchange="saveAnswer(2,2,3)"> Iron + gold alloy</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: Why should we recycle metals?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q3" value="0" onchange="saveAnswer(2,3,0)"> Because metals grow back</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="1" onchange="saveAnswer(2,3,1)"> To save money on mining and reduce environmental damage</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="2" onchange="saveAnswer(2,3,2)"> Because metals are not useful</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="3" onchange="saveAnswer(2,3,3)"> Because metals are very common and cheap</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: Which metal has the HIGHEST melting point and is used in light bulb filaments?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q4" value="0" onchange="saveAnswer(2,4,0)"> Gold</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="1" onchange="saveAnswer(2,4,1)"> Copper</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="2" onchange="saveAnswer(2,4,2)"> Tungsten</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="3" onchange="saveAnswer(2,4,3)"> Aluminium</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: Car batteries contain which metal?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q5" value="0" onchange="saveAnswer(2,5,0)"> Gold</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="1" onchange="saveAnswer(2,5,1)"> Lead</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="2" onchange="saveAnswer(2,5,2)"> Copper</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="3" onchange="saveAnswer(2,5,3)"> Platinum</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: Brass is used for keys and locks. Brass is an alloy of...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q6" value="0" onchange="saveAnswer(2,6,0)"> Iron and carbon</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="1" onchange="saveAnswer(2,6,1)"> Copper and zinc</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="2" onchange="saveAnswer(2,6,2)"> Gold and silver</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="3" onchange="saveAnswer(2,6,3)"> Aluminium and steel</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: Why is stainless steel used for cutlery (knives, forks, spoons)?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q7" value="0" onchange="saveAnswer(2,7,0)"> It is the cheapest option</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="1" onchange="saveAnswer(2,7,1)"> It does not rust and is easy to clean</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="2" onchange="saveAnswer(2,7,2)"> It is magnetic</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="3" onchange="saveAnswer(2,7,3)"> It is the lightest metal</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: Recycling aluminium uses only 5% of the energy needed to mine new aluminium. This means recycling is...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q8" value="0" onchange="saveAnswer(2,8,0)"> Wasteful</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="1" onchange="saveAnswer(2,8,1)"> More expensive than mining</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="2" onchange="saveAnswer(2,8,2)"> More energy-efficient than mining</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="3" onchange="saveAnswer(2,8,3)"> Not worth doing</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: Which metal is used in solar panel contacts because it is the best electrical conductor?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q9" value="0" onchange="saveAnswer(2,9,0)"> Gold</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="1" onchange="saveAnswer(2,9,1)"> Silver</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="2" onchange="saveAnswer(2,9,2)"> Copper</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="3" onchange="saveAnswer(2,9,3)"> Platinum</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_UOM_2.html" onclick="localStorage.setItem('cl_submit_course','UOM');localStorage.setItem('cl_submit_week','2');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:30px;">
+    <a href="https://dbeducator.github.io/Natural-Sciences/grade5/results.html" class="admin-btn" style="text-decoration:none;display:inline-block;">View My Results</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'coachL_UOM_';
+const TOTAL_WEEKS = 2;
+const COURSE_NAME = 'Uses of Metals';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz89hcA4Z70ZyOKnk2MBBc5kVWKG5aXljNgSzpXZbfXDOhGvtpeZXGSOadoZB_RdyPK/exec';
+const SECRET_KEY = 'CoachL2025SecureKey';
+const BASE_URL = 'https://dbeducator.github.io/Natural-Sciences/grade5/';
+const coursePrefixForSubmit = 'UOM';
+
+const CORRECT_ANSWERS = {
+  1: [2, 1, 1, 1, 1, 2, 3, 2, 1, 1],
+  2: [1, 2, 1, 1, 2, 1, 1, 1, 2, 1],
+};
+Object.keys(CORRECT_ANSWERS).forEach(function(w) {
+  localStorage.setItem(STORAGE_PREFIX + 'correct_' + w, JSON.stringify(CORRECT_ANSWERS[parseInt(w)]));
+});
+
+let currentWeek = 1;
+let completedWeeks = new Set(JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'completedWeeks') || '[]'));
+let studentInfo = { name: '', email: '' };
+
+function toggleTheme() {
+  const isLight = document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').innerHTML = isLight ? '&#9790; Dark' : '&#9728; Light';
+}
+
+function saveAnswer(week, q, val) {
+  var k = STORAGE_PREFIX + 'answers_' + week;
+  var saved = JSON.parse(localStorage.getItem(k) || '{}');
+  saved['q' + q] = val;
+  localStorage.setItem(k, JSON.stringify(saved));
+}
+
+function selectModule(week) {
+  currentWeek = week;
+  refreshModuleButtons();
+  updateWeekContent();
+}
+
+function refreshModuleButtons() {
+  document.querySelectorAll('.module-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (completedWeeks.has(i+1)) {
+      btn.classList.add('completed');
+      btn.textContent = 'Week ' + (i+1) + ' ✓';
+    } else {
+      btn.textContent = 'Week ' + (i+1);
+    }
+  });
+  document.querySelectorAll('.module-btn')[currentWeek - 1].classList.add('active');
+}
+
+function showTab(tabName, tabBtn) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  if (tabBtn) tabBtn.classList.add('active');
+}
+
+function updateVideoSection() {
+  const v = weekVideos[currentWeek];
+  document.getElementById('tutorialVideo').innerHTML = '<iframe src="https://www.youtube.com/embed/' + v.t + '?rel=0&modestbranding=1&iv_load_policy=3" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>';
+  document.getElementById('basicVideo').innerHTML = '<iframe src="https://www.youtube.com/embed/' + v.b + '?rel=0&modestbranding=1&iv_load_policy=3" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>';
+  document.getElementById('tutorialTitle').textContent = v.tTitle;
+  document.getElementById('basicTitle').textContent = v.bTitle;
+  document.getElementById('weekTitle').textContent = 'Videos — Week ' + currentWeek;
+}
+
+function updateWeekContent() {
+  const week = weekData[currentWeek];
+  updateVideoSection();
+  document.getElementById('lessonContent').innerHTML = week.content;
+  document.getElementById('resourcesTitle').textContent = 'Resources — Week ' + currentWeek;
+  document.querySelectorAll('.week-resources').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.assess-week').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+}
+
+function updateProgress() {
+  const done = completedWeeks.size;
+  const pct = Math.round(done / TOTAL_WEEKS * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').textContent = pct + '%';
+  document.getElementById('weeksComplete').textContent = done + '/' + TOTAL_WEEKS;
+  document.getElementById('videosWatched').textContent = (done*2) + '/' + (TOTAL_WEEKS*2);
+  document.getElementById('assessmentsPassed').textContent = done + '/' + TOTAL_WEEKS;
+}
+
+window.onload = function() {
+  studentInfo.name = localStorage.getItem('cl_firstName') || 'Learner';
+  document.getElementById('studentName').textContent = studentInfo.name;
+  document.getElementById('avatar').textContent = studentInfo.name.charAt(0).toUpperCase();
+  const isLight = localStorage.getItem('cl_theme') === 'light';
+  if(isLight) { document.getElementById('body').classList.add('light-mode'); document.getElementById('themeBtn').innerHTML = '&#9790; Dark'; }
+  updateProgress();
+  selectModule(1);
+};
+
+const weekVideos = {
+  1: {t:'x0lauGbQWvQ',tTitle:'Week 1: Metals in Construction and Industry',b:'x0lauGbQWvQ',bTitle:'Metals in Construction and Industry — Key Concepts'},
+  2: {t:'x0lauGbQWvQ',tTitle:'Week 2: Metals in Technology and Daily Life',b:'x0lauGbQWvQ',bTitle:'Metals in Technology and Daily Life — Key Concepts'}
+};
+
+const weekData = {
+  1: {
+    content: `<h2 style="color:#2196f3;">🔧 Uses of Metals — Week 1</h2>
+<div style="background:linear-gradient(135deg,#0d47a1,#1565c0);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">🏗️⚙️🔩</div>
+  <h3 style="color:#fff;margin:8px 0;">Metals in Construction and Industry</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">The right metal for the right job</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>Why different metals are used for different purposes</li><li>How the properties of metals determine their uses</li><li>Metals used in construction and manufacturing</li><li>The importance of the mining industry in South Africa</li></ul>
+<h3>⚙️ Properties Determine Uses</h3>
+<p>The <strong>properties</strong> of a metal determine what it can be used for. Scientists and engineers choose the right metal based on its properties.</p>
+<div style="background:rgba(33,150,243,0.1);border-radius:10px;padding:14px;margin:12px 0;border-left:4px solid #2196f3;">
+  <p>🏗️ <strong>Steel (iron + carbon)</strong> — very strong → used in buildings, bridges, cars, ships</p>
+  <p>⚡ <strong>Copper</strong> — excellent conductor → used in electrical wiring and water pipes</p>
+  <p>✈️ <strong>Aluminium</strong> — lightweight and strong → used in aeroplanes, drink cans, foil</p>
+  <p>🥇 <strong>Gold</strong> — does not rust, conducts electricity → used in jewellery and electronics</p>
+  <p>💍 <strong>Silver</strong> — best electrical conductor → used in electronics and jewellery</p>
+  <p>🔋 <strong>Lead</strong> — heavy and resistant to radiation → used in car batteries and X-ray shielding</p>
+  <p>🪙 <strong>Zinc</strong> — resists rust → used to coat steel (galvanising) and in coins</p>
+</div>
+<h3>🏠 Metals in Construction</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🏢 <strong>Steel beams</strong> — hold up tall buildings and bridges (strength)</p>
+  <p>🪟 <strong>Aluminium window frames</strong> — lightweight and does not rust</p>
+  <p>🚿 <strong>Copper pipes</strong> — water supply in homes and buildings</p>
+  <p>🔩 <strong>Steel bolts and screws</strong> — join structures together</p>
+  <p>🛡️ <strong>Galvanised (zinc-coated) steel</strong> — roofing sheets (resist rust)</p>
+</div>
+<h3>🇿🇦 Mining in South Africa</h3>
+<p>Mining is one of South Africa's most important industries. It provides jobs for hundreds of thousands of people and earns the country billions of rands from exports.</p>
+<div style="background:rgba(255,193,7,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #ffc107;">
+  <h4 style="color:#ffc107;">💰 SA Mining Facts</h4>
+  <p>🥇 Gold mining began on the Witwatersrand in 1886</p>
+  <p>💎 Kimberley became the diamond mining capital</p>
+  <p>🪨 SA produces coal, chrome, manganese, iron ore, platinum</p>
+  <p>👷 The mining industry employs over 450 000 workers</p>
+</div>
+<h3>🔬 Activity: Metal Properties Match</h3>
+<div style="background:rgba(33,150,243,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #2196f3;">
+  <p><strong>What to do:</strong> Draw a table with 3 columns: Metal Name | Key Property | Use in everyday life. Fill in at least 6 metals. Then answer: Why is aluminium used for drink cans but not for bridges? Explain using properties.</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Alloy</strong> — a mixture of two or more metals (e.g. steel = iron + carbon)</p>
+  <p>🔑 <strong>Galvanising</strong> — coating steel with zinc to prevent rust</p>
+  <p>🔑 <strong>Conductor</strong> — material that allows electricity or heat to flow through it</p>
+  <p>🔑 <strong>Corrosion</strong> — when metals react with the environment and weaken (rust)</p>
+</div>`,
+    assessment: [
+      { question: "Why is copper used for electrical wiring?", options: ["It is the cheapest metal", "It is the lightest metal", "It is an excellent conductor of electricity", "It is the strongest metal"], correct: 2 },
+      { question: "Why is aluminium used to make aeroplanes?", options: ["It is the cheapest material available", "It is lightweight and strong", "It is the hardest metal", "It is the best conductor of electricity"], correct: 1 },
+      { question: "What is an ALLOY?", options: ["A pure metal found in the earth", "A mixture of two or more metals", "A type of non-metal", "A metal that does not rust"], correct: 1 },
+      { question: "Steel is made from iron and which other element?", options: ["Copper", "Carbon", "Gold", "Zinc"], correct: 1 },
+      { question: "What is \"galvanising\"?", options: ["Melting metal in a furnace", "Coating steel with zinc to prevent rust", "Drawing metal into wires", "Hammering metal into shapes"], correct: 1 },
+      { question: "Gold is used in electronics because it...", options: ["Is the heaviest metal", "Is magnetic", "Does not rust and conducts electricity", "Is very cheap"], correct: 2 },
+      { question: "Where did gold mining begin in South Africa?", options: ["Cape Town", "Durban", "Kimberley", "The Witwatersrand"], correct: 3 },
+      { question: "Which metal is used to coat steel roofing sheets to prevent rust?", options: ["Copper", "Aluminium", "Zinc", "Gold"], correct: 2 },
+      { question: "What property makes steel suitable for building bridges?", options: ["It is lightweight", "It is very strong", "It does not conduct electricity", "It is flexible"], correct: 1 },
+      { question: "Which property of copper makes it good for water pipes?", options: ["It is magnetic", "It does not rust easily and is malleable", "It is very hard", "It has a high melting point"], correct: 1 },
+    ]
+  },
+  2: {
+    content: `<h2 style="color:#2196f3;">🔧 Uses of Metals — Week 2</h2>
+<div style="background:linear-gradient(135deg,#0d47a1,#1976d2);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">📱💍🥄</div>
+  <h3 style="color:#fff;margin:8px 0;">Metals in Technology, Transport and Daily Life</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Metals are everywhere in modern life</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>How metals are used in technology and electronics</li><li>Metals used in transport</li><li>Metals we use at home every day</li><li>Why we should recycle metals</li></ul>
+<h3>📱 Metals in Technology</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>📱 <strong>Smartphones</strong> — contain gold, silver, copper, lithium, cobalt</p>
+  <p>💻 <strong>Computers</strong> — aluminium case, copper wiring, gold in circuits</p>
+  <p>🔋 <strong>Batteries</strong> — lithium, cobalt, nickel, lead</p>
+  <p>⚡ <strong>Solar panels</strong> — silicon (non-metal) and silver contacts</p>
+  <p>💡 <strong>Light bulbs</strong> — tungsten filament (highest melting point of all metals)</p>
+</div>
+<h3>🚗 Metals in Transport</h3>
+<div style="background:rgba(33,150,243,0.1);border-radius:10px;padding:14px;margin:12px 0;border-left:4px solid #2196f3;">
+  <p>🚗 <strong>Cars</strong> — steel body, aluminium engine parts, copper wiring, lead battery</p>
+  <p>✈️ <strong>Aircraft</strong> — aluminium and titanium (lightweight and strong)</p>
+  <p>🚢 <strong>Ships</strong> — steel hull (strong, can be welded)</p>
+  <p>🚂 <strong>Trains</strong> — steel rails and wheels (hard and durable)</p>
+  <p>🚲 <strong>Bicycles</strong> — steel or aluminium frame</p>
+</div>
+<h3>🏠 Metals at Home</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🥄 <strong>Cutlery (stainless steel)</strong> — does not rust, easy to clean</p>
+  <p>🍳 <strong>Pots and pans</strong> — stainless steel or aluminium (conducts heat)</p>
+  <p>🔑 <strong>Keys and locks</strong> — brass (copper + zinc alloy, resists rust)</p>
+  <p>🪙 <strong>Coins</strong> — nickel, copper, zinc alloys</p>
+  <p>🥫 <strong>Food cans</strong> — steel with tin coating (prevents rust)</p>
+  <p>🪜 <strong>Foil wrap</strong> — aluminium (lightweight, conducts heat)</p>
+</div>
+<h3>♻️ Why Recycle Metals?</h3>
+<div style="background:rgba(76,175,80,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #4caf50;">
+  <p>💡 Mining is expensive, damaging to the environment and non-renewable</p>
+  <p>♻️ Recycling aluminium uses only 5% of the energy needed to mine new aluminium</p>
+  <p>🌍 Recycling reduces pollution and saves natural resources</p>
+  <p>💰 Scrap metal dealers in SA buy old metals for recycling</p>
+  <p>🔄 Steel, aluminium, copper and gold can all be recycled indefinitely</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Stainless steel</strong> — iron + carbon + chromium, does not rust</p>
+  <p>🔑 <strong>Titanium</strong> — very strong, very light, does not corrode</p>
+  <p>🔑 <strong>Tungsten</strong> — highest melting point of all metals</p>
+  <p>🔑 <strong>Recycling</strong> — processing old materials to make new ones</p>
+  <p>🔑 <strong>Non-renewable</strong> — cannot be replaced once used up</p>
+</div>`,
+    assessment: [
+      { question: "A smartphone contains which metals?", options: ["Only plastic", "Gold, silver, copper and lithium", "Only aluminium", "Only steel"], correct: 1 },
+      { question: "Why is aluminium used in aircraft instead of steel?", options: ["Aluminium is cheaper", "Aluminium is magnetic", "Aluminium is lighter than steel but still strong", "Aluminium has a higher melting point"], correct: 2 },
+      { question: "What is stainless steel?", options: ["Iron + copper alloy", "Iron + carbon + chromium alloy that does not rust", "Pure iron", "Iron + gold alloy"], correct: 1 },
+      { question: "Why should we recycle metals?", options: ["Because metals grow back", "To save money on mining and reduce environmental damage", "Because metals are not useful", "Because metals are very common and cheap"], correct: 1 },
+      { question: "Which metal has the HIGHEST melting point and is used in light bulb filaments?", options: ["Gold", "Copper", "Tungsten", "Aluminium"], correct: 2 },
+      { question: "Car batteries contain which metal?", options: ["Gold", "Lead", "Copper", "Platinum"], correct: 1 },
+      { question: "Brass is used for keys and locks. Brass is an alloy of...", options: ["Iron and carbon", "Copper and zinc", "Gold and silver", "Aluminium and steel"], correct: 1 },
+      { question: "Why is stainless steel used for cutlery (knives, forks, spoons)?", options: ["It is the cheapest option", "It does not rust and is easy to clean", "It is magnetic", "It is the lightest metal"], correct: 1 },
+      { question: "Recycling aluminium uses only 5% of the energy needed to mine new aluminium. This means recycling is...", options: ["Wasteful", "More expensive than mining", "More energy-efficient than mining", "Not worth doing"], correct: 2 },
+      { question: "Which metal is used in solar panel contacts because it is the best electrical conductor?", options: ["Gold", "Silver", "Copper", "Platinum"], correct: 1 },
+    ]
+  }
+};
+</script>
+</body>
+</html>
