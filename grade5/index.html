@@ -1,273 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Grade 5 Natural Sciences & Technology</title>
-<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png">
-<style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#07070c; color:#fff; min-height:100vh; }
-body.light-mode { background:#f5f5f5; color:#222; }
-.header { background:linear-gradient(135deg,#1a237e,#283593); padding:16px 20px; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(0,0,0,0.3); }
-.header-content { display:flex; justify-content:space-between; align-items:center; }
-.brand { display:flex; align-items:center; gap:10px; }
-.brand img { width:36px; height:36px; border-radius:8px; }
-.brand h1 { font-size:0.95rem; font-weight:700; color:#fff; }
-.brand p { font-size:0.7rem; color:rgba(255,255,255,0.8); }
-.header-actions { display:flex; align-items:center; gap:8px; }
-.theme-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 12px; border-radius:16px; font-size:0.8rem; cursor:pointer; font-family:inherit; }
-.avatar { width:34px; height:34px; background:linear-gradient(135deg,#4caf50,#1a237e); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; }
-.hero { background:linear-gradient(135deg,#1a237e,#4caf50); padding:20px; text-align:center; }
-.hero h2 { font-size:1.2rem; color:#fff; margin-bottom:6px; }
-.hero p { color:rgba(255,255,255,0.85); font-size:0.85rem; }
-.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:360px; margin:14px auto 0; }
-.stat { background:rgba(255,255,255,0.15); border-radius:10px; padding:10px; text-align:center; }
-.stat h3 { font-size:1.3rem; font-weight:800; color:#fff; }
-.stat p { font-size:0.65rem; color:rgba(255,255,255,0.85); }
-.content { max-width:800px; margin:0 auto; padding:16px 16px 80px; }
-body.light-mode .course-card { background:#fff !important; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-.results-btn { position:fixed; bottom:20px; right:16px; padding:11px 18px; background:linear-gradient(135deg,#f093fb,#f5576c); color:#fff; border-radius:28px; font-size:0.85rem; font-weight:600; box-shadow:0 4px 16px rgba(240,147,251,0.4); text-decoration:none; display:block; z-index:50; }
-#nameModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:200; align-items:center; justify-content:center; }
-.modal-box { background:#12121f; border-radius:20px; padding:30px 24px; max-width:340px; width:90%; text-align:center; }
-body.light-mode .modal-box { background:#fff; }
-.modal-box h2 { font-size:1.3rem; margin-bottom:8px; }
-.modal-box p { color:#aaa; font-size:0.9rem; margin-bottom:20px; }
-.modal-box input { width:100%; padding:12px 16px; background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.15); border-radius:10px; color:#fff; font-size:1rem; margin-bottom:16px; font-family:inherit; }
-body.light-mode .modal-box input { background:#f5f5f5; border-color:#e0e0e0; color:#222; }
-.modal-btn { width:100%; padding:14px; background:linear-gradient(135deg,#1a237e,#4caf50); color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; font-family:inherit; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maxi Pie - Grade 5 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#0a1a33; height: 100vh; overflow: hidden; }
+        
+        /* Floating Button */
+        #maxi-fab { position:fixed; bottom:25px; right:25px; width:75px; height:75px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); z-index:999; border:4px solid #fff; transition: transform 0.2s; }
+        #maxi-fab:active { transform: scale(0.9); }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit: cover; }
+
+        /* Modal Layout */
+        #chat-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#0a1a33; z-index:10000; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .chat-container { display:flex; flex-direction:column; height:100%; width:100%; max-width:600px; margin:0 auto; background:#f0f4f8; }
+        
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; }
+        .chat-header img { width:50px; height:50px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left: auto; background:#ef4444; color:white; border:none; border-radius:50%; width:40px; height:40px; font-weight:bold; font-size:20px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+        /* Messages */
+        .messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px; background-image: linear-gradient(#f0f4f8 0%, #dbe6f3 100%); }
+        .msg { max-width:85%; padding:14px 18px; border-radius:20px; line-height:1.5; font-size:17px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .bot { align-self:flex-start; background:white; color:#0a1a33; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+        
+        .source-tag { font-size:10px; font-weight:bold; text-transform:uppercase; color:#3b82f6; display:block; margin-bottom:5px; }
+        .content-img { width:100%; border-radius:10px; margin-top:10px; border:2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+
+        /* Input area */
+        .input-area { padding:15px; background:white; display:flex; gap:10px; border-top:1px solid #ddd; }
+        input { flex:1; padding:12px 18px; border-radius:25px; border:2px solid #dbe6f3; outline:none; font-size:16px; }
+        .action-btn { background:#10b981; color:white; border:none; width:50px; height:50px; border-radius:50%; font-size:20px; display:flex; align-items:center; justify-content:center; }
+    </style>
 </head>
-<body id="body">
-<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+<body>
 
-<div id="nameModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:200;align-items:center;justify-content:center;">
-  <div class="modal-box">
-    <div style="font-size:2.5rem;margin-bottom:12px;">🔬</div>
-    <h2>Welcome!</h2>
-    <p>What is your first name?</p>
-    <input type="text" id="nameInput" placeholder="Your first name" maxlength="30">
-    <button class="modal-btn" onclick="saveName()">Start Learning →</button>
-  </div>
+<div id="maxi-fab" onclick="openChat()">
+    <img src="cat_full.png" alt="Maxi Pie">
 </div>
 
-<div class="header">
-  <div class="header-content">
-    <div class="brand">
-      <img src="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png" alt="Logo" onerror="this.style.display='none'">
-      <div>
-        <h1>🔬 Grade 5 Natural Sciences</h1>
-        <p>& Technology — CAPS Curriculum | DBE</p>
-      </div>
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png" alt="Maxi Pie">
+            <div>
+                <h3 style="margin:0">Maxi Pie</h3>
+                <small style="color:#10b981">Grade 5 Science Chommie 🇿🇦</small>
+            </div>
+            <button class="close-btn" onclick="closeChat()">×</button>
+        </div>
+
+        <div id="messages" class="messages">
+            <div class="msg bot">
+                Sho! I'm loading your Grade 5 notes. While I finish up, what's on your mind? Matter? Plants? Electricity? Let's go!
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter') handleSend()">
+            <button id="micBtn" class="action-btn" style="background:#3b82f6">🎤</button>
+            <button onclick="handleSend()" class="action-btn">➔</button>
+        </div>
     </div>
-    <div class="header-actions">
-      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀️ Light</button>
-      <div class="avatar" id="avatar">?</div>
-    </div>
-  </div>
 </div>
-
-<div class="hero">
-  <h2>🇿🇦 Grade 5 Natural Sciences & Technology</h2>
-  <p>Department of Basic Education — CAPS Curriculum</p>
-  <div class="stats">
-    <div class="stat"><h3>19</h3><p>Topics</p></div>
-    <div class="stat"><h3>4</h3><p>Terms</p></div>
-    <div class="stat"><h3>38</h3><p>Lessons</p></div>
-  </div>
-</div>
-
-<div class="content">
-  <p id="welcomeMsg" style="margin-bottom:16px;color:#aaa;font-size:0.9rem;"></p>
-  <div class="term-section"><div class="term-header" style="border-left:4px solid #4caf50;padding-left:12px;margin:24px 0 12px;"><h2 style="color:#4caf50;font-size:1.1rem;">Term 1 — Life and Living / Technology</h2></div>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic1.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #4caf50;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#4caf50,#4caf5099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T1</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Plants and Animals on Earth</h3>
-    <p style="font-size:0.75rem;color:#888;">Life and Living · 3 Weeks</p>
-  </div>
-  <span style="color:#4caf50;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic2.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #4caf50;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#4caf50,#4caf5099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T2</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Animal Skeletons</h3>
-    <p style="font-size:0.75rem;color:#888;">Life and Living · 2 Weeks</p>
-  </div>
-  <span style="color:#4caf50;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic3.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #f44336;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#f44336,#f4433699);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T3</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Skeletons as Structures</h3>
-    <p style="font-size:0.75rem;color:#888;">Technology: Structures · 2 Weeks</p>
-  </div>
-  <span style="color:#f44336;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic4.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #4caf50;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#4caf50,#4caf5099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T4</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Food Chains</h3>
-    <p style="font-size:0.75rem;color:#888;">Life and Living · 2 Weeks</p>
-  </div>
-  <span style="color:#4caf50;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic5.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #4caf50;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#4caf50,#4caf5099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T5</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Life Cycles</h3>
-    <p style="font-size:0.75rem;color:#888;">Life and Living · 2 Weeks</p>
-  </div>
-  <span style="color:#4caf50;font-size:1.2rem;">›</span>
-</a>
-</div>
-<div class="term-section"><div class="term-header" style="border-left:4px solid #2196f3;padding-left:12px;margin:24px 0 12px;"><h2 style="color:#2196f3;font-size:1.1rem;">Term 2 — Matter and Materials / Energy</h2></div>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic6.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #2196f3;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#2196f3,#2196f399);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T6</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Metals and Non-metals</h3>
-    <p style="font-size:0.75rem;color:#888;">Matter and Materials · 2 Weeks</p>
-  </div>
-  <span style="color:#2196f3;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic7.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #2196f3;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#2196f3,#2196f399);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T7</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Uses of Metals</h3>
-    <p style="font-size:0.75rem;color:#888;">Matter and Materials · 2 Weeks</p>
-  </div>
-  <span style="color:#2196f3;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic8.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #2196f3;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#2196f3,#2196f399);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T8</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Processing Materials</h3>
-    <p style="font-size:0.75rem;color:#888;">Matter and Materials · 2 Weeks</p>
-  </div>
-  <span style="color:#2196f3;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic9.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #2196f3;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#2196f3,#2196f399);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T9</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Properties of Processed Materials</h3>
-    <p style="font-size:0.75rem;color:#888;">Matter and Materials · 2 Weeks</p>
-  </div>
-  <span style="color:#2196f3;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic10.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #ff9800;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#ff9800,#ff980099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T10</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Cells and Batteries</h3>
-    <p style="font-size:0.75rem;color:#888;">Energy and Change · 2 Weeks</p>
-  </div>
-  <span style="color:#ff9800;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic11.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #ff9800;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#ff9800,#ff980099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T11</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Electric Circuits</h3>
-    <p style="font-size:0.75rem;color:#888;">Energy and Change · 2 Weeks</p>
-  </div>
-  <span style="color:#ff9800;font-size:1.2rem;">›</span>
-</a>
-</div>
-<div class="term-section"><div class="term-header" style="border-left:4px solid #ff9800;padding-left:12px;margin:24px 0 12px;"><h2 style="color:#ff9800;font-size:1.1rem;">Term 3 — Energy and Change / Technology</h2></div>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic12.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #ff9800;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#ff9800,#ff980099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T12</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Energy and Movement</h3>
-    <p style="font-size:0.75rem;color:#888;">Energy and Change · 2 Weeks</p>
-  </div>
-  <span style="color:#ff9800;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic13.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #00bcd4;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#00bcd4,#00bcd499);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T13</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Systems for Moving Things</h3>
-    <p style="font-size:0.75rem;color:#888;">Technology: Systems · 2 Weeks</p>
-  </div>
-  <span style="color:#00bcd4;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic14.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #ff9800;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#ff9800,#ff980099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T14</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Safety with Electricity</h3>
-    <p style="font-size:0.75rem;color:#888;">Energy and Change · 2 Weeks</p>
-  </div>
-  <span style="color:#ff9800;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic15.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #ff9800;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#ff9800,#ff980099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T15</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Sources of Energy</h3>
-    <p style="font-size:0.75rem;color:#888;">Energy and Change · 2 Weeks</p>
-  </div>
-  <span style="color:#ff9800;font-size:1.2rem;">›</span>
-</a>
-</div>
-<div class="term-section"><div class="term-header" style="border-left:4px solid #9c27b0;padding-left:12px;margin:24px 0 12px;"><h2 style="color:#9c27b0;font-size:1.1rem;">Term 4 — Planet Earth and Beyond</h2></div>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic16.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #9c27b0;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#9c27b0,#9c27b099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T16</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">The Earth Moves</h3>
-    <p style="font-size:0.75rem;color:#888;">Planet Earth and Beyond · 2 Weeks</p>
-  </div>
-  <span style="color:#9c27b0;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic17.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #9c27b0;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#9c27b0,#9c27b099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T17</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Surface of the Earth</h3>
-    <p style="font-size:0.75rem;color:#888;">Planet Earth and Beyond · 2 Weeks</p>
-  </div>
-  <span style="color:#9c27b0;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic18.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #9c27b0;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#9c27b0,#9c27b099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T18</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Sedimentary Rocks</h3>
-    <p style="font-size:0.75rem;color:#888;">Planet Earth and Beyond · 2 Weeks</p>
-  </div>
-  <span style="color:#9c27b0;font-size:1.2rem;">›</span>
-</a>
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/topic19.html" class="course-card" style="display:flex;align-items:center;gap:12px;background:#12121f;border-radius:12px;padding:14px;margin-bottom:10px;text-decoration:none;color:inherit;border-left:4px solid #9c27b0;">
-  <div style="width:40px;height:40px;background:linear-gradient(135deg,#9c27b0,#9c27b099);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:0.8rem;">T19</div>
-  <div style="flex:1;">
-    <h3 style="font-size:0.95rem;margin-bottom:2px;">Fossils</h3>
-    <p style="font-size:0.75rem;color:#888;">Planet Earth and Beyond · 2 Weeks</p>
-  </div>
-  <span style="color:#9c27b0;font-size:1.2rem;">›</span>
-</a>
-</div>
-
-</div>
-
-<a href="https://dbeducator.github.io/Natural-Sciences/grade5/results.html" class="results-btn">📊 My Results</a>
 
 <script>
-function toggleTheme() {
-  const isLight = document.getElementById('body').classList.toggle('light-mode');
-  localStorage.setItem('cl_theme', isLight ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = isLight ? '🌙 Dark' : '☀️ Light';
-}
-function saveName() {
-  const name = document.getElementById('nameInput').value.trim();
-  if(!name) { alert('Please enter your name.'); return; }
-  localStorage.setItem('cl_firstName', name);
-  document.getElementById('nameModal').style.display = 'none';
-  document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
-  document.getElementById('welcomeMsg').textContent = 'Welcome, ' + name + '! Select a topic below to start learning.';
-}
-window.onload = function() {
-  const name = localStorage.getItem('cl_firstName');
-  if(!name) { document.getElementById('nameModal').style.display = 'flex'; }
-  else {
-    document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
-    document.getElementById('welcomeMsg').textContent = 'Welcome back, ' + name + '! Select a topic below.';
-  }
-  const isLight = localStorage.getItem('cl_theme') === 'light';
-  if(isLight) { document.getElementById('body').classList.add('light-mode'); document.getElementById('themeBtn').textContent = '🌙 Dark'; }
-};
+    let knowledgeBase = [];
+    let fuse = null;
+    let modalOpen = false;
+
+    // 1. NAVIGATION LOGIC (Syncs with Niotron "Go Back")
+    function openChat() {
+        modalOpen = true;
+        document.getElementById('chat-modal').style.display = 'block';
+        // Add a dummy entry to browser history so Niotron's "Go Back" closes the modal
+        window.history.pushState({ modal: "open" }, "");
+    }
+
+    function closeChat() {
+        modalOpen = false;
+        document.getElementById('chat-modal').style.display = 'none';
+        // If we closed via X button, we should also pop the history state
+        if (window.history.state && window.history.state.modal === "open") {
+            window.history.back();
+        }
+    }
+
+    // Handle Niotron's Go Back Block
+    window.onpopstate = function(event) {
+        if (modalOpen) {
+            modalOpen = false;
+            document.getElementById('chat-modal').style.display = 'none';
+        }
+    };
+
+    // 2. RESOURCE LOADING
+    async function initResources() {
+        const files = [
+            { path: 'resources/logic.pdf', type: 'pdf' },
+            { path: 'resources/logic2.html', type: 'html' },
+            { path: 'resources/logic3.html', type: 'html' }
+        ];
+
+        for (const file of files) {
+            try {
+                const res = await fetch(file.path);
+                if (!res.ok) continue;
+
+                if (file.type === 'pdf') {
+                    const arrayBuffer = await res.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const text = textContent.items.map(s => s.str).join(' ');
+                        knowledgeBase.push({ text, source: 'Textbook', page: i });
+                    }
+                } else {
+                    const html = await res.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const text = doc.body.innerText;
+                    const images = Array.from(doc.querySelectorAll('img')).map(img => img.src);
+                    knowledgeBase.push({ text, source: 'Lesson Notes', images: images });
+                }
+            } catch (e) { console.warn("Missing file: " + file.path); }
+        }
+        
+        fuse = new Fuse(knowledgeBase, { keys: ['text'], threshold: 0.45, ignoreLocation: true });
+        addMessage('bot', "Sharp! Everything is loaded. Ask me anything about the Natural Sciences & Tech curriculum! 🐾");
+    }
+
+    // 3. SEARCH & IMAGES
+    function handleSend() {
+        const input = document.getElementById('userInput');
+        const query = input.value.trim();
+        if (!query) return;
+
+        addMessage('user', query);
+        input.value = '';
+
+        setTimeout(() => {
+            if (!fuse) {
+                addMessage('bot', "Wait a bit, I'm still reading my notes!");
+                return;
+            }
+
+            const results = fuse.search(query);
+            if (results.length === 0) {
+                addMessage('bot', "Eish, I checked everywhere but I couldn't find that. Can you ask about a specific topic like 'Matter' or 'Plants'?");
+                return;
+            }
+
+            const match = results[0].item;
+            let response = `<span class="source-tag">Found in ${match.source}</span>${match.text.substring(0, 400)}...`;
+            
+            if (match.images && match.images.length > 0) {
+                response += `<br><img src="${match.images[0]}" class="content-img">`;
+            } else {
+                // Smart suggestion if it's a known Grade 5 topic without an image
+                if (query.toLowerCase().includes('water cycle')) {
+                    response += `<br><em>(Tip: Check page 42 of your textbook for the diagram!)</em>`;
+                }
+            }
+            addMessage('bot', response);
+        }, 600);
+    }
+
+    function addMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = `msg ${role}`;
+        div.innerHTML = text;
+        const container = document.getElementById('messages');
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // 4. VOICE
+    if ('webkitSpeechRecognition' in window) {
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'en-ZA';
+        document.getElementById('micBtn').onclick = () => {
+            recognition.start();
+            document.getElementById('micBtn').style.background = 'red';
+        };
+        recognition.onresult = (e) => {
+            document.getElementById('userInput').value = e.results[0][0].transcript;
+            document.getElementById('micBtn').style.background = '#3b82f6';
+            handleSend();
+        };
+        recognition.onerror = () => document.getElementById('micBtn').style.background = '#3b82f6';
+    }
+
+    window.onload = initResources;
 </script>
 </body>
 </html>
