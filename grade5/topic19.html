@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fossils — Grade 5 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png">
+<style>
+
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #07070c;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .course-title h1 { font-size: 1.8rem; margin-bottom: 5px; }
+  .course-title p { font-size: 0.9rem; opacity: 0.9; }
+
+  .user-info { display: flex; align-items: center; gap: 15px; }
+
+  .avatar {
+    width: 45px; height: 45px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: bold;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+  .progress-overview {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .progress-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    color: white; padding: 20px; border-radius: 12px; text-align: center;
+  }
+  .stat-card h3 { font-size: 2rem; margin-bottom: 5px; }
+  .stat-card p { font-size: 0.9rem; opacity: 0.9; }
+
+  .progress-bar {
+    width: 100%; height: 25px; background: #e0e0e0;
+    border-radius: 15px; overflow: hidden; margin: 20px 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #9c27b0 0%, #9c27b0cc 100%);
+    border-radius: 15px; transition: width 0.5s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 10px; color: white; font-weight: 600; font-size: 0.9rem;
+    min-width: 45px;
+  }
+
+  .tabs {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0; flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 12px 25px; background: #12121f; border: none;
+    border-radius: 10px 10px 0 0; cursor: pointer;
+    font-size: 1rem; font-weight: 600; color: #aaa; transition: all 0.3s ease;
+  }
+  .tab.active { background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%); color: white; }
+
+  .module-selector {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    overflow-x: auto; padding-bottom: 10px;
+  }
+
+  .module-btn {
+    padding: 12px 25px; background: #12121f;
+    border: 2px solid #9c27b0; border-radius: 25px;
+    cursor: pointer; font-size: 1rem; font-weight: 600;
+    color: #9c27b0; white-space: nowrap; transition: all 0.3s ease;
+  }
+  .module-btn.active {
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    color: white; border-color: transparent;
+  }
+  .module-btn.completed { background: #4caf50; color: white; border-color: #4caf50; }
+
+  .content-section { display: block; height: 0; overflow: hidden; }
+  .content-section.active { height: auto; overflow: visible; }
+
+  .video-section {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .video-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px; margin-top: 20px;
+  }
+
+  .video-player {
+    background: #000; border-radius: 12px; overflow: hidden;
+    position: relative; padding-top: 56.25%;
+  }
+
+  .video-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  }
+
+  .play-btn {
+    width: 70px; height: 70px;
+    background: rgba(102, 126, 234, 0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .play-btn:hover { background: #9c27b0; transform: scale(1.1); }
+  .play-btn::after { content: '▶'; color: white; font-size: 2rem; margin-left: 5px; }
+
+  .video-title { margin-top: 15px; font-size: 1.1rem; font-weight: 600; color: #fff; }
+  body.light-mode .video-title { color: #333; }
+
+  .lesson-content {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+  .lesson-content h2 { color: #9c27b0; margin-bottom: 20px; font-size: 1.8rem; }
+  .lesson-content h3 { color: #9c27b0cc; margin-top: 25px; margin-bottom: 15px; font-size: 1.3rem; }
+  .lesson-content h4 { color: #9c27b0; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+  .lesson-content p { line-height: 1.8; margin-bottom: 15px; color: #ccc; }
+  .lesson-content ul { margin-left: 25px; margin-bottom: 15px; }
+  .lesson-content li { margin-bottom: 10px; line-height: 1.6; color: #ccc; }
+
+  .assessment-section {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .quiz-question {
+    background: #1a1a2e; padding: 20px; border-radius: 12px;
+    margin-bottom: 20px; border-left: 4px solid #9c27b0;
+  }
+  .quiz-question h4 { margin-bottom: 15px; color: #fff; font-size: 1.1rem; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .quiz-option {
+    padding: 12px 20px; background: #12121f; border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .quiz-option:hover { border-color: #9c27b0; background: #f0f4ff; }
+  .quiz-option input { margin-right: 10px; }
+
+  .submit-btn {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    color: white; border: none; border-radius: 25px;
+    font-size: 1.1rem; font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; margin-top: 20px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+  .already-passed-notice {
+    background: #e8f5e9; border: 2px solid #4caf50; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; text-align: center;
+  }
+  .already-passed-notice h3 { color: #2e7d32; margin-bottom: 8px; }
+  .already-passed-notice p { color: #388e3c; }
+
+  .resources-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  a.resource-card { display: block; text-decoration: none; color: inherit; cursor: pointer; }
+  .resource-card {
+    display: block; text-decoration: none; color: inherit;
+    background: #12121f; border-radius: 12px; padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;
+    cursor: pointer; border: 2px solid transparent;
+  }
+  .resource-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: #9c27b0; }
+
+  .resource-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.5rem; margin-bottom: 15px;
+  }
+  .resource-card h4 { margin-bottom: 10px; color: #fff; }
+  .resource-card p { color: #aaa; font-size: 0.9rem; }
+
+  .download-badge {
+    display: inline-block; padding: 5px 12px; background: #4caf50;
+    color: white; border-radius: 15px; font-size: 0.75rem; margin-top: 10px;
+  }
+
+  .admin-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white; border: none; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(240,147,251,0.4); z-index: 50; transition: all 0.3s ease;
+  }
+  .admin-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(240,147,251,0.6); }
+
+  @media (max-width: 768px) {
+    .header-content { flex-direction: column; gap: 15px; text-align: center; }
+    .video-grid { grid-template-columns: 1fr; }
+    .module-selector { flex-wrap: wrap; }
+    .resources-grid { grid-template-columns: 1fr; }
+  }
+
+/* ── DARK THEME ADDITIONS ── */
+.lesson-content h2, .lesson-content h3, .lesson-content h4 { color: #c4b5fd; }
+.lesson-content p, .lesson-content li { color: #ccc; }
+.lesson-content strong { color: #e0d7ff; }
+.quiz-option { color: #ccc; }
+.quiz-option:hover { background: rgba(102,126,234,0.15); border-color: #9c27b0; }
+.resource-card h4 { color: #fff; }
+.resource-card p { color: #aaa; }
+.already-passed-notice { background: rgba(76,175,80,0.1); border: 2px solid #4caf50; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.already-passed-notice h3 { color: #4caf50; }
+.already-passed-notice p { color: #aaa; }
+
+
+/* ── LIGHT MODE ── */
+body.light-mode { background: #ffffff !important; color: #222 !important; }
+body.light-mode .header { background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%) !important; }
+body.light-mode .progress-overview { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .tabs { background: #f5f5f5 !important; }
+body.light-mode .tab { color: #666 !important; background: transparent !important; }
+body.light-mode .tab.active { background: linear-gradient(135deg, #9c27b0, #9c27b0cc) !important; color: #fff !important; }
+body.light-mode .module-selector { background: #f5f5f5 !important; }
+body.light-mode .module-btn { background: #fff !important; color: #9c27b0 !important; border-color: #9c27b0 !important; }
+body.light-mode .module-btn.active { background: linear-gradient(135deg, #9c27b0, #9c27b0cc) !important; color: #fff !important; }
+body.light-mode .module-btn.completed { background: #4caf50 !important; color: #fff !important; border-color: #4caf50 !important; }
+body.light-mode .video-section { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .lesson-content { background: #fff !important; color: #333 !important; }
+body.light-mode .lesson-content h2, body.light-mode .lesson-content h3, body.light-mode .lesson-content h4 { color: #9c27b0 !important; }
+body.light-mode .lesson-content p, body.light-mode .lesson-content li { color: #444 !important; }
+body.light-mode .resource-card { background: #fff !important; border-color: #e0e0e0 !important; }
+body.light-mode .resource-card h4 { color: #222 !important; }
+body.light-mode .resource-card p { color: #666 !important; }
+body.light-mode .quiz-question { background: #f8f9fa !important; }
+body.light-mode .quiz-question h4 { color: #333 !important; }
+body.light-mode .quiz-option { background: #fff !important; border-color: #e0e0e0 !important; color: #333 !important; }
+body.light-mode .live-section { background: #fff !important; }
+body.light-mode .support-card { background: #f8f9fa !important; }
+
+
+.resource-card { display:block; text-decoration:none; color:inherit; }
+.resource-icon { font-size:1.5rem; margin-bottom:8px; }
+.resources-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.already-passed-notice { background:rgba(76,175,80,0.1); border:2px solid #4caf50; border-radius:10px; padding:16px; margin-bottom:20px; }
+.already-passed-notice h3 { color:#4caf50; }
+.assess-week {}
+.theme-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-family:inherit; }
+body.light-mode .theme-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.2); color:#333; }
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button onclick="window.location.href='https://dbeducator.github.io/Natural-Sciences/grade5/index.html'" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:0;">&#8592;</button>
+      <img src="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png" alt="Logo" style="width:36px;height:36px;border-radius:8px;" onerror="this.style.display=&quot;none&quot;">
+      <div class="course-title">
+        <h1>Fossils</h1>
+        <p>Grade 5 Natural Sciences · Term 4 · Planet Earth and Beyond</p>
+      </div>
+    </div>
+    <div class="user-info">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#9728; Light</button>
+      <div class="avatar" id="avatar">?</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-overview">
+    <h2>Your Progress — <span id="studentName"></span></h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%">0%</div>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-card"><h3 id="weeksComplete">0/2</h3><p>Weeks Complete</p></div>
+      <div class="stat-card"><h3 id="videosWatched">0/4</h3><p>Videos</p></div>
+      <div class="stat-card"><h3 id="assessmentsPassed">0/2</h3><p>Passed</p></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('content', this)">Content</button>
+    <button class="tab" onclick="showTab('resources', this)">Resources</button>
+    <button class="tab" onclick="showTab('assessment', this)">Assessment</button>
+  </div>
+
+  <div class="module-selector">
+    <button class="module-btn active" onclick="selectModule(1)">Week 1</button>
+    <button class="module-btn" onclick="selectModule(2)">Week 2</button>
+  </div>
+
+  <div id="content" class="content-section active">
+    <div class="video-section">
+      <h2 id="weekTitle" style="margin-bottom:15px;">Videos</h2>
+      <div class="video-grid">
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="tutorialVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="tutorialTitle">Loading...</div>
+        </div>
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="basicVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="basicTitle">Loading...</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+
+  <div id="resources" class="content-section">
+    <h2 id="resourcesTitle" style="margin-bottom:20px;">Resources</h2>
+  <div class="week-resources" data-week="1">
+    <h3 style="color:#9c27b0;margin-bottom:16px;">📚 Week 1 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/pae-w1-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts and definitions</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/pae-w1-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/pae-w1-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation Guide</h4><p>Hands-on practical investigation</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/pae-w1-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  <div class="week-resources" data-week="2" style="display:none;">
+    <h3 style="color:#9c27b0;margin-bottom:16px;">📚 Week 2 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/pae-w2-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts and definitions</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/pae-w2-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/pae-w2-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation Guide</h4><p>Hands-on practical investigation</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/pae-w2-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  </div>
+
+  <div id="assessment" class="content-section">
+    <div id="assessmentContent">
+<div class="assess-week" data-week="1" style="display:block;">
+<h2>Week 1 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: What is a FOSSIL?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q0" value="0" onchange="saveAnswer(1,0,0)"> A very old rock</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="1" onchange="saveAnswer(1,0,1)"> The preserved remains or traces of ancient organisms found in rock</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="2" onchange="saveAnswer(1,0,2)"> A type of mineral</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="3" onchange="saveAnswer(1,0,3)"> An ancient human tool</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: For a fossil to form, what must happen FIRST after the organism dies?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q1" value="0" onchange="saveAnswer(1,1,0)"> It must be burned</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="1" onchange="saveAnswer(1,1,1)"> It must be buried quickly (by sediment) to prevent complete decay</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="2" onchange="saveAnswer(1,1,2)"> It must freeze</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="3" onchange="saveAnswer(1,1,3)"> It must dry in the sun</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: What happens to the soft tissue (muscles, skin) of a dead organism over time?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q2" value="0" onchange="saveAnswer(1,2,0)"> It becomes a fossil</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="1" onchange="saveAnswer(1,2,1)"> It turns to rock</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="2" onchange="saveAnswer(1,2,2)"> It decays and disappears</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="3" onchange="saveAnswer(1,2,3)"> It turns to gold</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: Over millions of years, the hard parts of an organism (bones, shells) are slowly replaced by...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q3" value="0" onchange="saveAnswer(1,3,0)"> Water</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="1" onchange="saveAnswer(1,3,1)"> Air</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="2" onchange="saveAnswer(1,3,2)"> Minerals from the surrounding rock</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="3" onchange="saveAnswer(1,3,3)"> Gold</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: What is a BODY FOSSIL?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q4" value="0" onchange="saveAnswer(1,4,0)"> Footprints left by an animal</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="1" onchange="saveAnswer(1,4,1)"> The fossilised remains of an actual body part (bone, shell, tooth)</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="2" onchange="saveAnswer(1,4,2)"> A fossil found underwater</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="3" onchange="saveAnswer(1,4,3)"> A drawing of an ancient animal</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: What is a TRACE FOSSIL?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q5" value="0" onchange="saveAnswer(1,5,0)"> The fossilised body of an animal</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="1" onchange="saveAnswer(1,5,1)"> Evidence of an organism's activity — footprints, burrows, egg shells, droppings</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="2" onchange="saveAnswer(1,5,2)"> A type of mineral</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="3" onchange="saveAnswer(1,5,3)"> A very small fossil</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: In which type of rock are fossils usually found?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q6" value="0" onchange="saveAnswer(1,6,0)"> Igneous rock (from lava)</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="1" onchange="saveAnswer(1,6,1)"> Metamorphic rock</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="2" onchange="saveAnswer(1,6,2)"> Sedimentary rock (formed from layers)</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="3" onchange="saveAnswer(1,6,3)"> Any type of rock equally</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: Why are fossils NOT usually found in igneous rock?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q7" value="0" onchange="saveAnswer(1,7,0)"> Igneous rock is too soft</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="1" onchange="saveAnswer(1,7,1)"> Any organisms caught in lava would be destroyed by the extreme heat</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="2" onchange="saveAnswer(1,7,2)"> Igneous rock is too old</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="3" onchange="saveAnswer(1,7,3)"> Fossils prefer sedimentary rock</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: How long does it usually take for a fossil to fully form?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q8" value="0" onchange="saveAnswer(1,8,0)"> A few hundred years</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="1" onchange="saveAnswer(1,8,1)"> A few thousand years</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="2" onchange="saveAnswer(1,8,2)"> Tens of thousands to millions of years</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="3" onchange="saveAnswer(1,8,3)"> A few days</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: The Karoo basin in South Africa is rich in fossils. Why?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q9" value="0" onchange="saveAnswer(1,9,0)"> The Karoo has many volcanoes</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="1" onchange="saveAnswer(1,9,1)"> The Karoo was once a large inland sea/lake — sediment buried organisms to form fossils</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="2" onchange="saveAnswer(1,9,2)"> The Karoo has the oldest rocks in SA</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="3" onchange="saveAnswer(1,9,3)"> Fossils grow in dry places</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_FOS_1.html" onclick="localStorage.setItem('cl_submit_course','FOS');localStorage.setItem('cl_submit_week','1');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+<div class="assess-week" data-week="2" style="display:none;">
+<h2>Week 2 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: What is PALAEOANTHROPOLOGY?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q0" value="0" onchange="saveAnswer(2,0,0)"> The study of ancient rocks</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="1" onchange="saveAnswer(2,0,1)"> The study of ancient human ancestors using fossil evidence</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="2" onchange="saveAnswer(2,0,2)"> The study of dinosaur fossils</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="3" onchange="saveAnswer(2,0,3)"> The study of ancient plants</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: "Mrs Ples" is a famous fossil found in South Africa. She is an example of which type of fossil?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q1" value="0" onchange="saveAnswer(2,1,0)"> A trace fossil</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="1" onchange="saveAnswer(2,1,1)"> A body fossil (skull of an ancient human ancestor — Australopithecus africanus)</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="2" onchange="saveAnswer(2,1,2)"> A plant fossil</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="3" onchange="saveAnswer(2,1,3)"> A dinosaur fossil</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: In what year was Mrs Ples discovered at Sterkfontein?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q2" value="0" onchange="saveAnswer(2,2,0)"> 1947</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="1" onchange="saveAnswer(2,2,1)"> 1860</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="2" onchange="saveAnswer(2,2,2)"> 2001</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="3" onchange="saveAnswer(2,2,3)"> 1910</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: What does fossil evidence tell scientists about extinct species?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q3" value="0" onchange="saveAnswer(2,3,0)"> Nothing useful</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="1" onchange="saveAnswer(2,3,1)"> What ancient organisms looked like, how they lived, and how species changed over time (evolution)</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="2" onchange="saveAnswer(2,3,2)"> Only the colour of ancient animals</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="3" onchange="saveAnswer(2,3,3)"> Only the size of ancient animals</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: An INDEX FOSSIL is used to...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q4" value="0" onchange="saveAnswer(2,4,0)"> Decorate museums</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="1" onchange="saveAnswer(2,4,1)"> Date rock layers (if you find the same index fossil in two places, the rocks are the same age)</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="2" onchange="saveAnswer(2,4,2)"> Find gold deposits</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="3" onchange="saveAnswer(2,4,3)"> Predict earthquakes</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: The Cradle of Humankind is located near which South African city?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q5" value="0" onchange="saveAnswer(2,5,0)"> Cape Town</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="1" onchange="saveAnswer(2,5,1)"> Durban</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="2" onchange="saveAnswer(2,5,2)"> Johannesburg (Maropeng, Sterkfontein)</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="3" onchange="saveAnswer(2,5,3)"> Bloemfontein</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: Mary Anning was a famous fossil hunter. She discovered fossils in...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q6" value="0" onchange="saveAnswer(2,6,0)"> South Africa</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="1" onchange="saveAnswer(2,6,1)"> Antarctica</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="2" onchange="saveAnswer(2,6,2)"> England (Jurassic Coast)</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="3" onchange="saveAnswer(2,6,3)"> Australia</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: "Little Foot" is a fossil skeleton found at Sterkfontein. It is approximately how old?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q7" value="0" onchange="saveAnswer(2,7,0)"> 100 000 years</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="1" onchange="saveAnswer(2,7,1)"> 500 000 years</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="2" onchange="saveAnswer(2,7,2)"> 3.67 million years old</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="3" onchange="saveAnswer(2,7,3)"> 10 million years</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: Fossilised FOOTPRINTS (trace fossils) can tell scientists...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q8" value="0" onchange="saveAnswer(2,8,0)"> Nothing useful</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="1" onchange="saveAnswer(2,8,1)"> What colour the animal was</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="2" onchange="saveAnswer(2,8,2)"> How the animal moved, its size and behaviour</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="3" onchange="saveAnswer(2,8,3)"> Only what the animal ate</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: Why is the Karoo important for understanding prehistoric life?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q9" value="0" onchange="saveAnswer(2,9,0)"> It has the most gold in SA</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="1" onchange="saveAnswer(2,9,1)"> Its extensive sedimentary rock layers contain some of the world's best-preserved mammal-like reptile fossils from 250 million years ago</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="2" onchange="saveAnswer(2,9,2)"> It is the driest place in SA</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="3" onchange="saveAnswer(2,9,3)"> It has the most recent rocks in SA</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_FOS_2.html" onclick="localStorage.setItem('cl_submit_course','FOS');localStorage.setItem('cl_submit_week','2');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:30px;">
+    <a href="https://dbeducator.github.io/Natural-Sciences/grade5/results.html" class="admin-btn" style="text-decoration:none;display:inline-block;">View My Results</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'coachL_FOS_';
+const TOTAL_WEEKS = 2;
+const COURSE_NAME = 'Fossils';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz89hcA4Z70ZyOKnk2MBBc5kVWKG5aXljNgSzpXZbfXDOhGvtpeZXGSOadoZB_RdyPK/exec';
+const SECRET_KEY = 'CoachL2025SecureKey';
+const BASE_URL = 'https://dbeducator.github.io/Natural-Sciences/grade5/';
+const coursePrefixForSubmit = 'FOS';
+
+const CORRECT_ANSWERS = {
+  1: [1, 1, 2, 2, 1, 1, 2, 1, 2, 1],
+  2: [1, 1, 0, 1, 1, 2, 2, 2, 2, 1],
+};
+Object.keys(CORRECT_ANSWERS).forEach(function(w) {
+  localStorage.setItem(STORAGE_PREFIX + 'correct_' + w, JSON.stringify(CORRECT_ANSWERS[parseInt(w)]));
+});
+
+let currentWeek = 1;
+let completedWeeks = new Set(JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'completedWeeks') || '[]'));
+let studentInfo = { name: '', email: '' };
+
+function toggleTheme() {
+  const isLight = document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').innerHTML = isLight ? '&#9790; Dark' : '&#9728; Light';
+}
+
+function saveAnswer(week, q, val) {
+  var k = STORAGE_PREFIX + 'answers_' + week;
+  var saved = JSON.parse(localStorage.getItem(k) || '{}');
+  saved['q' + q] = val;
+  localStorage.setItem(k, JSON.stringify(saved));
+}
+
+function selectModule(week) {
+  currentWeek = week;
+  refreshModuleButtons();
+  updateWeekContent();
+}
+
+function refreshModuleButtons() {
+  document.querySelectorAll('.module-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (completedWeeks.has(i+1)) {
+      btn.classList.add('completed');
+      btn.textContent = 'Week ' + (i+1) + ' ✓';
+    } else {
+      btn.textContent = 'Week ' + (i+1);
+    }
+  });
+  document.querySelectorAll('.module-btn')[currentWeek - 1].classList.add('active');
+}
+
+function showTab(tabName, tabBtn) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  if (tabBtn) tabBtn.classList.add('active');
+}
+
+function updateVideoSection() {
+  const v = weekVideos[currentWeek];
+  const CS = '<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;"><div style="font-size:2.5rem;">🎬</div><p style=\"color:#fff;font-weight:700;margin-top:10px;\">Video Coming Soon</p><p style=\"color:#aaa;font-size:0.8rem;margin-top:6px;\">Check back later</p></div>';
+  const iframe = function(id) { return '<iframe src="https://www.youtube.com/embed/'+id+'?rel=0&modestbranding=1&iv_load_policy=3" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>'; };
+  document.getElementById('tutorialVideo').innerHTML = (v.t && v.t !== 'x0lauGbQWvQ') ? iframe(v.t) : CS;
+  document.getElementById('basicVideo').innerHTML = (v.b && v.b !== 'x0lauGbQWvQ') ? iframe(v.b) : CS;
+  document.getElementById('tutorialTitle').textContent = v.tTitle;
+  document.getElementById('basicTitle').textContent = v.bTitle;
+  document.getElementById('weekTitle').textContent = 'Videos — Week ' + currentWeek;
+}
+
+function updateWeekContent() {
+  const week = weekData[currentWeek];
+  updateVideoSection();
+  document.getElementById('lessonContent').innerHTML = week.content;
+  document.getElementById('resourcesTitle').textContent = 'Resources — Week ' + currentWeek;
+  document.querySelectorAll('.week-resources').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.assess-week').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+}
+
+function updateProgress() {
+  const done = completedWeeks.size;
+  const pct = Math.round(done / TOTAL_WEEKS * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').textContent = pct + '%';
+  document.getElementById('weeksComplete').textContent = done + '/' + TOTAL_WEEKS;
+  document.getElementById('videosWatched').textContent = (done*2) + '/' + (TOTAL_WEEKS*2);
+  document.getElementById('assessmentsPassed').textContent = done + '/' + TOTAL_WEEKS;
+}
+
+window.onload = function() {
+  studentInfo.name = localStorage.getItem('cl_firstName') || 'Learner';
+  document.getElementById('studentName').textContent = studentInfo.name;
+  document.getElementById('avatar').textContent = studentInfo.name.charAt(0).toUpperCase();
+  const isLight = localStorage.getItem('cl_theme') === 'light';
+  if(isLight) { document.getElementById('body').classList.add('light-mode'); document.getElementById('themeBtn').innerHTML = '&#9790; Dark'; }
+  updateProgress();
+  selectModule(1);
+};
+
+const weekVideos = {
+  1: {t:'HubmDAQSo64',tTitle:'Week 1: How Fossils Form',b:'mAF1lbInUQ8',bTitle:'How Fossils Form — Key Concepts'},
+  2: {t:'ZKtkrqOpECI',tTitle:'Week 2: What Fossils Tell Us About the Past',b:'MBnmZABv4Rk',bTitle:'What Fossils Tell Us About the Past — Key Concepts'}
+};
+
+const weekData = {
+  1: {
+    content: `<h2 style="color:#9c27b0;">🦕 Fossils — Week 1</h2>
+<div style="background:linear-gradient(135deg,#4a148c,#6a1b9a);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">🦴</div>
+  <h3 style="color:#fff;margin:8px 0;">How Fossils Form</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Nature's record of ancient life</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>What a fossil is and how it forms</li><li>The conditions needed for good fossilisation</li><li>The different types of fossils</li><li>Where to find fossils in South Africa</li></ul>
+<h3>🦴 What is a Fossil?</h3>
+<p>A <strong>fossil</strong> is the preserved remains or traces of a once-living organism, usually found in sedimentary rock. Fossils can be millions or billions of years old.</p>
+<h3>🔄 How Fossils Form</h3>
+<div style="background:rgba(156,39,176,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid #9c27b0;">
+  <p style="text-align:center;">Organism dies → Soft parts decay → Hard parts remain → Buried by sediment → Minerals replace original material → Rock forms → Erosion exposes fossil millions of years later</p>
+</div>
+<h3>✅ Conditions for Good Fossilisation</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;">
+  <div style="background:rgba(76,175,80,0.1);border-radius:10px;padding:12px;border:1px solid #4caf50;">
+    <h4 style="color:#4caf50;">✅ Helps</h4>
+    <p style="font-size:0.85rem;">Quick burial (before scavengers) | Hard body parts (bones, shells, teeth) | Sedimentary environment (river, lake, sea)</p>
+  </div>
+  <div style="background:rgba(244,67,54,0.1);border-radius:10px;padding:12px;border:1px solid #f44336;">
+    <h4 style="color:#f44336;">❌ Hinders</h4>
+    <p style="font-size:0.85rem;">Acidic soil (dissolves bone) | High temperature/pressure (destroys fossils) | Scavengers eating remains</p>
+  </div>
+</div>
+<h3>🔬 Types of Fossils</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🦴 <strong>Body fossils</strong> — preserved body parts: bones, shells, teeth, wood</p>
+  <p>👣 <strong>Trace fossils</strong> — evidence of activity: footprints, burrows, bite marks, dung (coprolite)</p>
+  <p>🔲 <strong>Mould fossil</strong> — impression left in rock after organism dissolved</p>
+  <p>🟤 <strong>Cast fossil</strong> — mould filled with minerals; 3D replica of organism</p>
+  <p>🌿 <strong>Carbonised fossil</strong> — organism flattened and carbonised; common in plants and insects</p>
+</div>
+<div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;border:1px solid rgba(0,200,0,0.3);">
+  <p>🇿🇦 The <strong>Karoo Basin</strong> in SA contains one of the most complete continental fossil records on Earth — covering 50 million years from 260 to 210 million years ago. More Permian reptile fossils have been found here than anywhere else in the world.</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Fossil</strong> — preserved remains or traces of ancient life in rock</p>
+  <p>🔑 <strong>Fossilisation</strong> — the process of becoming a fossil</p>
+  <p>🔑 <strong>Body fossil</strong> — preserved body parts (bones, shells)</p>
+  <p>🔑 <strong>Trace fossil</strong> — evidence of activity (footprints, burrows)</p>
+  <p>🔑 <strong>Mould</strong> — impression left by organism in rock</p>
+  <p>🔑 <strong>Cast</strong> — 3D replica formed when mould fills with minerals</p>
+</div>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">🦕 How We Know How Old Fossils Are</h4><p>Determining the age of fossils uses two main methods:</p><ul style="line-height:1.8;"><li>📚 <strong>Relative dating</strong>: using the Law of Superposition (older rocks below) and index fossils (organisms known to have lived in specific time periods). Tells us which fossils are older or younger than each other — but not exact dates.</li><li>☢️ <strong>Radiometric dating</strong>: uses the predictable decay of radioactive isotopes. The "parent" isotope decays to the "daughter" isotope at a known half-life.</li></ul><div style="background:rgba(156,39,176,0.1);border-radius:8px;padding:12px;margin:10px 0;"><p><strong>Carbon-14 dating</strong>: carbon-14 (half-life 5,730 years) is absorbed by all living organisms. When they die, C-14 decays. Measuring remaining C-14 gives age up to ~50,000 years. Used for: human remains, wooden artefacts, peat bogs.</p><p style="margin-top:8px;"><strong>Uranium-lead dating</strong>: uranium-238 (half-life 4.5 billion years) decays to lead-206. Used for: ancient zircon crystals in rock. Can date rocks billions of years old — used to determine Earth's age (~4.54 billion years).</p></div></div><div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">🌍 What Fossils Proved — Continental Drift</h4><p>Fossils were crucial evidence for Alfred Wegener's theory of continental drift:</p><ul style="line-height:1.8;"><li>🌿 <strong>Glossopteris</strong> (extinct tree fern): identical fossils found in SA, South America, India, Antarctica, Australia. This plant could not cross oceans. Conclusion: these continents were once joined as Gondwana.</li><li>🦎 <strong>Mesosaurus</strong> (small aquatic reptile): fossils only in SA and South America. Too small to cross the Atlantic. Conclusion: SA and South America were once connected.</li><li>🦕 <strong>Lystrosaurus</strong> (Permian reptile): found in SA, India and Antarctica — all once part of Gondwana's southern land mass.</li></ul><p style="font-size:0.88rem;margin-top:8px;">These fossil distributions are now perfectly explained by plate tectonics — Gondwana broke apart ~180 million years ago, carrying the descendants of these organisms to their current positions on different continents.</p></div><div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>⭐ <strong>Did You Know?</strong> The oldest fossils on Earth are 3.5 billion-year-old stromatolites — layered mounds built by cyanobacteria (blue-green algae). Living stromatolites still exist in Shark Bay, Western Australia. South Africa's Barberton Greenstone Belt contains some of the earliest fossil evidence of life on Earth — microfossils over 3.2 billion years old. Life on Earth is almost as old as Earth itself (4.54 billion years).</p></div><div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>🇿🇦 <strong>SA Focus:</strong> The Karoo's Permian extinction — the largest mass extinction in Earth's history (252 million years ago) — is recorded in the Karoo rocks. Before the extinction, the Karoo was dominated by diverse mammal-like reptiles (therapsids). After it, almost 96% of all species died and the surviving therapsids diversified into the ancestors of all modern mammals. SA geologist Robert Broom collected many of these fossils in the early 1900s and his work was crucial in demonstrating that mammals evolved from reptiles.</p></div><div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #9c27b0;"><h3 style="color:#9c27b0;margin-bottom:10px;">📋 Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">Fossil formation: death → soft parts decay → hard parts buried → minerals replace material → rock forms → erosion exposes fossil.</li><li style="margin-bottom:6px;">Types: body fossils, trace fossils (footprints), mould fossils (impression), cast fossils (3D replica).</li><li style="margin-bottom:6px;">Relative dating: Law of Superposition + index fossils. Absolute dating: radiometric (C-14, U-Pb).</li><li style="margin-bottom:6px;">C-14 dating: up to 50,000 years. U-Pb dating: billions of years.</li><li style="margin-bottom:6px;">Fossils proved continental drift: Glossopteris, Mesosaurus, Lystrosaurus found on separated continents that were once joined.</li><li style="margin-bottom:6px;">Oldest life: 3.5 billion year stromatolites. SA Barberton Greenstone Belt: 3.2 billion year microfossils.</li></ul></div><div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#9c27b0;margin-bottom:10px;">🔁 Quick Recap Questions</h3><p style="margin-bottom:8px;"><strong>Q: What is the difference between relative and absolute dating of fossils?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Relative dating uses rock layer position (older below) and index fossils to determine which fossils are older/younger than each other. Absolute dating uses radioactive decay rates to give an actual age in years.</span></p><p style="margin-bottom:8px;"><strong>Q: Why is the Glossopteris fossil significant for the theory of continental drift?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Identical Glossopteris plant fossils are found in SA, South America, India, Antarctica and Australia. This plant could not cross oceans. Therefore these landmasses must have been connected when Glossopteris lived — proving they were once part of the supercontinent Gondwana.</span></p><p style="margin-bottom:8px;"><strong>Q: Why would a fossil found in a deeper rock layer generally be older than one found near the surface?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: According to the Law of Superposition, sedimentary rocks are deposited in horizontal layers with oldest at the bottom and youngest at the top. A fossil deeper in undisturbed rock was deposited earlier in time.</span></p></div>`,
+    assessment: [
+      { question: "What is PALAEOANTHROPOLOGY?", options: ["The study of ancient rocks", "The study of ancient human ancestors using fossil evidence", "The study of dinosaur fossils", "The study of ancient plants"], correct: 1 },
+      { question: "\"Mrs Ples\" is a famous fossil found in South Africa. She is an example of which type of fossil?", options: ["A trace fossil", "A body fossil (skull of an ancient human ancestor — Australopithecus africanus)", "A plant fossil", "A dinosaur fossil"], correct: 1 },
+      { question: "In what year was Mrs Ples discovered at Sterkfontein?", options: ["1947", "1860", "2001", "1910"], correct: 0 },
+      { question: "What does fossil evidence tell scientists about extinct species?", options: ["Nothing useful", "What ancient organisms looked like, how they lived, and how species changed over time (evolution)", "Only the colour of ancient animals", "Only the size of ancient animals"], correct: 1 },
+      { question: "An INDEX FOSSIL is used to...", options: ["Decorate museums", "Date rock layers (if you find the same index fossil in two places, the rocks are the same age)", "Find gold deposits", "Predict earthquakes"], correct: 1 },
+      { question: "The Cradle of Humankind is located near which South African city?", options: ["Cape Town", "Durban", "Johannesburg (Maropeng, Sterkfontein)", "Bloemfontein"], correct: 2 },
+      { question: "Mary Anning was a famous fossil hunter. She discovered fossils in...", options: ["South Africa", "Antarctica", "England (Jurassic Coast)", "Australia"], correct: 2 },
+      { question: "\"Little Foot\" is a fossil skeleton found at Sterkfontein. It is approximately how old?", options: ["100 000 years", "500 000 years", "3.67 million years old", "10 million years"], correct: 2 },
+      { question: "Fossilised FOOTPRINTS (trace fossils) can tell scientists...", options: ["Nothing useful", "What colour the animal was", "How the animal moved, its size and behaviour", "Only what the animal ate"], correct: 2 },
+      { question: "Why is the Karoo important for understanding prehistoric life?", options: ["It has the most gold in SA", "Its extensive sedimentary rock layers contain some of the world's best-preserved mammal-like reptile fossils from 250 million years ago", "It is the driest place in SA", "It has the most recent rocks in SA"], correct: 1 },
+    ]
+  },
+  2: {
+    content: `<h2 style="color:#9c27b0;">🦕 Fossils — Week 2</h2>
+<div style="background:linear-gradient(135deg,#4a148c,#6a1b9a);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">👤</div>
+  <h3 style="color:#fff;margin:8px 0;">What Fossils Tell Us</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Reading Earth's history in ancient remains</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>What fossils reveal about past life and environments</li><li>SA's world-famous fossil heritage sites</li><li>How fossils are used as evidence for evolution</li><li>The Cradle of Humankind</li></ul>
+<h3>📖 What Fossils Tell Scientists</h3>
+<div style="background:rgba(156,39,176,0.1);border-radius:10px;padding:14px;margin:12px 0;border:1px solid #9c27b0;">
+  <p>⏰ <strong>Age of life</strong> — fossils prove organisms have existed for billions of years</p>
+  <p>🔄 <strong>Evolution</strong> — fossil sequences show how species changed gradually over time</p>
+  <p>🌊 <strong>Past environments</strong> — marine fossils on land = ancient seas; tropical plants in cold regions = climate change</p>
+  <p>💀 <strong>Extinction events</strong> — sudden gaps in the fossil record mark mass extinctions (e.g. dinosaurs 66 million years ago)</p>
+  <p>🗺️ <strong>Continental drift</strong> — identical fossils on different continents proved the continents were once joined</p>
+</div>
+<h3>🇿🇦 SA's Fossil Heritage</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🦕 <strong>Karoo Basin</strong> — Dicynodon, Lystrosaurus (Permian reptiles); world-class fossil record</p>
+  <p>🌿 <strong>Glossopteris (Karoo)</strong> — plant fossil found on all southern continents; proved Gondwana existed</p>
+  <p>🐚 <strong>Cederberg Formation</strong> — 500 million year old marine invertebrate fossils</p>
+  <p>👤 <strong>Cradle of Humankind</strong> — early human fossils; 40% of all known early human fossils found here</p>
+</div>
+<h3>👤 The Cradle of Humankind</h3>
+<div style="background:rgba(156,39,176,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid #9c27b0;">
+  <p>Located 50km northwest of Johannesburg. UNESCO World Heritage Site. Limestone caves (Sterkfontein, Swartkrans, Kromdraai) contain the world's richest concentration of early human fossils.</p>
+  <p style="margin-top:8px;">👤 <strong>Mrs Ples</strong> (Australopithecus africanus, 2.5 million years old) — found 1947</p>
+  <p>👤 <strong>Little Foot</strong> (Australopithecus, 3.67 million years old) — nearly complete skeleton found 1994–1998</p>
+</div>
+<div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;border:1px solid rgba(0,200,0,0.3);">
+  <p>🇿🇦 The <strong>Glossopteris</strong> plant fossil found in the Karoo Basin was also found in identical form in Antarctica, India, South America and Australia — helping to prove that all these landmasses were once joined as the supercontinent <strong>Gondwana</strong>, before breaking apart ~180 million years ago.</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Evolution</strong> — gradual change in organisms over many generations</p>
+  <p>🔑 <strong>Extinction</strong> — when the last individual of a species dies</p>
+  <p>🔑 <strong>Gondwana</strong> — ancient supercontinent that included present-day Africa, SA, Antarctica, India, Australia</p>
+  <p>🔑 <strong>Australopithecus</strong> — genus of early human ancestors found in SA; lived 2–4 million years ago</p>
+  <p>🔑 <strong>Palaeontology</strong> — the scientific study of fossils</p>
+</div>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">👤 Human Evolution in SA — The Story So Far</h4><p>South Africa has produced some of the most important human fossils in the world:</p><ul style="line-height:1.8;"><li>👣 <strong>Ardipithecus</strong> (~4.4 Ma): one of the earliest possible human ancestors. Walked upright on two legs but still climbed trees.</li><li>👤 <strong>Australopithecus africanus</strong> (2–3 Ma): "Mrs Ples" found at Sterkfontein 1947. Brain about 1/3 size of modern human. Walked upright.</li><li>👤 <strong>Australopithecus sediba</strong> (1.98 Ma): found at Malapa cave (Cradle of Humankind) in 2008 by 9-year-old Matthew Berger (son of palaeontologist Lee Berger). Mix of Australopithecus and Homo features.</li><li>🧠 <strong>Homo naledi</strong> (0.24–0.34 Ma): discovered in Rising Star Cave (Cradle of Humankind) in 2013 by Lee Berger's team. Small-brained but with modern hand structure — possibly capable of symbolic behaviour.</li><li>🧠 <strong>Homo sapiens</strong> (~300,000 years ago): modern humans evolved in Africa. DNA evidence suggests SA's Khoisan people have one of the oldest genetic lineages of any living humans.</li></ul></div><div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">🦕 SA's Karoo Fossils — The Therapsid Revolution</h4><p>The Karoo Basin contains the world's most complete record of the transition from reptiles to mammals:</p><ul style="line-height:1.8;"><li>🦎 <strong>Pelycosaurs</strong> (Permian): the earliest mammal-like reptiles. Included Dimetrodon (large sail on back for thermoregulation).</li><li>🐊 <strong>Therapsids</strong> (Late Permian–Triassic): diverse group of "mammal-like reptiles." Features increasingly mammal-like: differentiated teeth, upright posture, possibly warm-blooded. SA Karoo has the best therapsid fossil record in the world.</li><li>💀 <strong>Permian extinction (252 Ma)</strong>: 96% of all species died. The Karoo fossil record clearly shows this catastrophe — diverse therapsid fauna suddenly replaced by almost nothing, then gradual recovery.</li><li>🐭 <strong>Cynodont therapsids</strong>: the survivors and ancestors of all modern mammals. Small, likely warm-blooded, had mammalian teeth and skull features. Modern mammals evolved from these.</li></ul></div><div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>⭐ <strong>Did You Know?</strong> Homo naledi, discovered in the Rising Star Cave near Johannesburg in 2013, is one of the most puzzling human relatives ever found. It has a tiny brain (about the size of an orange) yet has remarkably human-like hands, feet and teeth. Most controversially, the bones were found deep in a cave system accessible only through a narrow 18cm crack — suggesting they were deliberately placed there, possibly a form of burial practice by a species we previously assumed lacked that capacity.</p></div><div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>🇿🇦 <strong>SA Focus:</strong> South Africa is arguably the most important country in the world for understanding human evolution. The Cradle of Humankind UNESCO World Heritage Site has produced 40% of all known early human fossil material. The Maropeng visitor centre (meaning "returning to the place of origin" in Setswana) near Johannesburg tells the story of human evolution in an engaging way. SA palaeontologists like Robert Broom, Phillip Tobias, Raymond Dart and Lee Berger have made discoveries that fundamentally changed how we understand human origins.</p></div><div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #9c27b0;"><h3 style="color:#9c27b0;margin-bottom:10px;">📋 Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">Fossils reveal: evolution, past environments, extinction events, continental drift, age of life on Earth.</li><li style="margin-bottom:6px;">SA human fossil timeline: Australopithecus africanus (2-3 Ma, Sterkfontein) → A. sediba (1.98 Ma, Malapa) → Homo naledi (0.24-0.34 Ma, Rising Star Cave).</li><li style="margin-bottom:6px;">Karoo therapsids: world's best record of reptile-to-mammal transition, including the Permian mass extinction (252 Ma).</li><li style="margin-bottom:6px;">Glossopteris, Mesosaurus and Lystrosaurus fossils proved continental drift / Gondwana.</li><li style="margin-bottom:6px;">Cradle of Humankind: 40% of all known early human fossils. UNESCO World Heritage Site.</li><li style="margin-bottom:6px;">Palaeontology in SA: Dart, Broom, Tobias, Lee Berger — world-class discoveries.</li></ul></div><div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#9c27b0;margin-bottom:10px;">🔁 Quick Recap Questions</h3><p style="margin-bottom:8px;"><strong>Q: Name two SA human fossils and their approximate ages.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Mrs Ples (Australopithecus africanus) ~2.5 million years old from Sterkfontein. Little Foot (Australopithecus) ~3.67 million years old from Sterkfontein. Homo naledi ~0.24–0.34 million years old from Rising Star Cave.</span></p><p style="margin-bottom:8px;"><strong>Q: Why is the Karoo Supergroup important for understanding the evolution of mammals?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: It contains the world's most complete fossil record of therapsids — "mammal-like reptiles" — showing the gradual transition from reptile ancestors to early mammals over ~50 million years (260–210 Ma). It also records the Permian mass extinction and recovery.</span></p><p style="margin-bottom:8px;"><strong>Q: What do Glossopteris and Mesosaurus fossils prove and how?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: They prove that SA was once connected to South America, India, Antarctica and Australia as the supercontinent Gondwana. Glossopteris (tree fern) and Mesosaurus (small reptile) could not cross oceans, so finding their fossils on multiple continents proves those continents were once joined.</span></p></div>`,
+    assessment: [
+      { question: "What is PALAEOANTHROPOLOGY?", options: ["The study of ancient rocks", "The study of ancient human ancestors using fossil evidence", "The study of dinosaur fossils", "The study of ancient plants"], correct: 1 },
+      { question: "\"Mrs Ples\" is a famous fossil found in South Africa. She is an example of which type of fossil?", options: ["A trace fossil", "A body fossil (skull of an ancient human ancestor — Australopithecus africanus)", "A plant fossil", "A dinosaur fossil"], correct: 1 },
+      { question: "In what year was Mrs Ples discovered at Sterkfontein?", options: ["1947", "1860", "2001", "1910"], correct: 0 },
+      { question: "What does fossil evidence tell scientists about extinct species?", options: ["Nothing useful", "What ancient organisms looked like, how they lived, and how species changed over time (evolution)", "Only the colour of ancient animals", "Only the size of ancient animals"], correct: 1 },
+      { question: "An INDEX FOSSIL is used to...", options: ["Decorate museums", "Date rock layers (if you find the same index fossil in two places, the rocks are the same age)", "Find gold deposits", "Predict earthquakes"], correct: 1 },
+      { question: "The Cradle of Humankind is located near which South African city?", options: ["Cape Town", "Durban", "Johannesburg (Maropeng, Sterkfontein)", "Bloemfontein"], correct: 2 },
+      { question: "Mary Anning was a famous fossil hunter. She discovered fossils in...", options: ["South Africa", "Antarctica", "England (Jurassic Coast)", "Australia"], correct: 2 },
+      { question: "\"Little Foot\" is a fossil skeleton found at Sterkfontein. It is approximately how old?", options: ["100 000 years", "500 000 years", "3.67 million years old", "10 million years"], correct: 2 },
+      { question: "Fossilised FOOTPRINTS (trace fossils) can tell scientists...", options: ["Nothing useful", "What colour the animal was", "How the animal moved, its size and behaviour", "Only what the animal ate"], correct: 2 },
+      { question: "Why is the Karoo important for understanding prehistoric life?", options: ["It has the most gold in SA", "Its extensive sedimentary rock layers contain some of the world's best-preserved mammal-like reptile fossils from 250 million years ago", "It is the driest place in SA", "It has the most recent rocks in SA"], correct: 1 },
+    ]
+  }
+};
+</script>
+
+<!-- Maxi Pie Floating Bot -->
+<iframe src="bot.html" id="maxiFrame" style="position:fixed;bottom:0;right:0;width:100%;height:100%;border:none;pointer-events:none;z-index:9999;" allow="microphone"></iframe>
+<script>
+  var mf = document.getElementById('maxiFrame');
+  document.addEventListener('touchstart', function(e){
+    var t = e.touches[0];
+    var fromRight = window.innerWidth - t.clientX;
+    var fromBottom = window.innerHeight - t.clientY;
+    mf.style.pointerEvents = (fromRight < 100 && fromBottom < 100) ? 'auto' : 'none';
+  });
+  document.addEventListener('mousemove', function(e){
+    var fromRight = window.innerWidth - e.clientX;
+    var fromBottom = window.innerHeight - e.clientY;
+    mf.style.pointerEvents = (fromRight < 100 && fromBottom < 100) ? 'auto' : 'none';
+  });
+</script>
+</body>
+</html>
