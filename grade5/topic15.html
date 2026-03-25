@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sources of Energy — Grade 5 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png">
+<style>
+
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #07070c;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #ff9800 0%, #ff9800cc 100%);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .course-title h1 { font-size: 1.8rem; margin-bottom: 5px; }
+  .course-title p { font-size: 0.9rem; opacity: 0.9; }
+
+  .user-info { display: flex; align-items: center; gap: 15px; }
+
+  .avatar {
+    width: 45px; height: 45px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: bold;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+  .progress-overview {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .progress-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #ff9800 0%, #ff9800cc 100%);
+    color: white; padding: 20px; border-radius: 12px; text-align: center;
+  }
+  .stat-card h3 { font-size: 2rem; margin-bottom: 5px; }
+  .stat-card p { font-size: 0.9rem; opacity: 0.9; }
+
+  .progress-bar {
+    width: 100%; height: 25px; background: #e0e0e0;
+    border-radius: 15px; overflow: hidden; margin: 20px 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff9800 0%, #ff9800cc 100%);
+    border-radius: 15px; transition: width 0.5s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 10px; color: white; font-weight: 600; font-size: 0.9rem;
+    min-width: 45px;
+  }
+
+  .tabs {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0; flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 12px 25px; background: #12121f; border: none;
+    border-radius: 10px 10px 0 0; cursor: pointer;
+    font-size: 1rem; font-weight: 600; color: #aaa; transition: all 0.3s ease;
+  }
+  .tab.active { background: linear-gradient(135deg, #ff9800 0%, #ff9800cc 100%); color: white; }
+
+  .module-selector {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    overflow-x: auto; padding-bottom: 10px;
+  }
+
+  .module-btn {
+    padding: 12px 25px; background: #12121f;
+    border: 2px solid #ff9800; border-radius: 25px;
+    cursor: pointer; font-size: 1rem; font-weight: 600;
+    color: #ff9800; white-space: nowrap; transition: all 0.3s ease;
+  }
+  .module-btn.active {
+    background: linear-gradient(135deg, #ff9800 0%, #ff9800cc 100%);
+    color: white; border-color: transparent;
+  }
+  .module-btn.completed { background: #4caf50; color: white; border-color: #4caf50; }
+
+  .content-section { display: block; height: 0; overflow: hidden; }
+  .content-section.active { height: auto; overflow: visible; }
+
+  .video-section {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .video-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px; margin-top: 20px;
+  }
+
+  .video-player {
+    background: #000; border-radius: 12px; overflow: hidden;
+    position: relative; padding-top: 56.25%;
+  }
+
+  .video-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  }
+
+  .play-btn {
+    width: 70px; height: 70px;
+    background: rgba(102, 126, 234, 0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .play-btn:hover { background: #ff9800; transform: scale(1.1); }
+  .play-btn::after { content: '▶'; color: white; font-size: 2rem; margin-left: 5px; }
+
+  .video-title { margin-top: 15px; font-size: 1.1rem; font-weight: 600; color: #fff; }
+  body.light-mode .video-title { color: #333; }
+
+  .lesson-content {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+  .lesson-content h2 { color: #ff9800; margin-bottom: 20px; font-size: 1.8rem; }
+  .lesson-content h3 { color: #ff9800cc; margin-top: 25px; margin-bottom: 15px; font-size: 1.3rem; }
+  .lesson-content h4 { color: #ff9800; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+  .lesson-content p { line-height: 1.8; margin-bottom: 15px; color: #ccc; }
+  .lesson-content ul { margin-left: 25px; margin-bottom: 15px; }
+  .lesson-content li { margin-bottom: 10px; line-height: 1.6; color: #ccc; }
+
+  .assessment-section {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .quiz-question {
+    background: #1a1a2e; padding: 20px; border-radius: 12px;
+    margin-bottom: 20px; border-left: 4px solid #ff9800;
+  }
+  .quiz-question h4 { margin-bottom: 15px; color: #fff; font-size: 1.1rem; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .quiz-option {
+    padding: 12px 20px; background: #12121f; border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .quiz-option:hover { border-color: #ff9800; background: #f0f4ff; }
+  .quiz-option input { margin-right: 10px; }
+
+  .submit-btn {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #ff9800 0%, #ff9800cc 100%);
+    color: white; border: none; border-radius: 25px;
+    font-size: 1.1rem; font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; margin-top: 20px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+  .already-passed-notice {
+    background: #e8f5e9; border: 2px solid #4caf50; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; text-align: center;
+  }
+  .already-passed-notice h3 { color: #2e7d32; margin-bottom: 8px; }
+  .already-passed-notice p { color: #388e3c; }
+
+  .resources-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  a.resource-card { display: block; text-decoration: none; color: inherit; cursor: pointer; }
+  .resource-card {
+    display: block; text-decoration: none; color: inherit;
+    background: #12121f; border-radius: 12px; padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;
+    cursor: pointer; border: 2px solid transparent;
+  }
+  .resource-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: #ff9800; }
+
+  .resource-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #ff9800 0%, #ff9800cc 100%);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.5rem; margin-bottom: 15px;
+  }
+  .resource-card h4 { margin-bottom: 10px; color: #fff; }
+  .resource-card p { color: #aaa; font-size: 0.9rem; }
+
+  .download-badge {
+    display: inline-block; padding: 5px 12px; background: #4caf50;
+    color: white; border-radius: 15px; font-size: 0.75rem; margin-top: 10px;
+  }
+
+  .admin-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white; border: none; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(240,147,251,0.4); z-index: 50; transition: all 0.3s ease;
+  }
+  .admin-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(240,147,251,0.6); }
+
+  @media (max-width: 768px) {
+    .header-content { flex-direction: column; gap: 15px; text-align: center; }
+    .video-grid { grid-template-columns: 1fr; }
+    .module-selector { flex-wrap: wrap; }
+    .resources-grid { grid-template-columns: 1fr; }
+  }
+
+/* ── DARK THEME ADDITIONS ── */
+.lesson-content h2, .lesson-content h3, .lesson-content h4 { color: #c4b5fd; }
+.lesson-content p, .lesson-content li { color: #ccc; }
+.lesson-content strong { color: #e0d7ff; }
+.quiz-option { color: #ccc; }
+.quiz-option:hover { background: rgba(102,126,234,0.15); border-color: #ff9800; }
+.resource-card h4 { color: #fff; }
+.resource-card p { color: #aaa; }
+.already-passed-notice { background: rgba(76,175,80,0.1); border: 2px solid #4caf50; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.already-passed-notice h3 { color: #4caf50; }
+.already-passed-notice p { color: #aaa; }
+
+
+/* ── LIGHT MODE ── */
+body.light-mode { background: #ffffff !important; color: #222 !important; }
+body.light-mode .header { background: linear-gradient(135deg, #ff9800 0%, #ff9800cc 100%) !important; }
+body.light-mode .progress-overview { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .tabs { background: #f5f5f5 !important; }
+body.light-mode .tab { color: #666 !important; background: transparent !important; }
+body.light-mode .tab.active { background: linear-gradient(135deg, #ff9800, #ff9800cc) !important; color: #fff !important; }
+body.light-mode .module-selector { background: #f5f5f5 !important; }
+body.light-mode .module-btn { background: #fff !important; color: #ff9800 !important; border-color: #ff9800 !important; }
+body.light-mode .module-btn.active { background: linear-gradient(135deg, #ff9800, #ff9800cc) !important; color: #fff !important; }
+body.light-mode .module-btn.completed { background: #4caf50 !important; color: #fff !important; border-color: #4caf50 !important; }
+body.light-mode .video-section { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .lesson-content { background: #fff !important; color: #333 !important; }
+body.light-mode .lesson-content h2, body.light-mode .lesson-content h3, body.light-mode .lesson-content h4 { color: #ff9800 !important; }
+body.light-mode .lesson-content p, body.light-mode .lesson-content li { color: #444 !important; }
+body.light-mode .resource-card { background: #fff !important; border-color: #e0e0e0 !important; }
+body.light-mode .resource-card h4 { color: #222 !important; }
+body.light-mode .resource-card p { color: #666 !important; }
+body.light-mode .quiz-question { background: #f8f9fa !important; }
+body.light-mode .quiz-question h4 { color: #333 !important; }
+body.light-mode .quiz-option { background: #fff !important; border-color: #e0e0e0 !important; color: #333 !important; }
+body.light-mode .live-section { background: #fff !important; }
+body.light-mode .support-card { background: #f8f9fa !important; }
+
+
+.resource-card { display:block; text-decoration:none; color:inherit; }
+.resource-icon { font-size:1.5rem; margin-bottom:8px; }
+.resources-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.already-passed-notice { background:rgba(76,175,80,0.1); border:2px solid #4caf50; border-radius:10px; padding:16px; margin-bottom:20px; }
+.already-passed-notice h3 { color:#4caf50; }
+.assess-week {}
+.theme-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-family:inherit; }
+body.light-mode .theme-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.2); color:#333; }
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button onclick="window.location.href='https://dbeducator.github.io/Natural-Sciences/grade5/index.html'" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:0;">&#8592;</button>
+      <img src="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png" alt="Logo" style="width:36px;height:36px;border-radius:8px;" onerror="this.style.display=&quot;none&quot;">
+      <div class="course-title">
+        <h1>Sources of Energy</h1>
+        <p>Grade 5 Natural Sciences · Term 3 · Energy and Change</p>
+      </div>
+    </div>
+    <div class="user-info">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#9728; Light</button>
+      <div class="avatar" id="avatar">?</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-overview">
+    <h2>Your Progress — <span id="studentName"></span></h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%">0%</div>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-card"><h3 id="weeksComplete">0/2</h3><p>Weeks Complete</p></div>
+      <div class="stat-card"><h3 id="videosWatched">0/4</h3><p>Videos</p></div>
+      <div class="stat-card"><h3 id="assessmentsPassed">0/2</h3><p>Passed</p></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('content', this)">Content</button>
+    <button class="tab" onclick="showTab('resources', this)">Resources</button>
+    <button class="tab" onclick="showTab('assessment', this)">Assessment</button>
+  </div>
+
+  <div class="module-selector">
+    <button class="module-btn active" onclick="selectModule(1)">Week 1</button>
+    <button class="module-btn" onclick="selectModule(2)">Week 2</button>
+  </div>
+
+  <div id="content" class="content-section active">
+    <div class="video-section">
+      <h2 id="weekTitle" style="margin-bottom:15px;">Videos</h2>
+      <div class="video-grid">
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="tutorialVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="tutorialTitle">Loading...</div>
+        </div>
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="basicVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="basicTitle">Loading...</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+
+  <div id="resources" class="content-section">
+    <h2 id="resourcesTitle" style="margin-bottom:20px;">Resources</h2>
+  <div class="week-resources" data-week="1">
+    <h3 style="color:#ff9800;margin-bottom:16px;">📚 Week 1 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/mnm-w1-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts and definitions</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/mnm-w1-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/mnm-w1-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation Guide</h4><p>Hands-on practical investigation</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/mnm-w1-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  <div class="week-resources" data-week="2" style="display:none;">
+    <h3 style="color:#ff9800;margin-bottom:16px;">📚 Week 2 Resources</h3>
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/mnm-w2-notes.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes</h4><p>Key concepts and definitions</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/mnm-w2-worksheet.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Worksheet</h4><p>Practice activities and exercises</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/mnm-w2-investigation.pdf" class="resource-card"><div class="resource-icon">🔬</div><h4>Investigation Guide</h4><p>Hands-on practical investigation</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade5/resources/mnm-w2-pastpaper.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Paper Questions</h4><p>DBE exam-style practice</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  </div>
+
+  <div id="assessment" class="content-section">
+    <div id="assessmentContent">
+<div class="assess-week" data-week="1" style="display:block;">
+<h2>Week 1 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: What are FOSSIL FUELS?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q0" value="0" onchange="saveAnswer(1,0,0)"> Fuels made from recycled materials</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="1" onchange="saveAnswer(1,0,1)"> Fuels formed from remains of ancient organisms over millions of years (coal, oil, gas)</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="2" onchange="saveAnswer(1,0,2)"> Fuels made from living plants today</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="3" onchange="saveAnswer(1,0,3)"> Types of nuclear fuel</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: Which fossil fuel does South Africa rely on MOST for electricity generation?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q1" value="0" onchange="saveAnswer(1,1,0)"> Oil</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="1" onchange="saveAnswer(1,1,1)"> Natural gas</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="2" onchange="saveAnswer(1,1,2)"> Coal</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="3" onchange="saveAnswer(1,1,3)"> Nuclear</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: Why are fossil fuels called NON-RENEWABLE?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q2" value="0" onchange="saveAnswer(1,2,0)"> They are very expensive</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="1" onchange="saveAnswer(1,2,1)"> They can be replaced within a human lifetime</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="2" onchange="saveAnswer(1,2,2)"> They took millions of years to form and will run out</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="3" onchange="saveAnswer(1,2,3)"> They are found underground</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: What is the main environmental problem with burning fossil fuels?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q3" value="0" onchange="saveAnswer(1,3,0)"> They produce too much light</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="1" onchange="saveAnswer(1,3,1)"> They release carbon dioxide (CO₂) which contributes to climate change</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="2" onchange="saveAnswer(1,3,2)"> They are too noisy</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="3" onchange="saveAnswer(1,3,3)"> They produce too much water</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: Where is South Africa's coal mainly found and mined?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q4" value="0" onchange="saveAnswer(1,4,0)"> Western Cape</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="1" onchange="saveAnswer(1,4,1)"> Mpumalanga</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="2" onchange="saveAnswer(1,4,2)"> KwaZulu-Natal coast</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="3" onchange="saveAnswer(1,4,3)"> Northern Cape</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: What is a COAL-FIRED POWER STATION?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q5" value="0" onchange="saveAnswer(1,5,0)"> A station that uses solar energy</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="1" onchange="saveAnswer(1,5,1)"> A facility where coal is burned to heat water to make steam to drive turbines to generate electricity</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="2" onchange="saveAnswer(1,5,2)"> A station that uses wind energy</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="3" onchange="saveAnswer(1,5,3)"> A nuclear power station</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: What does "load shedding" in South Africa mean?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q6" value="0" onchange="saveAnswer(1,6,0)"> Too much electricity being produced</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="1" onchange="saveAnswer(1,6,1)"> The deliberate cutting of electricity supply to prevent total grid collapse</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="2" onchange="saveAnswer(1,6,2)"> A storm that damages power lines</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="3" onchange="saveAnswer(1,6,3)"> A type of battery charging</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: How is OIL used in South Africa?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q7" value="0" onchange="saveAnswer(1,7,0)"> Only for making plastics</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="1" onchange="saveAnswer(1,7,1)"> Mainly for transport fuels (petrol, diesel) and industrial processes</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="2" onchange="saveAnswer(1,7,2)"> Only for generating electricity</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="3" onchange="saveAnswer(1,7,3)"> Only for cooking</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: What percentage of South Africa's electricity comes from coal?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q8" value="0" onchange="saveAnswer(1,8,0)"> 20%</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="1" onchange="saveAnswer(1,8,1)"> 50%</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="2" onchange="saveAnswer(1,8,2)"> 80%</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="3" onchange="saveAnswer(1,8,3)"> 100%</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: Greenhouse gases trap heat in the atmosphere. Which gas do fossil fuels mainly produce?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q9" value="0" onchange="saveAnswer(1,9,0)"> Oxygen</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="1" onchange="saveAnswer(1,9,1)"> Nitrogen</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="2" onchange="saveAnswer(1,9,2)"> Carbon dioxide (CO₂)</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="3" onchange="saveAnswer(1,9,3)"> Hydrogen</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_SOE_1.html" onclick="localStorage.setItem('cl_submit_course','SOE');localStorage.setItem('cl_submit_week','1');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+<div class="assess-week" data-week="2" style="display:none;">
+<h2>Week 2 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: What is RENEWABLE energy?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q0" value="0" onchange="saveAnswer(2,0,0)"> Energy from fossil fuels</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="1" onchange="saveAnswer(2,0,1)"> Energy from sources that naturally replenish and will not run out</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="2" onchange="saveAnswer(2,0,2)"> Energy from nuclear power</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="3" onchange="saveAnswer(2,0,3)"> Energy that is very expensive</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: Which energy source uses sunlight to generate electricity?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q1" value="0" onchange="saveAnswer(2,1,0)"> Wind energy</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="1" onchange="saveAnswer(2,1,1)"> Solar (photovoltaic) energy</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="2" onchange="saveAnswer(2,1,2)"> Hydroelectric energy</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="3" onchange="saveAnswer(2,1,3)"> Biogas</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: South Africa's Loeriesfontein and Sere Wind Farms are located in the...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q2" value="0" onchange="saveAnswer(2,2,0)"> Eastern Cape</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="1" onchange="saveAnswer(2,2,1)"> Limpopo</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="2" onchange="saveAnswer(2,2,2)"> Northern Cape/Western Cape (windy areas)</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="3" onchange="saveAnswer(2,2,3)"> Gauteng</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: What is HYDROELECTRIC power?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q3" value="0" onchange="saveAnswer(2,3,0)"> Electricity from burning hydrogen</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="1" onchange="saveAnswer(2,3,1)"> Electricity generated from moving water turning turbines</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="2" onchange="saveAnswer(2,3,2)"> Electricity from solar panels</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="3" onchange="saveAnswer(2,3,3)"> Electricity from wind turbines</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: Biogas is a renewable energy source made from...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q4" value="0" onchange="saveAnswer(2,4,0)"> Sunlight</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="1" onchange="saveAnswer(2,4,1)"> Wind</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="2" onchange="saveAnswer(2,4,2)"> Decomposing organic waste (animal dung, plant material)</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="3" onchange="saveAnswer(2,4,3)"> Coal</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: What is the main advantage of renewable energy over fossil fuels?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q5" value="0" onchange="saveAnswer(2,5,0)"> It is always cheaper</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="1" onchange="saveAnswer(2,5,1)"> It does not run out and produces little or no pollution</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="2" onchange="saveAnswer(2,5,2)"> It is easier to transport</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="3" onchange="saveAnswer(2,5,3)"> It produces more energy</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: The Kathu Solar Park in the Northern Cape generates electricity using...</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q6" value="0" onchange="saveAnswer(2,6,0)"> Wind</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="1" onchange="saveAnswer(2,6,1)"> Solar thermal energy (mirrors focusing sunlight to heat fluid to make steam)</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="2" onchange="saveAnswer(2,6,2)"> Coal</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="3" onchange="saveAnswer(2,6,3)"> Biogas</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: What is the REIPPPP in South Africa?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q7" value="0" onchange="saveAnswer(2,7,0)"> A type of coal mine</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="1" onchange="saveAnswer(2,7,1)"> The Renewable Energy Independent Power Producer Procurement Programme — a government programme for renewable energy</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="2" onchange="saveAnswer(2,7,2)"> A type of solar panel</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="3" onchange="saveAnswer(2,7,3)"> A government department</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: Why is South Africa well-suited for solar energy?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q8" value="0" onchange="saveAnswer(2,8,0)"> It has many rivers</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="1" onchange="saveAnswer(2,8,1)"> It receives an above-average amount of sunlight throughout the year</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="2" onchange="saveAnswer(2,8,2)"> It has strong winds everywhere</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="3" onchange="saveAnswer(2,8,3)"> It has many mountains</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: Which of the following is NOT a form of renewable energy?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q9" value="0" onchange="saveAnswer(2,9,0)"> Wind energy</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="1" onchange="saveAnswer(2,9,1)"> Solar energy</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="2" onchange="saveAnswer(2,9,2)"> Coal energy</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="3" onchange="saveAnswer(2,9,3)"> Hydroelectric energy</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_SOE_2.html" onclick="localStorage.setItem('cl_submit_course','SOE');localStorage.setItem('cl_submit_week','2');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:30px;">
+    <a href="https://dbeducator.github.io/Natural-Sciences/grade5/results.html" class="admin-btn" style="text-decoration:none;display:inline-block;">View My Results</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'coachL_SOE_';
+const TOTAL_WEEKS = 2;
+const COURSE_NAME = 'Sources of Energy';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz89hcA4Z70ZyOKnk2MBBc5kVWKG5aXljNgSzpXZbfXDOhGvtpeZXGSOadoZB_RdyPK/exec';
+const SECRET_KEY = 'CoachL2025SecureKey';
+const BASE_URL = 'https://dbeducator.github.io/Natural-Sciences/grade5/';
+const coursePrefixForSubmit = 'SOE';
+
+const CORRECT_ANSWERS = {
+  1: [1, 2, 2, 1, 1, 1, 1, 1, 2, 2],
+  2: [1, 1, 2, 1, 2, 1, 1, 1, 1, 2],
+};
+Object.keys(CORRECT_ANSWERS).forEach(function(w) {
+  localStorage.setItem(STORAGE_PREFIX + 'correct_' + w, JSON.stringify(CORRECT_ANSWERS[parseInt(w)]));
+});
+
+let currentWeek = 1;
+let completedWeeks = new Set(JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'completedWeeks') || '[]'));
+let studentInfo = { name: '', email: '' };
+
+function toggleTheme() {
+  const isLight = document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').innerHTML = isLight ? '&#9790; Dark' : '&#9728; Light';
+}
+
+function saveAnswer(week, q, val) {
+  var k = STORAGE_PREFIX + 'answers_' + week;
+  var saved = JSON.parse(localStorage.getItem(k) || '{}');
+  saved['q' + q] = val;
+  localStorage.setItem(k, JSON.stringify(saved));
+}
+
+function selectModule(week) {
+  currentWeek = week;
+  refreshModuleButtons();
+  updateWeekContent();
+}
+
+function refreshModuleButtons() {
+  document.querySelectorAll('.module-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (completedWeeks.has(i+1)) {
+      btn.classList.add('completed');
+      btn.textContent = 'Week ' + (i+1) + ' ✓';
+    } else {
+      btn.textContent = 'Week ' + (i+1);
+    }
+  });
+  document.querySelectorAll('.module-btn')[currentWeek - 1].classList.add('active');
+}
+
+function showTab(tabName, tabBtn) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  if (tabBtn) tabBtn.classList.add('active');
+}
+
+function updateVideoSection() {
+  const v = weekVideos[currentWeek];
+  const PLACEHOLDER = 'x0lauGbQWvQ';
+  const CS = '<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;"><div style="font-size:2.5rem;">&#127916;</div><p style="color:#fff;font-weight:700;margin-top:10px;">Video Coming Soon</p><p style="color:#aaa;font-size:0.8rem;margin-top:6px;">Check back later</p></div>';
+  const iframe = function(id) {
+    return '<iframe src="https://www.youtube.com/embed/' + id + '?rel=0&modestbranding=1&iv_load_policy=3" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>';
+  };
+  document.getElementById('tutorialVideo').innerHTML = (v.t && v.t !== PLACEHOLDER) ? iframe(v.t) : CS;
+  document.getElementById('basicVideo').innerHTML = (v.b && v.b !== PLACEHOLDER) ? iframe(v.b) : CS;
+  document.getElementById('tutorialTitle').textContent = v.tTitle;
+  document.getElementById('basicTitle').textContent = v.bTitle;
+  document.getElementById('weekTitle').textContent = 'Videos — Week ' + currentWeek;
+}
+
+function updateWeekContent() {
+  const week = weekData[currentWeek];
+  updateVideoSection();
+  document.getElementById('lessonContent').innerHTML = week.content;
+  document.getElementById('resourcesTitle').textContent = 'Resources — Week ' + currentWeek;
+  document.querySelectorAll('.week-resources').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.assess-week').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+}
+
+function updateProgress() {
+  const done = completedWeeks.size;
+  const pct = Math.round(done / TOTAL_WEEKS * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').textContent = pct + '%';
+  document.getElementById('weeksComplete').textContent = done + '/' + TOTAL_WEEKS;
+  document.getElementById('videosWatched').textContent = (done*2) + '/' + (TOTAL_WEEKS*2);
+  document.getElementById('assessmentsPassed').textContent = done + '/' + TOTAL_WEEKS;
+}
+
+window.onload = function() {
+  studentInfo.name = localStorage.getItem('cl_firstName') || 'Learner';
+  document.getElementById('studentName').textContent = studentInfo.name;
+  document.getElementById('avatar').textContent = studentInfo.name.charAt(0).toUpperCase();
+  const isLight = localStorage.getItem('cl_theme') === 'light';
+  if(isLight) { document.getElementById('body').classList.add('light-mode'); document.getElementById('themeBtn').innerHTML = '&#9790; Dark'; }
+  updateProgress();
+  selectModule(1);
+};
+
+const weekVideos = {
+  1: {t:'MpEJnnpye-k',tTitle:'Week 1: Non-Renewable Energy Sources',b:'PLBK1ux5b7U',bTitle:'Non-Renewable Energy Sources — Key Concepts'},
+  2: {t:'44Wp3WE1AHs',tTitle:'Week 2: Renewable Energy Sources',b:'ViXtT8c4z-c',bTitle:'Renewable Energy Sources — Key Concepts'}
+};
+
+const weekData = {
+  1: {
+    content: `<h2 style="color:#ff9800;">☀️ Sources of Energy — Week 1</h2>
+<div style="background:linear-gradient(135deg,#e65100,#f57c00);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">⬛</div>
+  <h3 style="color:#fff;margin:8px 0;">Non-renewable Energy Sources</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Fossil fuels and nuclear energy in South Africa</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>What energy sources are and why we need them</li><li>The main non-renewable energy sources</li><li>How coal-fired power stations work</li><li>Environmental impacts of non-renewable energy</li></ul>
+<h3>⚡ Why We Need Energy Sources</h3>
+<p>Modern society needs large amounts of energy for: lighting, heating, cooking, transport, industry and agriculture. This energy must come from somewhere — an <strong>energy source</strong>.</p>
+<div style="background:rgba(255,152,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid #ff9800;">
+  <p><strong>Non-renewable</strong> = formed over millions of years; will eventually run out. Currently provide about 85% of SA's electricity.</p>
+</div>
+<h3>⬛ Coal</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>Coal formed from compressed plant material over 300 million years. SA has vast coal reserves in Mpumalanga.</p>
+  <p style="margin-top:8px;">In a <strong>coal-fired power station</strong>:</p>
+  <p>⬛ Coal burns → 🌡️ heats water → 💨 steam → ⚙️ turns turbine → 🔋 generator produces electricity</p>
+  <p style="margin-top:8px;color:#ff9800;">⚠️ Problems: CO₂ (climate change), SO₂ (acid rain), particulates (lung disease), ash dumps</p>
+</div>
+<h3>🛢️ Oil and Natural Gas</h3>
+<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;margin:12px 0;">
+  <p>🛢️ <strong>Oil (petroleum)</strong> — imported to SA; refined into petrol, diesel, jet fuel, plastic</p>
+  <p>⛽ <strong>Natural gas</strong> — imported; used for cooking and heating</p>
+  <p>🏭 <strong>Sasol (Secunda)</strong> — SA's unique coal-to-liquids technology converts coal into liquid fuel; world's largest synthetic fuels plant</p>
+</div>
+<h3>☢️ Nuclear Energy</h3>
+<div style="background:rgba(156,39,176,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid #9c27b0;">
+  <p><strong>Koeberg Nuclear Power Station</strong> near Cape Town — the only nuclear power station in Africa. Produces about 1,800MW (5% of SA's electricity). No carbon emissions. Has operated since 1984.</p>
+  <p style="margin-top:8px;font-size:0.85rem;">Nuclear energy uses uranium (mined in Namibia and SA). Uranium atoms split (fission), releasing enormous heat to make steam for turbines.</p>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Non-renewable energy</strong> — cannot be replenished on human timescales</p>
+  <p>🔑 <strong>Fossil fuel</strong> — coal, oil, natural gas — formed from ancient organisms</p>
+  <p>🔑 <strong>Turbine</strong> — blades driven by steam or wind that spin a generator</p>
+  <p>🔑 <strong>Generator</strong> — converts rotational motion to electricity</p>
+  <p>🔑 <strong>Nuclear fission</strong> — splitting of uranium atoms releasing enormous energy</p>
+</div>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #ff9800;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#ff9800;margin-bottom:8px;">⬛ How SA's Coal Power Stations Work</h4><p>Understanding a coal power station helps explain both SA's energy situation and load shedding:</p><ol style="line-height:1.8;"><li>⬛ <strong>Coal delivery</strong>: coal is crushed into fine powder and blown into the <strong>boiler</strong></li><li>🔥 <strong>Combustion</strong>: powdered coal burns at ~1,400°C, heating water in thousands of tubes surrounding the furnace</li><li>💨 <strong>Steam production</strong>: water converts to high-pressure steam (~540°C, ~160 atmospheres pressure)</li><li>⚙️ <strong>Turbine</strong>: steam rushes through turbine blades at ~3,000 rpm, spinning the shaft</li><li>⚡ <strong>Generator</strong>: the rotating shaft turns a generator, producing ~900MW of electricity</li><li>💧 <strong>Condenser</strong>: used steam is condensed back to water using a cooling tower (the large hourglass towers visible at Mpumalanga)</li><li>🔁 <strong>Cycle repeats</strong>: water is pumped back to boiler</li></ol></div><div style="background:rgba(255,255,255,0.05);border-left:4px solid #ff9800;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#ff9800;margin-bottom:8px;">🌡️ Why Load Shedding Happens</h4><p>Load shedding occurs when Eskom cannot produce enough electricity to meet demand. Causes:</p><ul style="line-height:1.8;"><li>⬛ <strong>Aging infrastructure</strong>: many SA power stations are over 40 years old. Boiler tubes crack, turbine blades crack, generators fail. Maintenance has been delayed for decades.</li><li>🏗️ <strong>New plants delayed</strong>: Medupi and Kusile power stations (planned to add 9,600MW) have been over 12 years late and over-budget due to construction problems and corruption.</li><li>⬛ <strong>Coal supply issues</strong>: wet coal (lower energy content), delivery problems from mines.</li><li>👷 <strong>Skills shortages</strong>: loss of experienced engineers and technicians.</li></ul><p style="margin-top:8px;font-size:0.88rem;">Load shedding costs the SA economy an estimated R500 million per day in lost productivity.</p></div><div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>⭐ <strong>Did You Know?</strong> Eskom's Kendal Power Station in Mpumalanga is the largest coal-fired power station in the southern hemisphere. It burns 18 million tonnes of coal per year (nearly 50,000 tonnes per day) from mines right next to the plant. At full capacity it generates 4,116MW — enough electricity for approximately 4 million average SA homes.</p></div><div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>🇿🇦 <strong>SA Focus:</strong> South Africa's energy situation is at a critical turning point. SA was for decades powered by cheap (but polluting) coal. Now coal is running out of cheap reserves, the aging power stations are unreliable, and climate change requires reducing carbon emissions. The Just Energy Transition Investment Plan (JET-IP) commits R1.5 trillion (over 5 years) to transition SA to cleaner energy while protecting coal-dependent communities in Mpumalanga.</p></div><div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #ff9800;"><h3 style="color:#ff9800;margin-bottom:10px;">📋 Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">SA gets ~85% of electricity from coal-fired power stations (mainly Mpumalanga).</li><li style="margin-bottom:6px;">Coal power station: coal → combustion → steam → turbine → generator → electricity → transformer → grid.</li><li style="margin-bottom:6px;">Load shedding causes: aging stations, delayed new plants, coal supply problems, maintenance backlog.</li><li style="margin-bottom:6px;">Other non-renewables: oil (imported, refined at Sapref/Enref), natural gas (imported), nuclear (Koeberg, 1,800MW).</li><li style="margin-bottom:6px;">SA's JET-IP commits R1.5 trillion to energy transition — closing coal plants, building renewables.</li><li style="margin-bottom:6px;">Koeberg is Africa's only nuclear power station — operates since 1984, no carbon emissions.</li></ul></div><div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#ff9800;margin-bottom:10px;">🔁 Quick Recap Questions</h3><p style="margin-bottom:8px;"><strong>Q: Trace the energy conversions in a coal power station from coal to electricity in your home.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Chemical energy (coal) → heat energy (combustion) → kinetic energy (steam turbine) → electrical energy (generator) → transmitted via transformers and power lines → electrical energy in your home.</span></p><p style="margin-bottom:8px;"><strong>Q: Give three reasons why SA experiences load shedding.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Aging power stations needing repairs, delayed construction of new plants (Medupi, Kusile), coal supply and quality issues, and loss of skilled maintenance staff.</span></p><p style="margin-bottom:8px;"><strong>Q: Why is Koeberg unusual and what are its advantages?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: It is Africa's only nuclear power station. Advantages: produces no carbon emissions, generates reliable 1,800MW baseload power, not affected by coal supply problems.</span></p></div>`,
+    assessment: [
+      { question: "What is RENEWABLE energy?", options: ["Energy from fossil fuels", "Energy from sources that naturally replenish and will not run out", "Energy from nuclear power", "Energy that is very expensive"], correct: 1 },
+      { question: "Which energy source uses sunlight to generate electricity?", options: ["Wind energy", "Solar (photovoltaic) energy", "Hydroelectric energy", "Biogas"], correct: 1 },
+      { question: "South Africa\'s Loeriesfontein and Sere Wind Farms are located in the...", options: ["Eastern Cape", "Limpopo", "Northern Cape/Western Cape (windy areas)", "Gauteng"], correct: 2 },
+      { question: "What is HYDROELECTRIC power?", options: ["Electricity from burning hydrogen", "Electricity generated from moving water turning turbines", "Electricity from solar panels", "Electricity from wind turbines"], correct: 1 },
+      { question: "Biogas is a renewable energy source made from...", options: ["Sunlight", "Wind", "Decomposing organic waste (animal dung, plant material)", "Coal"], correct: 2 },
+      { question: "What is the main advantage of renewable energy over fossil fuels?", options: ["It is always cheaper", "It does not run out and produces little or no pollution", "It is easier to transport", "It produces more energy"], correct: 1 },
+      { question: "The Kathu Solar Park in the Northern Cape generates electricity using...", options: ["Wind", "Solar thermal energy (mirrors focusing sunlight to heat fluid to make steam)", "Coal", "Biogas"], correct: 1 },
+      { question: "What is the REIPPPP in South Africa?", options: ["A type of coal mine", "The Renewable Energy Independent Power Producer Procurement Programme — a government programme for renewable energy", "A type of solar panel", "A government department"], correct: 1 },
+      { question: "Why is South Africa well-suited for solar energy?", options: ["It has many rivers", "It receives an above-average amount of sunlight throughout the year", "It has strong winds everywhere", "It has many mountains"], correct: 1 },
+      { question: "Which of the following is NOT a form of renewable energy?", options: ["Wind energy", "Solar energy", "Coal energy", "Hydroelectric energy"], correct: 2 },
+    ]
+  },
+  2: {
+    content: `<h2 style="color:#ff9800;">☀️ Sources of Energy — Week 2</h2>
+<div style="background:linear-gradient(135deg,#e65100,#f57c00);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;">
+  <div style="font-size:3rem;">☀️</div>
+  <h3 style="color:#fff;margin:8px 0;">Renewable Energy Sources</h3>
+  <p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Solar, wind and SA's clean energy future</p>
+</div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>The main renewable energy sources</li><li>SA's exceptional renewable energy resources</li><li>Advantages and challenges of renewables</li><li>SA's energy transition plans</li></ul>
+<h3>♻️ Renewable Energy Sources</h3>
+<div style="background:rgba(76,175,80,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid #4caf50;">
+  <p>☀️ <strong>Solar</strong> — sunlight converted to electricity (photovoltaic) or heat (solar thermal)</p>
+  <p>💨 <strong>Wind</strong> — wind turbines generate electricity; SA's best sites: Saldanha Bay, Jeffreys Bay, Eastern Cape</p>
+  <p>💧 <strong>Hydroelectric</strong> — flowing water drives turbines; Gariep Dam and Vanderkloof Dam on Orange River</p>
+  <p>🌱 <strong>Biomass</strong> — burning wood, crop waste or biogas from landfill</p>
+  <p>🌊 <strong>Tidal/Wave</strong> — ocean energy; still in early development stages in SA</p>
+</div>
+<div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;border:1px solid rgba(0,200,0,0.3);">
+  <p>🇿🇦 SA receives some of the highest solar radiation in the world — especially the Northern Cape (2,900+ sunshine hours/year). The <strong>Kathu Solar Park</strong> (400,000 mirrors, 100MW) and <strong>Redstone Solar Thermal Plant</strong> are among Africa's largest solar projects.</p>
+</div>
+<h3>⚖️ Advantages and Challenges</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;">
+  <div style="background:rgba(76,175,80,0.1);border-radius:10px;padding:12px;border:1px solid #4caf50;">
+    <h4 style="color:#4caf50;">✅ Advantages</h4>
+    <p style="font-size:0.85rem;">No carbon emissions | Fuel is free | Will never run out | Local jobs | Distributed generation</p>
+  </div>
+  <div style="background:rgba(255,152,0,0.1);border-radius:10px;padding:12px;border:1px solid #ff9800;">
+    <h4 style="color:#ff9800;">⚠️ Challenges</h4>
+    <p style="font-size:0.85rem;">Intermittent (sun/wind not always available) | High upfront cost | Need battery storage | Land use</p>
+  </div>
+</div>
+<h3>📝 Key Vocabulary</h3>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;">
+  <p>🔑 <strong>Renewable energy</strong> — energy from sources that are naturally replenished</p>
+  <p>🔑 <strong>Photovoltaic (PV)</strong> — converting sunlight directly to electricity using silicon cells</p>
+  <p>🔑 <strong>Wind turbine</strong> — device using wind to spin a generator and produce electricity</p>
+  <p>🔑 <strong>Hydroelectric</strong> — electricity generated by flowing or falling water</p>
+  <p>🔑 <strong>Carbon emissions</strong> — CO₂ and other greenhouse gases released by burning fossil fuels</p>
+</div>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #ff9800;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#ff9800;margin-bottom:8px;">☀️ How Concentrated Solar Power (CSP) Works</h4><p>The Redstone and Kathu Solar Parks in SA's Northern Cape use a different technology to standard solar panels:</p><ol style="line-height:1.8;"><li>🪞 <strong>Mirrors (heliostats)</strong>: thousands of mirrors track the sun and focus sunlight onto a central tower receiver</li><li>🌡️ <strong>Heat generation</strong>: concentrated sunlight heats molten salt to ~565°C</li><li>🌡️ <strong>Thermal storage</strong>: hot molten salt stored in insulated tanks — holds heat for up to 12 hours</li><li>💨 <strong>Steam generation</strong>: hot salt heats water to steam</li><li>⚙️ <strong>Turbine + generator</strong>: steam drives turbine → generator → electricity</li><li>🌙 <strong>Night generation</strong>: stored heat used after sunset — CSP can generate electricity at night unlike PV solar panels</li></ol></div><div style="background:rgba(255,255,255,0.05);border-left:4px solid #ff9800;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#ff9800;margin-bottom:8px;">🌬️ Wind Energy — How Turbines Work</h4><p>SA is developing significant wind energy capacity especially in the Eastern Cape and Western Cape:</p><ul style="line-height:1.8;"><li>🌬️ Wind pushes the <strong>aerodynamic blades</strong> (shaped like aircraft wings to create lift). Each blade is up to 80m long.</li><li>⚙️ Blade rotation drives a <strong>gearbox</strong> that increases rotation speed from ~15 rpm to ~1,500 rpm.</li><li>⚡ Fast rotation drives a <strong>generator</strong> producing electricity.</li><li>📡 A <strong>yaw motor</strong> continuously rotates the nacelle (head) to face the wind direction.</li><li>🏗️ Typical modern turbine: 3MW, 100m hub height, blades 80m long — generates enough electricity for ~2,000 homes when wind speed is right.</li></ul></div><div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>⭐ <strong>Did You Know?</strong> South Africa has some of the world's best wind resources along the Cape coast. The Jeffreys Bay Wind Farm (138MW) near Port Elizabeth was the first large wind farm in SA. A single 3MW wind turbine rotating for one year generates enough electricity for 2,000 homes and prevents about 4,000 tonnes of CO₂ emissions compared to coal generation.</p></div><div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>🇿🇦 <strong>SA Focus:</strong> The Loeriesfontein and Noupoort wind farms in the Northern Cape are in one of the world's windiest regions. The Loeriesfontein 2 wind farm (140MW) uses 61 turbines, each 3m taller than the Statue of Liberty. Together the wind farms in SA's RE-IPPPP programme produce enough electricity for over 1.5 million homes — equivalent to taking 1.5 million cars off the road in terms of carbon emissions avoided.</p></div><div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #ff9800;"><h3 style="color:#ff9800;margin-bottom:10px;">📋 Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">Renewable energy sources: solar (PV and CSP), wind, hydroelectric, biomass, tidal/wave.</li><li style="margin-bottom:6px;">CSP (Concentrated Solar Power): mirrors focus sunlight → heat molten salt → steam → turbine → electricity. Can store heat and generate at night.</li><li style="margin-bottom:6px;">Wind turbines: aerodynamic blades capture wind → gearbox → generator. 3MW turbines power ~2,000 homes.</li><li style="margin-bottom:6px;">SA advantages: world-class solar radiation (Northern Cape), strong consistent wind (Cape coast), cheap land.</li><li style="margin-bottom:6px;">Challenges: intermittent supply, need battery/pumped hydro storage, high upfront capital cost.</li><li style="margin-bottom:6px;">SA RE-IPPPP has attracted R200 billion+ investment; wind farms power 1.5M+ homes.</li></ul></div><div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#ff9800;margin-bottom:10px;">🔁 Quick Recap Questions</h3><p style="margin-bottom:8px;"><strong>Q: What is the main advantage of CSP (Concentrated Solar Power) over PV solar panels?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: CSP stores heat in molten salt and can generate electricity for up to 12 hours after sunset. PV panels can only generate electricity when the sun is shining.</span></p><p style="margin-bottom:8px;"><strong>Q: Why is the Western Cape/Northern Cape ideal for wind and solar energy?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: The Cape coast has some of the world's most consistent strong winds (due to cold Benguela current). The Northern Cape has one of the world's highest solar radiation levels (2,900+ sunshine hours/year). Both have large areas of cheap land.</span></p><p style="margin-bottom:8px;"><strong>Q: Explain one challenge and one advantage of renewable energy.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Challenge: intermittent supply — solar doesn't work at night, wind doesn't blow constantly. Advantage: no fuel costs (sun and wind are free), no carbon emissions during operation, never runs out.</span></p></div>`,
+    assessment: [
+      { question: "What is RENEWABLE energy?", options: ["Energy from fossil fuels", "Energy from sources that naturally replenish and will not run out", "Energy from nuclear power", "Energy that is very expensive"], correct: 1 },
+      { question: "Which energy source uses sunlight to generate electricity?", options: ["Wind energy", "Solar (photovoltaic) energy", "Hydroelectric energy", "Biogas"], correct: 1 },
+      { question: "South Africa\'s Loeriesfontein and Sere Wind Farms are located in the...", options: ["Eastern Cape", "Limpopo", "Northern Cape/Western Cape (windy areas)", "Gauteng"], correct: 2 },
+      { question: "What is HYDROELECTRIC power?", options: ["Electricity from burning hydrogen", "Electricity generated from moving water turning turbines", "Electricity from solar panels", "Electricity from wind turbines"], correct: 1 },
+      { question: "Biogas is a renewable energy source made from...", options: ["Sunlight", "Wind", "Decomposing organic waste (animal dung, plant material)", "Coal"], correct: 2 },
+      { question: "What is the main advantage of renewable energy over fossil fuels?", options: ["It is always cheaper", "It does not run out and produces little or no pollution", "It is easier to transport", "It produces more energy"], correct: 1 },
+      { question: "The Kathu Solar Park in the Northern Cape generates electricity using...", options: ["Wind", "Solar thermal energy (mirrors focusing sunlight to heat fluid to make steam)", "Coal", "Biogas"], correct: 1 },
+      { question: "What is the REIPPPP in South Africa?", options: ["A type of coal mine", "The Renewable Energy Independent Power Producer Procurement Programme — a government programme for renewable energy", "A type of solar panel", "A government department"], correct: 1 },
+      { question: "Why is South Africa well-suited for solar energy?", options: ["It has many rivers", "It receives an above-average amount of sunlight throughout the year", "It has strong winds everywhere", "It has many mountains"], correct: 1 },
+      { question: "Which of the following is NOT a form of renewable energy?", options: ["Wind energy", "Solar energy", "Coal energy", "Hydroelectric energy"], correct: 2 },
+    ]
+  }
+};
+</script>
+
+
+
+<!-- Maxi Pie Bot -->
+<div id="mfab" style="position:fixed;bottom:24px;left:20px;width:56px;height:56px;background:#10b981;border-radius:50%;z-index:2147483647;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(0,0,0,0.5);" onclick="document.getElementById('mchat').style.display='flex'">
+  <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+    <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+    <circle cx="8" cy="11" r="1.2" fill="#10b981"/>
+    <circle cx="12" cy="11" r="1.2" fill="#10b981"/>
+    <circle cx="16" cy="11" r="1.2" fill="#10b981"/>
+  </svg>
+</div>
+
+<div id="mchat" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0a1a33;z-index:2147483647;flex-direction:column;">
+  <div style="background:#0a1a33;padding:14px;display:flex;align-items:center;gap:12px;border-bottom:3px solid #10b981;flex-shrink:0;">
+    <span style="font-size:24px">🐾</span>
+    <div>
+      <div style="color:white;font-weight:700;font-size:16px;">Maxi Pie</div>
+      <div style="color:#10b981;font-size:12px;">Grade 5 Science Chommie 🇿🇦</div>
+    </div>
+    <button onclick="document.getElementById('mchat').style.display='none'" style="margin-left:auto;background:#ef4444;color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer;">×</button>
+  </div>
+  <div id="mmsgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(rgba(240,244,248,0.92),rgba(219,230,243,0.92)),url('cat_full.png') center/contain no-repeat;">
+    <div style="background:white;color:#0a1a33;padding:12px 16px;border-radius:18px;max-width:85%;font-size:15px;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+      Sho! I'm <strong>Maxi Pie</strong> 🐾 Ask me anything about this topic!
+    </div>
+  </div>
+  <div style="padding:12px;background:white;display:flex;gap:8px;border-top:1px solid #ddd;flex-shrink:0;">
+    <input id="minput" type="text" placeholder="Ask a question..." onkeypress="if(event.key==='Enter')msend()" style="flex:1;padding:10px 16px;border-radius:22px;border:2px solid #dbe6f3;outline:none;font-size:15px;">
+    <button onclick="msend()" style="background:#10b981;color:white;border:none;width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;">➔</button>
+  </div>
+</div>
+
+<script>
+function msend() {
+  var inp = document.getElementById('minput');
+  var q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  var msgs = document.getElementById('mmsgs');
+  
+  var uDiv = document.createElement('div');
+  uDiv.style.cssText = 'background:#10b981;color:white;padding:12px 16px;border-radius:18px;max-width:85%;align-self:flex-end;font-size:15px;margin-left:auto;';
+  uDiv.textContent = q;
+  msgs.appendChild(uDiv);
+  
+  setTimeout(function() {
+    var bDiv = document.createElement('div');
+    bDiv.style.cssText = 'background:white;color:#0a1a33;padding:12px 16px;border-radius:18px;max-width:85%;font-size:15px;box-shadow:0 2px 6px rgba(0,0,0,0.1);';
+    bDiv.innerHTML = msearch(q);
+    msgs.appendChild(bDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 500);
+  
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function msearch(q) {
+  if (typeof weekData === 'undefined') return "Notes not loaded yet.";
+  var ql = q.toLowerCase();
+  var best = null, bestScore = 0;
+  Object.keys(weekData).forEach(function(w) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = weekData[w].content;
+    var text = tmp.innerText || tmp.textContent || '';
+    var words = ql.split(' ').filter(function(x) { return x.length > 2; });
+    var score = words.filter(function(x) { return text.toLowerCase().indexOf(x) !== -1; }).length;
+    if (score > bestScore) { bestScore = score; best = { text: text, week: w }; }
+  });
+  if (!best || bestScore === 0) return "I couldn't find that. Try asking about fossils, evolution or SA fossil sites!";
+  var sentences = best.text.split('.').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 20; });
+  var ql2 = ql.split(' ').filter(function(x) { return x.length > 2; });
+  var rel = sentences.filter(function(s) { return ql2.some(function(w) { return s.toLowerCase().indexOf(w) !== -1; }); }).slice(0, 3);
+  return (rel.length ? rel.join('. ') + '.' : sentences.slice(0, 2).join('. ') + '.');
+}
+</script>
+</body>
+</html>
