@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maxi Pie - Grade 5 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:transparent; height: 100vh; overflow: hidden; }
+        
+        #maxi-fab { position:fixed; bottom:25px; right:25px; width:70px; height:70px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); z-index:999; border:3px solid #fff; }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit: cover; }
+
+        #chat-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(7, 7, 12, 0.9); z-index:1000; }
+        .chat-container { display:flex; flex-direction:column; height:100%; width:100%; max-width:500px; margin:0 auto; background:#f0f4f8; }
+        
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; }
+        .chat-header img { width:45px; height:45px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left:auto; background:#ef4444; color:white; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer; }
+
+        .chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px; }
+        .msg { max-width:85%; padding:12px 16px; border-radius:18px; line-height:1.4; font-size:16px; }
+        .bot { align-self:flex-start; background:white; color:#333; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+
+        .chat-input-area { padding:15px; background:white; display:flex; gap:10px; border-top:1px solid #ddd; align-items:center; }
+        .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; }
+        .send-btn { background:#10b981; color:white; border:none; padding:0 20px; height:45px; border-radius:25px; font-weight:bold; cursor:pointer; }
+        .content-img { width:100%; border-radius:10px; margin-top:10px; }
+    </style>
+</head>
+<body>
+
+<div id="maxi-fab" onclick="openChat()">
+    <img src="cat_full.png" alt="Maxi Pie">
+</div>
+
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png" alt="Maxi Pie">
+            <div>
+                <h3 style="margin:0;font-size:1.1rem;">Maxi Pie</h3>
+                <small style="color:#10b981">Science Chommie 🇿🇦</small>
+            </div>
+            <button class="close-btn" onclick="closeChat()">×</button>
+        </div>
+        <div id="messages" class="chat-messages">
+            <div class="msg bot">Sho! I'm Maxi Pie 🐾 Ask me anything about this topic!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Type here, chommie..." onkeypress="if(event.key==='Enter') handleSend()">
+            <button onclick="handleSend()" class="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let knowledgeBase = [];
+    let fuse = null;
+    let modalOpen = false;
+
+    function openChat() { modalOpen = true; document.getElementById('chat-modal').style.display = 'block'; window.history.pushState({ modal: "open" }, ""); }
+    function closeChat() { modalOpen = false; document.getElementById('chat-modal').style.display = 'none'; if (window.history.state?.modal === "open") window.history.back(); }
+    
+    // --- RESOURCE LOADING ---
+    async function initResources() {
+        const files = [{ path: 'resources/logic.pdf', type: 'pdf' }, { path: 'resources/logic2.html', type: 'html' }];
+        for (const file of files) {
+            try {
+                const res = await fetch(file.path);
+                if (!res.ok) continue;
+                if (file.type === 'pdf') {
+                    const buffer = await res.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({data: buffer}).promise;
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const content = await page.getTextContent();
+                        const text = content.items.map(s => s.str).join(' ');
+                        knowledgeBase.push({ text: text.replace(/\s+/g, ' '), source: 'PDF' });
+                    }
+                } else {
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    doc.querySelectorAll('div, p').forEach(b => {
+                        if (b.innerText.trim().length > 20) {
+                            knowledgeBase.push({ text: b.innerText.trim(), source: 'HTML', images: Array.from(b.querySelectorAll('img')).map(img => img.src) });
+                        }
+                    });
+                }
+            } catch (e) { console.error(e); }
+        }
+        fuse = new Fuse(knowledgeBase, { keys: ['text'], threshold: 0.4 });
+    }
+
+    // --- SMART FORMAT & GREETINGS ---
+    function smartFormat(text, query) {
+        const q = query.toLowerCase();
+
+        // IDENTITY & GREETINGS (The "Gatekeeper")
+        if (q.includes("who are you") || q.includes("your name") || q.includes("who is this")) {
+            return "I'm <strong>Maxi Pie</strong> 🐾, your Science chommie! I've read your <em>logic.pdf</em> and I'm ready to help you pass! 🔥";
+        }
+        if (q === "hi" || q === "hello" || q === "aweh" || q === "sho") {
+            return "Aweh chommie! 👋 I'm ready. What are we looking at today? Energy, Fossils, or Metals?";
+        }
+
+        // TEXTBOOK ANSWERS
+        let response = "Sho chommie 😎<br><br>";
+        const sentences = text.split(/[.!?]/);
+        const short = sentences.slice(0, 3).join('.') + '.';
+        response += `<strong>💡 The Lesson says:</strong><br>${short}`;
+        
+        return response;
+    }
+
+    // --- SEND LOGIC ---
+    function handleSend() {
+        const input = document.getElementById('userInput');
+        const query = input.value.trim();
+        if (!query) return;
+
+        addMessage('user', query);
+        input.value = '';
+
+        setTimeout(() => {
+            const q = query.toLowerCase();
+            
+            // Priority 1: Greetings & Name
+            const greetings = ["hi", "hello", "aweh", "sho", "who are you", "your name", "what is your name"];
+            if (greetings.some(g => q.includes(g))) {
+                addMessage('bot', smartFormat("", query));
+                return;
+            }
+
+            // Priority 2: Search PDF/HTML
+            const results = fuse ? fuse.search(query) : [];
+            if (results.length === 0) {
+                addMessage('bot', `Eish 😅 I couldn't find "${query}" in the notes. Try asking about 'energy' or 'machines'!`);
+            } else {
+                const match = results[0].item;
+                let resHtml = smartFormat(match.text, query);
+                if (match.images?.length > 0) resHtml += `<br><img src="${match.images[0]}" class="content-img">`;
+                addMessage('bot', resHtml);
+            }
+        }, 500);
+    }
+
+    function addMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = `msg ${role}`;
+        div.innerHTML = text;
+        document.getElementById('messages').appendChild(div);
+        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    }
+
+    window.onload = initResources;
+</script>
+</body>
+</html>
