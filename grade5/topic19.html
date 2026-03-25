@@ -738,21 +738,212 @@ const weekData = {
 };
 </script>
 
+
+
+
 <!-- Maxi Pie Floating Bot -->
-<iframe src="bot.html" id="maxiFrame" style="position:fixed;bottom:0;right:0;width:100%;height:100%;border:none;pointer-events:none;z-index:9999;" allow="microphone"></iframe>
+<style>
+#maxi-fab{position:fixed;bottom:24px;left:20px;width:54px;height:54px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(16,185,129,0.5);z-index:9998;border:none;transition:transform 0.15s;}
+#maxi-fab:active{transform:scale(0.92);}
+#maxi-fab svg{width:28px;height:28px;fill:white;}
+#maxi-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0a1a33;z-index:9999;flex-direction:column;animation:maxiUp 0.3s ease-out;}
+@keyframes maxiUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+#maxi-modal.open{display:flex;}
+.maxi-header{background:#0a1a33;padding:14px 16px;display:flex;align-items:center;gap:12px;color:white;border-bottom:3px solid #10b981;flex-shrink:0;}
+.maxi-title h3{margin:0;font-size:17px;}
+.maxi-title small{color:#10b981;font-size:12px;}
+.maxi-close{margin-left:auto;background:#ef4444;color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;font-weight:bold;cursor:pointer;}
+#maxi-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(#f0f4f8,#dbe6f3);}
+.maxi-msg{max-width:85%;padding:12px 16px;border-radius:18px;line-height:1.5;font-size:15px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+.maxi-bot{align-self:flex-start;background:white;color:#0a1a33;border-bottom-left-radius:3px;}
+.maxi-user{align-self:flex-end;background:#10b981;color:white;border-bottom-right-radius:3px;}
+.maxi-typing{display:flex;gap:5px;padding:14px 18px;align-items:center;}
+.maxi-dot{width:8px;height:8px;background:#10b981;border-radius:50%;animation:mdot 1s infinite;}
+.maxi-dot:nth-child(2){animation-delay:0.2s;}.maxi-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes mdot{0%,80%,100%{transform:scale(0);}40%{transform:scale(1);}}
+.maxi-img{width:100%;border-radius:10px;margin-top:8px;border:2px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,0.15);}
+.maxi-source{font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;display:block;margin-bottom:6px;}
+.maxi-input-row{padding:12px;background:white;display:flex;gap:8px;border-top:1px solid #ddd;flex-shrink:0;}
+.maxi-input-row input{flex:1;padding:10px 16px;border-radius:22px;border:2px solid #dbe6f3;outline:none;font-size:15px;}
+.maxi-send{background:#10b981;color:white;border:none;width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;flex-shrink:0;}
+</style>
+
+<div id="maxi-fab" onclick="maxiOpen()">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+  </svg>
+</div>
+
+<div id="maxi-modal">
+  <div class="maxi-header">
+    <div style="font-size:26px;">🐾</div>
+    <div class="maxi-title">
+      <h3>Maxi Pie</h3>
+      <small>Grade 5 Science Chommie 🇿🇦</small>
+    </div>
+    <button class="maxi-close" onclick="maxiClose()">×</button>
+  </div>
+  <div id="maxi-messages">
+    <div class="maxi-msg maxi-bot">Sho! I'm <strong>Maxi Pie</strong> 🐾 Loading your Grade 5 notes...</div>
+  </div>
+  <div class="maxi-input-row">
+    <input type="text" id="maxi-input" placeholder="Ask a question..." onkeypress="if(event.key==='Enter')maxiSend()">
+    <button class="maxi-send" onclick="maxiSend()">➔</button>
+  </div>
+</div>
+
 <script>
-  var mf = document.getElementById('maxiFrame');
-  document.addEventListener('touchstart', function(e){
-    var t = e.touches[0];
-    var fromRight = window.innerWidth - t.clientX;
-    var fromBottom = window.innerHeight - t.clientY;
-    mf.style.pointerEvents = (fromRight < 100 && fromBottom < 100) ? 'auto' : 'none';
+(function(){
+  var textKB = [];   // logic.pdf — main content
+  var imageKB = [];  // logic2.pdf — images/diagrams
+  var extraKB = [];  // logic3.pdf — extra content
+  var fuseTxt = null, fuseImg = null, fuseExtra = null;
+  var modalOpen = false;
+
+  window.maxiOpen = function(){
+    modalOpen = true;
+    document.getElementById('maxi-modal').classList.add('open');
+    window.history.pushState({maxi:'open'},'');
+  };
+  window.maxiClose = function(){
+    modalOpen = false;
+    document.getElementById('maxi-modal').classList.remove('open');
+  };
+  window.addEventListener('popstate', function(){
+    if(modalOpen) window.maxiClose();
   });
-  document.addEventListener('mousemove', function(e){
-    var fromRight = window.innerWidth - e.clientX;
-    var fromBottom = window.innerHeight - e.clientY;
-    mf.style.pointerEvents = (fromRight < 100 && fromBottom < 100) ? 'auto' : 'none';
+
+  function addMsg(role, html){
+    var msgs = document.getElementById('maxi-messages');
+    var typing = msgs.querySelector('.maxi-typing');
+    if(typing) typing.remove();
+    var div = document.createElement('div');
+    div.className = 'maxi-msg maxi-'+role;
+    div.innerHTML = html;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTyping(){
+    var msgs = document.getElementById('maxi-messages');
+    var div = document.createElement('div');
+    div.className = 'maxi-msg maxi-bot maxi-typing';
+    div.innerHTML = '<div class="maxi-dot"></div><div class="maxi-dot"></div><div class="maxi-dot"></div>';
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  async function loadPDF(path, store){
+    try{
+      var lib = window['pdfjs-dist/build/pdf'];
+      if(!lib) return false;
+      var r = await fetch(path);
+      if(!r.ok) return false;
+      var buf = await r.arrayBuffer();
+      var pdf = await lib.getDocument({data:buf}).promise;
+      for(var p=1; p<=pdf.numPages; p++){
+        var page = await pdf.getPage(p);
+        // Get text
+        var tc = await page.getTextContent();
+        var text = tc.items.map(function(s){return s.str;}).join(' ').trim();
+        // Get images from page (operator list)
+        var ops = await page.getOperatorList();
+        var imgs = [];
+        for(var i=0; i<ops.fnArray.length; i++){
+          if(ops.fnArray[i]===82){ // paintImageXObject
+            imgs.push('resources/'+ops.argsArray[i][0]);
+          }
+        }
+        if(text.length > 10){
+          store.push({text:text, source:path.split('/').pop()+' p.'+p, images:imgs, page:p});
+        }
+      }
+      return true;
+    }catch(e){ console.warn('Maxi: could not load '+path+' — '+e.message); return false; }
+  }
+
+  async function loadResources(){
+    var ok1 = await loadPDF('resources/logic.pdf', textKB);
+    var ok2 = await loadPDF('resources/logic2.pdf', imageKB);
+    var ok3 = await loadPDF('resources/logic3.pdf', extraKB);
+
+    var F = window.Fuse;
+    if(F){
+      if(textKB.length)  fuseTxt   = new F(textKB,  {keys:['text'],threshold:0.4,ignoreLocation:true});
+      if(imageKB.length) fuseImg   = new F(imageKB, {keys:['text'],threshold:0.4,ignoreLocation:true});
+      if(extraKB.length) fuseExtra = new F(extraKB, {keys:['text'],threshold:0.4,ignoreLocation:true});
+    }
+
+    var loaded = [ok1&&'logic.pdf', ok2&&'logic2.pdf', ok3&&'logic3.pdf'].filter(Boolean);
+    if(loaded.length){
+      addMsg('bot','Sharp! Loaded: '+loaded.join(', ')+'. Ask me anything! 🐾');
+    } else {
+      addMsg('bot','Notes not found in resources folder yet — but I can still answer from the lesson content on this page! Ask away 🐾');
+    }
+  }
+
+  window.maxiSend = function(){
+    var inp = document.getElementById('maxi-input');
+    var q = inp.value.trim();
+    if(!q) return;
+    inp.value='';
+    addMsg('user', q);
+    showTyping();
+    setTimeout(function(){ addMsg('bot', maxiSearch(q)); }, 600);
+  };
+
+  function maxiSearch(query){
+    var result = '';
+
+    // 1. Search logic.pdf for text content
+    if(fuseTxt){
+      var r = fuseTxt.search(query);
+      if(r.length){
+        var m = r[0].item;
+        var snippet = m.text.substring(0,350).replace(/\s+/g,' ').trim();
+        result += '<span class="maxi-source">'+m.source+'</span>'+snippet+'...';
+      }
+    }
+
+    // 2. Search logic2.pdf for images
+    if(fuseImg){
+      var r2 = fuseImg.search(query);
+      if(r2.length){
+        var m2 = r2[0].item;
+        if(!result && m2.text){
+          result += '<span class="maxi-source">'+m2.source+'</span>'+m2.text.substring(0,200).trim()+'...';
+        }
+        if(m2.images && m2.images.length){
+          result += '<br><img src="'+m2.images[0]+'" class="maxi-img" onerror="this.style.display='none'">';
+        }
+      }
+    }
+
+    // 3. Search logic3.pdf for extra info
+    if(fuseExtra && !result){
+      var r3 = fuseExtra.search(query);
+      if(r3.length){
+        var m3 = r3[0].item;
+        result += '<span class="maxi-source">'+m3.source+'</span>'+m3.text.substring(0,350).trim()+'...';
+      }
+    }
+
+    return result || "Eish, I checked the notes but couldn't find that. Try rephrasing your question!";
+  }
+
+  // Load PDF.js then Fuse.js then resources
+  function loadScript(src, cb){
+    var s = document.createElement('script');
+    s.src = src; s.onload = cb; s.onerror = cb;
+    document.head.appendChild(s);
+  }
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js', function(){
+    var lib = window['pdfjs-dist/build/pdf'];
+    if(lib) lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js', loadResources);
   });
+
+})();
 </script>
 </body>
 </html>
