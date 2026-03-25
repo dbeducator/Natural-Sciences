@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Maxi Pie - Grade 5 Science Assistant</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', Roboto, sans-serif; background:#0a1a33; height: 100vh; overflow: hidden; }
+
+#maxi-fab {
+ position:fixed; bottom:25px; right:25px;
+ width:75px; height:75px;
+ background:#10b981; border-radius:50%;
+ display:flex; align-items:center; justify-content:center;
+ cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5);
+ z-index:999; border:4px solid #fff;
+}
+#maxi-fab img { width:85%; height:85%; border-radius:50%; }
+
+#chat-modal {
+ display:none; position:fixed; top:0; left:0;
+ width:100%; height:100%;
+ background:rgba(7,7,12,0.95);
+ z-index:1000;
+}
+
+.chat-container {
+ display:flex; flex-direction:column;
+ height:100%; width:100%; max-width:500px;
+ margin:0 auto; background:#f0f4f8;
+}
+
+.chat-header {
+ background:#0a1a33; padding:15px;
+ display:flex; align-items:center; gap:12px;
+ color:white; border-bottom:3px solid #10b981;
+}
+.chat-header img { width:45px; height:45px; border-radius:50%; }
+
+.chat-messages {
+ flex:1; overflow-y:auto;
+ padding:20px; display:flex; flex-direction:column; gap:15px;
+}
+
+.msg {
+ max-width:85%; padding:12px 16px;
+ border-radius:18px; line-height:1.4; font-size:16px;
+}
+.bot { align-self:flex-start; background:white; color:#333; }
+.user { align-self:flex-end; background:#10b981; color:white; }
+
+.chat-input-area {
+ padding:15px; background:white;
+ display:flex; gap:10px;
+}
+.chat-input-area input {
+ flex:1; padding:12px;
+ border-radius:25px; border:1px solid #ccc;
+}
+
+.send-btn {
+ background:#10b981; color:white;
+ border:none; padding:0 20px;
+ border-radius:25px; font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<!-- FLOAT BUTTON -->
+<div id="maxi-fab" onclick="openChat()">
+<img src="cat_full.png">
+</div>
+
+<!-- CHAT -->
+<div id="chat-modal">
+<div class="chat-container">
+
+<div class="chat-header">
+<img src="cat_full.png">
+<div>
+<h3>Maxi Pie</h3>
+<small style="color:#10b981">Science Chommie 🇿🇦</small>
+</div>
+<button onclick="closeChat()" style="margin-left:auto;background:red;color:white;border:none;border-radius:50%;width:30px;height:30px;">×</button>
+</div>
+
+<div id="messages" class="chat-messages">
+<div class="msg bot">Sho! I'm Maxi Pie 🐾 Ask me anything about Science!</div>
+</div>
+
+<div class="chat-input-area">
+<input id="userInput" placeholder="Ask a question..." onkeypress="if(event.key==='Enter') handleSend()">
+<button onclick="handleSend()" class="send-btn">Send</button>
+</div>
+
+</div>
+</div>
+
+<script>
+let knowledgeBase = [];
+let fuse = null;
+
+// ================= LOAD PDF =================
+async function initResources() {
+    try {
+        const res = await fetch('resources/logic.pdf');
+        const buffer = await res.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({data: buffer}).promise;
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const text = content.items.map(s => s.str).join(' ');
+            knowledgeBase.push({ text: text.replace(/\s+/g,' ') });
+        }
+
+        fuse = new Fuse(knowledgeBase, {
+            keys:['text'],
+            threshold:0.25,
+            ignoreLocation:true,
+            includeScore:true,
+            minMatchCharLength:4
+        });
+
+    } catch(e){
+        console.log("PDF failed to load");
+    }
+}
+
+// ================= CHAT =================
+function handleSend() {
+    const input = document.getElementById('userInput');
+    const query = input.value.trim();
+    if (!query) return;
+
+    addMessage('user', query);
+    input.value = '';
+
+    setTimeout(() => {
+
+        const q = query.toLowerCase();
+
+        // ---------- CONVERSATION ----------
+        if (q === "hi" || q === "hello" || q.includes("hey")) {
+            addMessage('bot', "Aweh chommie 😎 what are we learning today?");
+            return;
+        }
+
+        if (q.includes("your name")) {
+            addMessage('bot', "I'm Maxi Pie 🐾 your Science chommie 🇿🇦");
+            return;
+        }
+
+        if (q.includes("how are you")) {
+            addMessage('bot', "Sharp sharp 😎 always ready to help!");
+            return;
+        }
+
+        // ---------- SEARCH ----------
+        const topicKeywords = [
+            "metal","rust","iron","gold","copper",
+            "fossil","rock","plant","animal",
+            "energy","food","matter"
+        ];
+
+        const isTopic = topicKeywords.some(k => q.includes(k));
+
+        if (isTopic && fuse) {
+            const results = fuse.search(query);
+
+            if (results.length > 0 && results[0].score < 0.35) {
+
+                const text = results[0].item.text;
+                let response = "Sho chommie 😎<br><br>";
+
+                if (q.includes("rust")) {
+                    response += "🦠 Rust = iron + oxygen + water 💧<br>It flakes off so the metal keeps getting damaged!";
+                    addMessage('bot', response);
+                    return;
+                }
+
+                if (q.includes("metal")) {
+                    response += "🔩 Metals:<br>• Conduct electricity ⚡<br>• Conduct heat 🌡️<br>• Strong & shapeable 🔨";
+                    addMessage('bot', response);
+                    return;
+                }
+
+                const short = text.split(/[.!?]/).slice(0,2).join('.') + '.';
+                response += "<strong>💡 Quick Answer:</strong><br>" + short;
+
+                addMessage('bot', response);
+                return;
+            }
+        }
+
+        // ---------- FALLBACK ----------
+        addMessage('bot',
+        `Eish 😅 I couldn't find "${query}".<br><br>
+        Try asking:<br>
+        • What is rust?<br>
+        • Properties of metals<br>
+        • What is a fossil?<br><br>
+        I'm still learning chommie 🐾`);
+
+    }, 400);
+}
+
+// ================= UI =================
+function addMessage(role,text){
+    const div=document.createElement('div');
+    div.className='msg '+role;
+    div.innerHTML=text;
+    document.getElementById('messages').appendChild(div);
+    document.getElementById('messages').scrollTop=999999;
+}
+
+// ================= MODAL =================
+function openChat(){ document.getElementById('chat-modal').style.display='block'; }
+function closeChat(){ document.getElementById('chat-modal').style.display='none'; }
+
+window.onload = initResources;
+</script>
+
+</body>
+</html>
