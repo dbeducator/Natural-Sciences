@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maxi Pie - Grade 5 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background:#0a1a33; height: 100vh; overflow: hidden; }
+
+        #maxi-fab { position:fixed; bottom:25px; right:25px; width:75px; height:75px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); z-index:999; border:4px solid #fff; }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit: cover; }
+
+        #chat-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(7, 7, 12, 0.95); z-index:1000; }
+        .chat-container { display:flex; flex-direction:column; height:100%; width:100%; max-width:500px; margin:0 auto; background:#f0f4f8; }
+
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; }
+        .chat-header img { width:45px; height:45px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left:auto; background:#ef4444; color:white; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer; }
+
+        .chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px; }
+        .msg { max-width:85%; padding:12px 16px; border-radius:18px; line-height:1.4; font-size:16px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        .bot { align-self:flex-start; background:white; color:#333; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+
+        .chat-input-area { padding:15px; background:white; display:flex; gap:10px; border-top:1px solid #ddd; }
+        .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; font-size:16px; }
+        .send-btn { background:#10b981; color:white; border:none; padding:10px; height:45px; border-radius:25px; font-weight:bold; cursor:pointer; }
+
+        .image-zoom { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.8); 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1001; 
+        } 
+        .image-zoom img { 
+            max-width: 90%; 
+            max-height: 90%; 
+        } 
+        .image-zoom:target { display: flex; }
+    </style>
+</head>
+<body>
+
+<div id="maxi-fab" onclick="openChat()"><img src="cat_full.png"></div>
+
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png">
+            <div><h3>Maxi Pie</h3><small style="color:#10b981">Science Chommie 🇿🇦</small></div>
+            <button class="close-btn" onclick="closeChat()">×</button>
+        </div>
+        <div id="messages" class="chat-messages">
+            <div class="msg bot">Sho! I'm <strong>Maxi Pie</strong> 🐾, your science sidekick! I’m here to help you conquer the world of science. Ask me anything!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask me something, chommie..." onkeypress="handleTyping(event)">
+            <button onclick="handleSend()" class="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<div id="image-zoom" class="image-zoom" onclick="this.style.display='none'">
+    <img id="zoomed-image" src="" alt="Zoomed Image" />
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+
+<script>
+    let knowledgeBase = [];
+    let fuse = null;
+    let lastTopic = null;
+
+    async function initPDF() {
+        const url = 'resources/logic.pdf';
+        const pdf = await pdfjsLib.getDocument(url).promise;
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const text = content.items.map(s => s.str).join(' ');
+            knowledgeBase.push({ text });
+        }
+
+        fuse = new Fuse(knowledgeBase, {
+            keys: ['text'],
+            threshold: 0.4,
+            ignoreLocation: true
+        });
+    }
+
+    function smartSearch(query) {
+        if (!fuse) return null;
+        const results = fuse.search(query);
+        return results.length ? results[0].item.text : null;
+    }
+
+    function add(role, text, quick=[]) {
+        const div = document.createElement('div');
+        div.className = 'msg ' + role;
+        div.innerHTML = text;
+
+        const box = document.getElementById('messages');
+        box.appendChild(div);
+
+        if (quick.length) {
+            const qdiv = document.createElement('div');
+            qdiv.className = 'quick';
+            quick.forEach(q=>{
+                const b = document.createElement('button');
+                b.innerText = q;
+                b.onclick = ()=>{ document.getElementById('userInput').value = q; send(); };
+                qdiv.appendChild(b);
+            });
+            box.appendChild(qdiv);
+        }
+
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function typing() {
+        const div = document.createElement('div');
+        div.className = 'msg bot typing';
+        div.id = 'typing';
+        div.innerText = "Maxi Pie is cooking something lekker... 🍳";
+        document.getElementById('messages').appendChild(div);
+    }
+
+    function stopTyping() {
+        const t = document.getElementById('typing');
+        if (t) t.remove();
+    }
+
+    function send() {
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        add('user', text);
+        input.value = '';
+
+        typing();
+
+        setTimeout(()=>{
+            stopTyping();
+            reply(text.toLowerCase());
+        }, 500);
+    }
+
+    function reply(q) {
+        // HOW ARE YOU
+        if (q.includes("how are you")) {
+            add('bot', "Sharp sharp 😎 I'm running smoother than a taxi with no traffic! What science are we tackling today?");
+            return;
+        }
+
+        // GREETING
+        if (/^(hi|hello|hey|aweh)/.test(q)) {
+            add('bot', "Aweh chommie! 👋 Ready to cook some science? No load shedding here ⚡",
+            ["Fossils", "Circuits", "Skeleton"]);
+            return;
+        }
+
+        // ---------- TOPICS ----------
+        let answer = "";
+        let follow = "";
+
+        if (q.includes("fossil")) {
+            lastTopic = "fossil";
+            answer = "Fossils are ancient remains or traces of living things 🦖 — like nature's old photo album!";
+            follow = "How do you think fossils are formed?";
+        }
+        else if (q.includes("sedimentary")) {
+            lastTopic = "rocks";
+            answer = "Sedimentary rocks form in layers — like a kota stacked with fillings 😄";
+            follow = "What causes these layers to build up over time?";
+        }
+        else if (q.includes("circuit")) {
+            lastTopic = "circuit";
+            answer = "An electrical circuit is a full loop where electricity flows ⚡ — like taxis doing a full route!";
+            follow = "What happens if the circuit is broken?";
+        }
+        else if (q.includes("skeleton")) {
+            lastTopic = "skeleton";
+            answer = "The skeleton is your body's frame 🦴 — it supports you and protects organs like your brain.";
+            follow = "Can you name one function of the skeleton?";
+        }
+        else if (q.includes("lifting mechanism") || q.includes("pulley") || q.includes("lever")) {
+            lastTopic = "machines";
+            answer = "Lifting mechanisms like levers and pulleys make work easier 💪 — like using a spade instead of your hands!";
+            follow = "Can you think of where we use pulleys in real life?";
+        }
+
+        // ---------- IF TOPIC FOUND ----------
+        if (answer) {
+            let pdfData = smartSearch(q);
+
+            add('bot', answer + " 😎");
+
+            if (pdfData) {
+                add('bot', "📚 Extra brain power from the textbook:<br><br>" + pdfData);
+            }
+
+            setTimeout(()=>{
+                add('bot', follow);
+            }, 400);
+
+            return;
+        }
+
+        // ---------- FOLLOW-UP ----------
+        if (lastTopic) {
+            let pdfData = smartSearch(q);
+
+            add('bot', "You're thinking like a scientist now 👀🔥");
+
+            if (pdfData) {
+                add('bot', "📚 Let me sharpen that answer for you:<br><br>" + pdfData);
+            }
+
+            lastTopic = null;
+            return;
+        }
+
+        // ---------- PURE PDF FALLBACK ----------
+        let pdfData = smartSearch(q);
+
+        if (pdfData) {
+            add('bot', "Yoh! Found something lekker for you 😄👇<br><br>" + pdfData);
+            return;
+        }
+
+        // ---------- SMART FUN FALLBACK ----------
+        const fun = [
+            "Eish 😅 that one dodged me like a taxi skipping a robot!",
+            "Hau 🤣 even Einstein would pause there!",
+            "Yoh 😭 my brain just buffered like slow WiFi!"
+        ];
+
+        add('bot', fun[Math.floor(Math.random() * fun.length)],
+        ["Fossils", "Circuits", "Skeleton"]);
+    }
+
+    // INIT
+    window.onload = initPDF; // Initialize PDF data on page load
+</script>
+
+</body>
+</html>
