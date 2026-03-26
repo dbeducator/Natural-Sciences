@@ -29,6 +29,24 @@
         .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; font-size:16px; }
         .send-btn { background:#10b981; color:white; border:none; padding:0 20px; height:45px; border-radius:25px; font-weight:bold; cursor:pointer; }
         .talk-btn { background:#10b981; color:white; border:none; border-radius:25px; padding:5px; cursor:pointer; font-weight:bold; }
+
+        .image-zoom { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.8); 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1001; 
+        } 
+        .image-zoom img { 
+            max-width: 90%; 
+            max-height: 90%; 
+        } 
+        .image-zoom:target { display: flex; }
     </style>
 </head>
 <body>
@@ -51,6 +69,10 @@
             <button onclick="speakResponse()" class="talk-btn">🔊 Talk</button>
         </div>
     </div>
+</div>
+
+<div id="image-zoom" class="image-zoom" onclick="this.style.display='none'">
+    <img id="zoomed-image" src="" alt="Zoomed Image" />
 </div>
 
 <script>
@@ -91,17 +113,17 @@
             const context = canvas.getContext('2d');
             await page.render({ canvasContext: context, viewport }).promise;
 
-            const imgSrc = canvas.toDataURL(); // Get the image as data URL
-            const title = await getPageTitle(pdf, i); // Extract title
-            imagesDB.push({ src: imgSrc, title: title }); // Store image and title
+            const imgSrc = canvas.toDataURL();
+            const title = await getPageTitle(pdf, i);
+            imagesDB.push({ src: imgSrc, title: title });
         }
     }
 
     async function getPageTitle(pdf, pageNumber) {
         const page = await pdf.getPage(pageNumber);
         const content = await page.getTextContent();
-        const titles = content.items.map(s => s.str).filter(str => str.trim() !== ''); // Get titles from the page
-        return titles.join(" ") || `Image from Page ${pageNumber}`; // Fallback title
+        const titles = content.items.map(s => s.str).filter(str => str.trim() !== '');
+        return titles.join(" ") || `Image from Page ${pageNumber}`;
     }
 
     function handleSend() {
@@ -140,7 +162,7 @@
             if (q.includes("who is alexis")) {
                 personalInquiryCount++;
                 if (personalInquiryCount > 2) {
-                    addMessage('bot', "Yoh chommie, are you trying to be an investigator? 😂 Alexis directed *Sometimes Love Isn't Enough*! Let's discuss something else.");
+                    addMessage('bot', "Yoh chommie, are you trying to be an investigator? 😂 Alexis directed *Sometimes Love Isn't Enough*! Let's talk more about something else.");
                 } else {
                     addMessage('bot', "Alexis is a talented director who made a movie called *Sometimes Love Isn't Enough*! You should check it out.");
                 }
@@ -160,7 +182,7 @@
             const specificImageMatch = imagesDB.find(img => q.includes(img.title.toLowerCase()));
             if (specificImageMatch) {
                 addMessage('bot', `Sho chommie! Here’s the image related to your request:<br>` +
-                    `<img src="${specificImageMatch.src}" style="max-width:100%;border-radius:10px;margin-top:10px;">` +
+                    `<img src="${specificImageMatch.src}" style="max-width:100%;border-radius:10px;margin-top:10px;" onclick="zoomImage('${specificImageMatch.src}')" title="${specificImageMatch.title}">` +
                     `<br><small>${specificImageMatch.title}</small>`);
                 return;
             }
@@ -195,6 +217,12 @@
         const box = document.getElementById('messages');
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
+    }
+
+    function zoomImage(src) {
+        const zoomedImage = document.getElementById('zoomed-image');
+        zoomedImage.src = src;
+        document.getElementById('image-zoom').style.display = 'flex'; // Show the zoomed image
     }
 
     function speakResponse() {
