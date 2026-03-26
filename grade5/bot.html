@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maxi Pie 🐾 Science Chommie 🇿🇦</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+
+<style>
+body { margin:0; font-family:Arial; background:#0a1a33; }
+
+#fab {
+ position:fixed; bottom:20px; right:20px;
+ width:70px; height:70px; border-radius:50%;
+ background:#10b981; display:flex;
+ align-items:center; justify-content:center;
+ cursor:pointer;
+}
+
+#chat { display:none; position:fixed; inset:0; background:#000000cc; }
+
+.container {
+ max-width:500px; height:100%; margin:auto;
+ display:flex; flex-direction:column;
+ background:#f1f5f9;
+}
+
+.header {
+ background:#0a1a33; color:white; padding:15px;
+ display:flex; align-items:center;
+}
+
+.messages { flex:1; overflow:auto; padding:15px; }
+
+.msg {
+ padding:10px 14px; border-radius:15px;
+ margin:6px 0; max-width:80%;
+}
+
+.bot { background:white; }
+.user { background:#10b981; color:white; margin-left:auto; }
+
+.input { display:flex; padding:10px; background:white; }
+
+input { flex:1; padding:10px; border-radius:20px; border:1px solid #ccc; }
+
+.quick { display:flex; gap:6px; flex-wrap:wrap; margin-top:5px; }
+.quick button {
+ background:#e2e8f0; border:none; padding:6px 10px;
+ border-radius:12px; cursor:pointer;
+}
+
+.typing { opacity:0.6; font-style:italic; }
+</style>
+</head>
+
+<body>
+
+<div id="fab" onclick="openChat()">🐾</div>
+
+<div id="chat">
+<div class="container">
+
+<div class="header">
+<b>Maxi Pie 🐾</b>&nbsp; Science Chommie 🇿🇦
+<button onclick="closeChat()" style="margin-left:auto">X</button>
+</div>
+
+<div id="messages" class="messages"></div>
+
+<div class="input">
+<input id="input" placeholder="Ask me something, chommie..." onkeypress="if(event.key==='Enter') send()">
+<button onclick="send()">Send</button>
+</div>
+
+</div>
+</div>
+
+<script>
+let knowledgeBase = [];
+let fuse = null;
+let lastTopic = null;
+
+// LOAD PDF (MAIN BRAIN)
+async function initPDF() {
+    const pdf = await pdfjsLib.getDocument('resources/logic.pdf').promise;
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const text = (await page.getTextContent()).items.map(s=>s.str).join(' ');
+        knowledgeBase.push({ text });
+    }
+
+    fuse = new Fuse(knowledgeBase, {
+        keys:['text'],
+        threshold:0.35,
+        ignoreLocation:true
+    });
+}
+
+// SMART SEARCH
+function searchPDF(q) {
+    if (!fuse) return null;
+    const r = fuse.search(q);
+    return r.length ? r[0].item.text : null;
+}
+
+// UI
+function add(role, text, quick=[]) {
+    const div = document.createElement('div');
+    div.className = 'msg '+role;
+    div.innerHTML = text;
+    const box = messages;
+    box.appendChild(div);
+
+    if (quick.length) {
+        const qd = document.createElement('div');
+        qd.className='quick';
+        quick.forEach(q=>{
+            const b=document.createElement('button');
+            b.innerText=q;
+            b.onclick=()=>{input.value=q; send();};
+            qd.appendChild(b);
+        });
+        box.appendChild(qd);
+    }
+
+    box.scrollTop = box.scrollHeight;
+}
+
+function typing() {
+    const d=document.createElement('div');
+    d.className='msg bot typing';
+    d.id='typing';
+    d.innerText="Maxi Pie is cooking something lekker... 🍳";
+    messages.appendChild(d);
+}
+
+function stopTyping() {
+    const t=document.getElementById('typing');
+    if(t) t.remove();
+}
+
+function send() {
+    const q=input.value.trim();
+    if(!q) return;
+
+    add('user', q);
+    input.value='';
+    typing();
+
+    setTimeout(()=>{
+        stopTyping();
+        reply(q.toLowerCase());
+    },500);
+}
+
+// CORE BRAIN
+function reply(q) {
+
+    // GREETING
+    if (/^(hi|hello|hey|aweh)/.test(q)) {
+        add('bot',"Aweh chommie 👋 ready to smash science? No load shedding here ⚡",
+        ["Food chains","Circuits","Fossils"]);
+        return;
+    }
+
+    if (q.includes("how are you")) {
+        add('bot',"Sharp sharp 😎 running smoother than a taxi with full tank!");
+        return;
+    }
+
+    let baseAnswer="";
+    let follow="";
+
+    // FULL CAPS TOPIC COVERAGE
+    const topics = [
+        ["plants","Plants make their own food using sunlight 🌱 — they are producers!", "Why are plants important?"],
+        ["skeleton","Your skeleton supports your body and protects organs 🦴","Name one function of the skeleton"],
+        ["structure","Structures must be strong and stable to support weight 🏗️","What makes a structure strong?"],
+        ["food chain","Food chains show energy flow 🍔➡️🐍➡️🦅","Who are producers?"],
+        ["life cycle","Life cycles show how living things grow and change 🔄","Can you name stages?"],
+        ["metals","Metals conduct heat and electricity ⚡","Name one metal"],
+        ["non-metal","Non-metals are poor conductors","Why is that useful?"],
+        ["battery","Batteries store energy 🔋","Where do we use batteries?"],
+        ["circuit","Circuits are closed loops for electricity ⚡","What if it's broken?"],
+        ["energy","Energy allows work to happen 🔥","Name a type of energy"],
+        ["movement","Energy causes movement 🚗","What uses movement?"],
+        ["pulley","Pulleys help lift heavy loads 💪","Where are pulleys used?"],
+        ["safety","Electricity can be dangerous ⚠️","Name one safety rule"],
+        ["source of energy","Energy comes from sources like sun ☀️","Renewable vs non?"],
+        ["earth moves","Earth rotates and orbits 🌍","What causes day/night?"],
+        ["surface","Earth surface has land and water 🌊","Name landforms"],
+        ["sedimentary","Rocks form in layers like kota 😄","How layers form?"],
+        ["fossil","Fossils are preserved remains 🦖","How fossils form?"]
+    ];
+
+    for (let t of topics) {
+        if (q.includes(t[0])) {
+            baseAnswer = t[1];
+            follow = t[2];
+            lastTopic = t[0];
+            break;
+        }
+    }
+
+    // RESPONSE BUILD
+    if (baseAnswer) {
+        let pdf = searchPDF(q);
+
+        add('bot', baseAnswer + " 😎");
+
+        if (pdf) {
+            add('bot',"📚 From your textbook:<br><br>"+pdf);
+        }
+
+        add('bot', follow);
+        return;
+    }
+
+    // FOLLOW UP
+    if (lastTopic) {
+        let pdf = searchPDF(q);
+        add('bot',"Nice thinking 👀🔥 you're getting sharp!");
+        if (pdf) add('bot',"📚 Let me upgrade that answer:<br><br>"+pdf);
+        lastTopic=null;
+        return;
+    }
+
+    // PURE PDF FALLBACK (VERY IMPORTANT)
+    let pdf = searchPDF(q);
+    if (pdf) {
+        add('bot',"Yoh! Found something lekker for you 😄👇<br><br>"+pdf);
+        return;
+    }
+
+    // FUN FALLBACK
+    const jokes=[
+        "Eish 😅 that one dodged me like a taxi skipping a robot!",
+        "Hau 🤣 even Einstein would think twice!",
+        "Yoh 😭 my brain just buffered like slow WiFi!"
+    ];
+
+    add('bot', jokes[Math.floor(Math.random()*jokes.length)],
+    ["Fossils","Circuits","Energy"]);
+}
+
+function openChat() {
+    chat.style.display='block';
+    if (!messages.innerHTML) {
+        add('bot',"Sho! I'm Maxi Pie 🐾 your science chommie 🇿🇦 Ask me anything!",
+        ["Food chains","Electric circuits","Fossils"]);
+    }
+}
+
+function closeChat() {
+    chat.style.display='none';
+}
+
+window.onload = initPDF;
+</script>
+
+</body>
+</html>
