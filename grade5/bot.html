@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maxi Pie - Grade 5 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background:#0a1a33; height: 100vh; overflow: hidden; }
+        #maxi-fab { position:fixed; bottom:25px; right:25px; width:75px; height:75px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); z-index:999; border:4px solid #fff; }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit: cover; }
+        #chat-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(7, 7, 12, 0.95); z-index:1000; }
+        .chat-container { display:flex; flex-direction:column; height:100%; width:100%; max-width:500px; margin:0 auto; background:#f0f4f8; }
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; }
+        .chat-header img { width:45px; height:45px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left:auto; background:#ef4444; color:white; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer; }
+        .chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px; }
+        .msg { max-width:85%; padding:12px 16px; border-radius:18px; line-height:1.4; font-size:16px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        .bot { align-self:flex-start; background:white; color:#333; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+        .chat-input-area { padding:15px; background:white; display:flex; gap:10px; border-top:1px solid #ddd; }
+        .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; font-size:16px; }
+        .send-btn { background:#10b981; color:white; border:none; padding:10px; height:45px; border-radius:25px; font-weight:bold; cursor:pointer; }
+    </style>
+</head>
+<body>
+
+<div id="maxi-fab" onclick="openChat()"><img src="cat_full.png"></div>
+
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png">
+            <div><h3>Maxi Pie</h3><small style="color:#10b981">Science Chommie 🇿🇦</small></div>
+            <button class="close-btn" onclick="closeChat()">×</button>
+        </div>
+        <div id="messages" class="chat-messages">
+            <div class="msg bot">Aweh! I'm <strong>Maxi Pie</strong> 🐾. Ready to conquer Grade 5 Science with Leslee, Linda, Alexis, and Sadee? Ask me anything!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask me something, chommie..." onkeypress="handleTyping(event)">
+            <button onclick="handleSend()" class="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let knowledgeBase = [];
+    let fuse = null;
+    let awaitingAnswer = false; // NEW: Track if bot is waiting for user response
+
+    async function initResources() {
+        const files = ['resources/logic.pdf', 'resources/logic2.pdf'];
+        for (const url of files) {
+            try {
+                const pdf = await pdfjsLib.getDocument(url).promise;
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const text = content.items.map(s => s.str).join(' ');
+                    knowledgeBase.push({ text: text.replace(/\s+/g, ' ') });
+                }
+            } catch (e) { console.warn("PDF missing:", url); }
+        }
+        fuse = new Fuse(knowledgeBase, { keys: ['text'], threshold: 0.4 });
+    }
+
+    function handleTyping(event) { if (event.key === 'Enter') handleSend(); }
+
+    function handleSend() {
+        const input = document.getElementById('userInput');
+        const userQueryRaw = input.value.trim();
+        if (!userQueryRaw) return;
+
+        addMessage('user', userQueryRaw);
+        input.value = '';
+
+        setTimeout(() => {
+            const q = userQueryRaw.toLowerCase();
+
+            // 1. GREETINGS & CHOMMIE VIBES
+            const greetings = ["hi", "hello", "hey", "aweh", "sho", "howzit", "shap", "ndaa"];
+            if (greetings.some(word => q === word || q.startsWith(word + " "))) {
+                addMessage('bot', "Aweh chommie! 👋 Ready to smash this science paper like a legend? What are we learning today?");
+                return;
+            }
+
+            if (q.includes("how are you")) {
+                addMessage('bot', "I'm buzzing like a closed circuit! ⚡ Ready to help. How's the studying going?");
+                return;
+            }
+
+            // 2. THE NESHEHE FAMILY (Leslee, Linda, Alexis, Sadee)
+            if (q.includes("leslee") || q.includes("linda") || q.includes("alexis") || q.includes("sadee") || q.includes("neshehe")) {
+                addMessage('bot', "Ah, the <strong>Venda Girls</strong> and the Neshehe legacy! 🇿🇦 Whether it's Leslee, Linda, Alexis, or Sadee, we're all about that top-tier Science excellence! Let's make the family proud! 🔥");
+                return;
+            }
+
+            // 3. JOKES
+            if (q.includes("joke")) {
+                const jokes = [
+                    "Why did the skeleton go to the party alone? He had no-body to go with! 💀",
+                    "Why can't you trust an atom? Because they make up everything! 😂",
+                    "What did the science book say to the student? I've got a lot of problems! 📖"
+                ];
+                addMessage('bot', jokes[Math.floor(Math.random() * jokes.length)]);
+                return;
+            }
+
+            // 4. CONVERSATION STATE (Handling the "Answer" to the follow-up)
+            if (awaitingAnswer) {
+                awaitingAnswer = false;
+                addMessage('bot', "Sharp answer! 🌟 You're actually getting the hang of this. Should we look deeper into this or try a new topic?");
+                return;
+            }
+
+            // 5. TOPIC MATCHING (Detailed Responses)
+            const topics = [
+                { keys: ['skeleton'], answer: "The skeleton is your body's scaffold. It gives you shape and protects your heart and brain! 💀", followUp: "Can you name one organ the ribs protect?" },
+                { keys: ['sedimentary'], answer: "Sedimentary rocks form in layers over millions of years. They are like nature's pancakes! 🥞", followUp: "What do you think helped form these layers?" },
+                { keys: ['circuit'], answer: "An electrical circuit is a complete path for energy to flow. If the wire snaps, the lights go out! ⚡", followUp: "What happens if the circuit is broken?" },
+                { keys: ['fossil'], answer: "Fossils are stone 'photos' of plants and animals from millions of years ago. 🦴", followUp: "How do you think fossils are formed?" }
+            ];
+
+            let matched = false;
+            for (const topic of topics) {
+                if (topic.keys.some(key => q.includes(key))) {
+                    addMessage('bot', topic.answer);
+                    setTimeout(() => {
+                        addMessage('bot', `<em>Thinking question:</em> ${topic.followUp}`);
+                        awaitingAnswer = true; // Bot is now waiting for an answer
+                    }, 800);
+                    matched = true;
+                    break;
+                }
+            }
+            if (matched) return;
+
+            // 6. FUZZY SEARCH (Last resort)
+            const results = fuse ? fuse.search(userQueryRaw) : [];
+            if (results.length > 0) {
+                const matchText = results[0].item.text.substring(0, 300) + "...";
+                addMessage('bot', `Sho chommie, check what I found in your notes: <br><br> "<em>${matchText}</em>" <br><br> Does that help?`);
+            } else {
+                addMessage('bot', "Eish chommie! My brain just had a load-shedding moment. 🕯️ I couldn't find that. Try asking about <strong>skeletons</strong>, <strong>rust</strong>, or <strong>circuits</strong>!");
+            }
+        }, 500);
+    }
+
+    function addMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = `msg ${role}`;
+        div.innerHTML = text;
+        const box = document.getElementById('messages');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function openChat() { document.getElementById('chat-modal').style.display = 'block'; }
+    function closeChat() { document.getElementById('chat-modal').style.display = 'none'; }
+    window.onload = initResources;
+</script>
+</body>
+</html>
