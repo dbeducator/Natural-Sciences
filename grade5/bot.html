@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maxi Pie - Grade 5 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background:#0a1a33; height: 100vh; overflow: hidden; }
+
+        #maxi-fab { position:fixed; bottom:25px; right:25px; width:75px; height:75px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); z-index:999; border:4px solid #fff; }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit: cover; }
+
+        #chat-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(7, 7, 12, 0.95); z-index:1000; }
+        .chat-container { display:flex; flex-direction:column; height:100%; width:100%; max-width:500px; margin:0 auto; background:#f0f4f8; }
+
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; }
+        .chat-header img { width:45px; height:45px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left:auto; background:#ef4444; color:white; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer; }
+
+        .chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px; }
+        .msg { max-width:85%; padding:12px 16px; border-radius:18px; line-height:1.4; font-size:16px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        .bot { align-self:flex-start; background:white; color:#333; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+
+        .chat-input-area { padding:15px; background:white; display:flex; gap:10px; border-top:1px solid #ddd; }
+        .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; font-size:16px; }
+        .send-btn { background:#10b981; color:white; border:none; padding:10px; height:45px; border-radius:25px; font-weight:bold; cursor:pointer; }
+
+        /* Suggestion chips */
+        .chip-row { display:flex; flex-wrap:wrap; gap:8px; padding:6px 0 2px; }
+        .chip {
+            background:#e8f5f0; color:#0a6e50; border:1.5px solid #10b981;
+            border-radius:20px; padding:7px 16px; font-size:14px; font-weight:600;
+            cursor:pointer; transition:background 0.15s, transform 0.1s;
+            white-space:nowrap;
+        }
+        .chip:hover { background:#10b981; color:white; transform:scale(1.04); }
+        .chip:active { transform:scale(0.97); }
+
+        /* Suggestion chips */
+        .chip-row { display:flex; flex-wrap:wrap; gap:8px; padding:4px 0 2px; }
+        .chip {
+            background:#e8f5f0; color:#0a6e50; border:1.5px solid #10b981;
+            border-radius:20px; padding:6px 14px; font-size:14px; font-weight:600;
+            cursor:pointer; transition:background 0.15s, transform 0.1s;
+            white-space:nowrap;
+        }
+        .chip:hover { background:#10b981; color:white; transform:scale(1.04); }
+        .chip:active { transform:scale(0.97); }
+
+
+    </style>
+</head>
+<body>
+
+<div id="maxi-fab" onclick="openChat()"><img src="cat_full.png"></div>
+
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png">
+            <div><h3>Maxi Pie</h3><small style="color:#10b981">Science Chommie 🇿🇦</small></div>
+            <button class="close-btn" onclick="closeChat()">×</button>
+        </div>
+        <div id="messages" class="chat-messages">
+            <div class="msg bot">Sho! I'm <strong>Maxi Pie</strong> 🐾, your science sidekick! I’m here to help you conquer the world of science. Ask me anything!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask me something, chommie..." onkeypress="if(event.key==='Enter') handleSend()">
+            <button onclick="handleSend()" class="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let knowledgeBase = [];
+    let fuse = null;
+    let personalInquiryCount = 0;
+    let pdfReady = false;
+
+    // ── PDF chunk search system ───────────────────────────────────────────
+    let PDF_CHUNKS = [];
+
+    const SYNONYMS = {
+        electricity: ["current","power","voltage","electric","electrical energy"],
+        rocks: ["stone","mineral","rock","geology","igneous","metamorphic"],
+        fossils: ["fossil","prehistoric","fossilized","fossilised","remains"],
+        skeleton: ["backbone","spine","skull","rib","vertebrae","endoskeleton"],
+        metal: ["iron","copper","steel","aluminium","gold","silver","zinc","rust"],
+        food: ["eat","feed","nutrition","diet","predator","prey"],
+        plant: ["tree","flower","leaf","photosynthesis","seed","root","stem"],
+        animal: ["creature","organism","mammal","reptile","bird","fish"],
+        circuit: ["electrical circuit","series circuit","parallel circuit","conductor","switch","bulb"],
+        fuel: ["coal","petrol","diesel","gas","fossil fuel","burn","combustion"],
+        structure: ["frame","shell","support","beam","column","strut","load"],
+        surface: ["crust","layer","mantle","core","ground","soil","lithosphere"],
+        sediment: ["sedimentary","sand","mud","gravel","deposit","compacted","layer"],
+        material: ["substance","raw material","processed","natural","manufactured"],
+        ligament: ["joint","tendon","connective","tissue","bone connection"],
+        amphibian: ["frog","toad","salamander","newt","tadpole","metamorphosis"],
+        reptile: ["snake","lizard","crocodile","tortoise","scales","cold blooded"],
+        photosynthesis: ["chlorophyll","sunlight","carbon dioxide","oxygen","glucose","leaves"],
+        producer: ["plant","photosynthesis","makes food","autotroph","green plant"],
+        consumer: ["herbivore","carnivore","omnivore","eats","feeds on","heterotroph"],
+        vertebrate: ["backbone","spine","fish","amphibian","reptile","bird","mammal"],
+        invertebrate: ["no backbone","insect","worm","crab","snail","spider"],
+        weathering: ["erosion","breaking down","wind","water","rock fragments"],
+        conductor: ["copper","metal","allows electricity","low resistance"],
+        insulator: ["rubber","plastic","wood","prevents electricity","high resistance"]
+    };
+
+    // 🧠 MEMORY SYSTEM
+    let USER_MEMORY = { topicsAsked: {}, weakTopics: {}, lastTopic: null };
+    let lastQuery = '';
+    let lastRawAnswer = '';
+
+    // EXTRA PERSONALITY
+    const EXTRA_PERSONALITY = {
+        praise: ["🔥 That's it!","💯 Nailed it chommie!","Aweh 😎 you're getting sharp now!","Yoh that's clever hey!"],
+        encouragement: ["Don't stress chommie 💪 we build it step by step","You're close 👀 adjust it slightly","Eish 😅 this one confuses everyone"],
+        hints: ["📚 Try asking about <b>rocks</b>, <b>fossils</b>, <b>electricity</b>","📘 You can ask for definitions or examples","🧪 Say <b>quiz me</b> to test yourself","📖 Ask anything from the textbook 😎"]
+    };
+
+    // Track topic memory
+    function trackTopic(q) {
+        const topics = ["rock","fossil","electric","metal","skeleton","plant","food chain","circuit","energy","earth","material","structure","amphibian","vertebrate","invertebrate","weathering","photosynthesis","sediment"];
+        topics.forEach(t => {
+            if (q.includes(t)) {
+                USER_MEMORY.topicsAsked[t] = (USER_MEMORY.topicsAsked[t] || 0) + 1;
+                USER_MEMORY.lastTopic = t;
+            }
+        });
+    }
+
+    // Teacher-mode breakdown (called explicitly by chip)
+    function teacherExplain(answer) {
+        return `📘 <b>Let's break it down chommie 👇</b><br><br>🧠 ${answer}<br><br>💡 <b>Simple:</b> Strip away the big words — the key idea is what those sentences above describe. That's the concept in a nutshell!<br><br>👀 <b>Real-life example:</b> In South Africa, you can see this in action — think Karoo rocks, Cradle of Humankind fossils, or the power lines running to your house. Picture it! 🌍`;
+    }
+
+    // Show clickable suggestion chips
+    function showChips(topic) {
+        const chips = [
+            { label: "📖 Explain it simply", action: "explain"  },
+            { label: "💡 Give an example",   action: "example"  },
+            { label: "🔍 Go deeper",         action: "deeper"   },
+            { label: "🧪 Quiz me on this",   action: "quiz"     }
+        ];
+        const box = document.getElementById('messages');
+        const row = document.createElement('div');
+        row.className = 'chip-row';
+        chips.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'chip';
+            btn.textContent = c.label;
+            btn.onclick = () => chipAction(c.action, topic);
+            row.appendChild(btn);
+        });
+        box.appendChild(row);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function chipAction(action, topic) {
+        const labels = { explain:"Explain it simply", example:"Give an example", deeper:"Go deeper", quiz:"Quiz me on this" };
+        addMessage('user', labels[action]);
+
+        setTimeout(() => {
+            if (action === 'quiz') { startQuiz(); return; }
+
+            if (!lastRawAnswer) {
+                addMessage('bot', "Eish 😅 ask me a topic question first, then I can do that for you!");
+                setTimeout(() => showChips(topic), 600);
+                return;
+            }
+
+            if (action === 'explain') {
+                addMessage('bot', teacherExplain(lastRawAnswer));
+
+            } else if (action === 'example') {
+                const saContext = lastQuery.includes('rock') || lastQuery.includes('sediment')
+                    ? "You can see sedimentary rocks all over the <b>Karoo</b> — those flat-topped mountains (koppies) are layers of compressed sediment! 🪨"
+                    : lastQuery.includes('fossil')
+                    ? "South Africa's <b>Cradle of Humankind</b> near Johannesburg is one of the world's richest fossil sites — real fossils right in our backyard! 🦕"
+                    : lastQuery.includes('electric') || lastQuery.includes('circuit')
+                    ? "Think of the <b>Eskom power grid</b> — electricity travels from power stations through cables to your home, just like a giant circuit! ⚡"
+                    : lastQuery.includes('skeleton') || lastQuery.includes('bone')
+                    ? "Your own body is a perfect example — feel your spine, your ribs, your skull. That's your endoskeleton at work! 🦴"
+                    : lastQuery.includes('metal')
+                    ? "Look around you — your pots, spoons, coins, and roof sheets are all processed metals used every day in SA homes! 🔩"
+                    : "In South Africa, you can see this concept everywhere — from the Karoo to Soweto to the ocean. Science is all around us! 🌍";
+
+                addMessage('bot',
+                    `💡 <b>Real-life example — ${lastQuery}</b><br><br>` +
+                    `${lastRawAnswer}<br><br>` +
+                    `🇿🇦 <b>SA Connection:</b><br>${saContext}`
+                );
+
+            } else if (action === 'deeper') {
+                if (fuse) {
+                    const results = fuse.search(lastQuery, { limit: 6 });
+                    if (results.length > 0) {
+                        const rawText = results.map(r => r.item.text).join(' ');
+                        const deepAnswer = formatAnswer(lastQuery, rawText, true);
+                        addMessage('bot', `🔍 <b>Going deeper on "${lastQuery}" 👇</b><br><br>${deepAnswer}`);
+                    } else {
+                        addMessage('bot', "Eish 😅 I couldn't find more detail on that. Try asking it differently chommie!");
+                    }
+                }
+            }
+            setTimeout(() => showChips(topic), 700);
+        }, 350);
+    }
+
+    // followUp now shows chips
+    function followUp(topic) {
+        setTimeout(() => showChips(topic || lastQuery), 900);
+    }
+
+    function normalizePDF(text) {
+        return text.toLowerCase().replace(/[^\w\s]/g, "").trim();
+    }
+
+    function getKeywords(q) {
+        const words = normalizePDF(q).split(" ").filter(w => w.length > 2);
+        const expanded = [...words];
+        words.forEach(w => {
+            if (SYNONYMS[w]) expanded.push(...SYNONYMS[w]);
+        });
+        return [...new Set(expanded)];
+    }
+
+    function scoreChunk(chunk, keywords) {
+        const text = normalizePDF(chunk);
+        const raw = chunk.toLowerCase();
+
+        // Penalise question chunks — they contain keywords but aren't answers
+        const trimmed = chunk.trim();
+        if (trimmed.endsWith('?')) return -5;
+        if (/^(what |how |why |which |give |list |name |describe |explain |below is|now we are|show where|carefully study)/i.test(trimmed)) return -8;
+
+        // Penalise activity/instruction chunks heavily
+        const isJunk = /^(now give|do not tell|use the knife|tap gently|cut out|paste|tick|fill in|write the names|perhaps an adult|as such the|they are designed|enabling activities|learners will have|if possible combine|hint what other|indb 20)/i.test(trimmed);
+        if (isJunk) return -10;
+
+        let score = 0;
+        keywords.forEach(k => { if (text.includes(k)) score += 2; });
+
+        // Bonus: exact phrase
+        const joined = keywords.slice(0, 3).join(" ");
+        if (joined.length > 3 && text.includes(joined)) score += 5;
+
+        // Bonus: definitive sentences (starts with topic word)
+        if (keywords.some(k => raw.startsWith(k))) score += 3;
+
+        // Bonus: contains a definition pattern ("X is..." or "X are...")
+        if (/ is | are | means | refers to /i.test(chunk)) score += 2;
+
+        // Bonus: shorter = more precise (but not too short)
+        if (chunk.length > 60 && chunk.length < 300) score += 2;
+
+        // Penalise list-like chunks (components, materials lists)
+        if (/^[A-Z][a-z]+,\s|,\s[a-z]+ [a-z]+,/i.test(chunk)) score -= 3;
+
+        // Penalise teacher/activity language
+        if (/teacher|learner|activity|exercise book|instruction|materials:|question:/i.test(raw)) score -= 3;
+
+        return score;
+    }
+
+    function searchPDFChunks(q) {
+        if (PDF_CHUNKS.length === 0) return null;
+        const keywords = getKeywords(q);
+        let bestScore = 0;
+        let bestIndex = 0;
+
+        PDF_CHUNKS.forEach((chunk, i) => {
+            const score = scoreChunk(chunk, keywords);
+            if (score > bestScore) { bestScore = score; bestIndex = i; }
+        });
+
+        if (bestScore === 0) return null;
+
+        // Return context window: best chunk + neighbours
+        return [
+            PDF_CHUNKS[bestIndex - 1] || "",
+            PDF_CHUNKS[bestIndex],
+            PDF_CHUNKS[bestIndex + 1] || ""
+        ].join(" ").trim();
+    }
+
+    function preparePDFChunks(fullText) {
+        PDF_CHUNKS = fullText
+            .split(/(?<=[.!?])\s+/)   // split on sentence boundaries
+            .map(t => t.replace(/\s+/g, ' ').trim())
+            .filter(t => t.length > 40 && t.length < 600);
+    }
+
+    async function initResources() {
+        // Load logic2.pdf ONCE — extract text first, then render images in background
+        await initFromLearnerPDF();
+    }
+
+    async function initFromLearnerPDF() {
+        const url = 'resources/logic2.pdf';
+        const pdf = await pdfjsLib.getDocument(url).promise;
+
+        // Step 1: Extract all text (fast)
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const text = textContent.items.map(s => s.str).join(' ');
+            knowledgeBase.push({ text: text.replace(/\s+/g, ' ') });
+        }
+
+        // Build search indexes
+        fuse = new Fuse(knowledgeBase, { keys: ['text'], threshold: 0.4, ignoreLocation: true });
+        const fullText = knowledgeBase.map(p => p.text).join(' ');
+        preparePDFChunks(fullText);
+        pdfReady = true;
+        extractTOC();
+
+        // Show ready message immediately after text loads
+        const box = document.getElementById('messages');
+        const readyMsg = document.createElement('div');
+        readyMsg.className = 'msg bot';
+        readyMsg.innerHTML = "Sho! 📚 Textbook loaded and ready — ask me anything chommie!";
+        box.appendChild(readyMsg);
+        box.scrollTop = box.scrollHeight;
+
+    }
+
+    let tocChapters = [];
+
+    function extractTOC() {
+        // Hardcoded Grade 5 CAPS topics — 19 topics across 4 terms
+        tocChapters = [
+            "Term 1 — Life and Living / Technology",
+            "T1: Plants and Animals on Earth",
+            "T2: Animal Skeletons",
+            "T3: Skeletons as Structures",
+            "T4: Food Chains",
+            "T5: Life Cycles",
+            "Term 2 — Matter and Materials / Energy",
+            "T6: Metals and Non-metals",
+            "T7: Uses of Metals",
+            "T8: Processing Materials",
+            "T9: Properties of Processed Materials",
+            "T10: Cells and Batteries",
+            "T11: Electric Circuits",
+            "Term 3 — Energy and Change / Technology",
+            "T12: Energy and Movement",
+            "T13: Systems for Moving Things",
+            "T14: Safety with Electricity",
+            "T15: Sources of Energy",
+            "Term 4 — Planet Earth and Beyond",
+            "T16: The Earth Moves",
+            "T17: Surface of the Earth",
+            "T18: Sedimentary Rocks",
+            "T19: Fossils"
+        ];
+    }
+
+
+
+
+
+    const SA_PERSONALITY = {
+        greetings: [
+            "Aweh chommie! 👋 What are we tackling today?",
+            "Yoh! Yoh! 😄 You came ready hey — what topic?",
+            "Sharp sharp! 🔥 Let's get into some science!",
+            "Heita! 😎 Brain switched on or must I warm you up?"
+        ],
+        mood: [
+            "I'm buzzing like Eskom just came back on 😄⚡",
+            "Sharp chommie — brain fully charged 🔋",
+            "Yoh I'm ready! Let's go 🔥",
+            "Better than a Friday after school 😎"
+        ],
+        confusion: [
+            "Yoh chommie… that one flew over my head 😅 Try again?",
+            "Eish 😅 I didn't quite catch that — try saying it another way?",
+            "Hayi that's a tricky one… say it another way?",
+            "Yoh that's deep 👀 break it down for me a bit"
+        ],
+        praise: [
+            "Sharp answer! 🔥 You're getting this!",
+            "Yoh you're clever hey 😄",
+            "Aweh that's solid thinking 💪",
+            "Even Leslee would nod at that one 😎"
+        ],
+        encouragement: [
+            "Don't stress chommie, we build it step by step 💪",
+            "Even Lexi didn't get it first time 😄",
+            "Yoh this one confuses everyone at first 😅",
+            "You're close — just adjust it a bit 👀"
+        ],
+        jokes: [
+            "Yoh imagine asking Linda that 😂 he'd say 'read properly!'",
+            "Lexi would already be on Google 😆",
+            "Sadee would guess and hope for the best 😅",
+            "Even Alexis would pause there hey 😂",
+            "Yoh this one would make the whole class quiet 😶"
+        ],
+        reactions: {
+            correct: ["🔥 That's it!", "💯 Nailed it chommie!", "✔️ Perfect answer!"],
+            wrong: ["Eish not quite 😅", "Close but not there yet 👀", "Yoh almost chommie!"]
+        }
+    };
+
+    const SA_ULTRA_FLOW = {
+        greetings: [
+            "Aweh chommie! 👋 What are we tackling today?",
+            "Heita! 😎 Brain switched on or still loading?",
+            "Yoh! 😄 You came ready hey — what topic?",
+            "Sharp sharp! 🔥 Let's get into it!",
+            "Howzit! 😏 You ready or must I warm you up?",
+            "Aweh fam 😎 science vibes only today!",
+            "Yoh chommie, let's make your brain work 💪",
+            "Heita! Ready to flex that brain?",
+            "Aweh 😄 let's cook some knowledge!",
+            "Yoh! Let's see what you've got 🔥",
+            "Sharp! What are we learning today?",
+            "Aweh boss 😎 ready to go?",
+            "Yoh 😏 let's build some brain power",
+            "Heita chommie! Let's go!",
+            "Aweh 😄 ready when you are!"
+        ],
+        positive: [
+            "Lekker! 💪 Let's go! Rocks, fossils or electricity?",
+            "Sharp! 🔥 I like that energy!",
+            "Aweh 😎 that's the spirit!",
+            "Let's do it! 💯 What topic?",
+            "Yoh 😄 I knew you were ready!",
+            "Lekker vibes! 🔥 let's learn!",
+            "Aweh chommie, we move!",
+            "Nice one! 💪 pick a topic",
+            "Yoh that's energy 😎 let's go",
+            "Let's cook! 🔥",
+            "Aweh 😄 brain activated!",
+            "Sharp sharp! Let's start",
+            "Yoh 💯 we're moving now!",
+            "Aweh! This is gonna be good",
+            "Let's go chommie!",
+            "🔥 Time to learn!",
+            "Aweh 😏 choose your topic",
+            "Yoh we're on!",
+            "Lekker 😎 what first?",
+            "Let's smash it 💪"
+        ],
+        negative: [
+            "Eish 😅 not feeling it? Let's start small chommie",
+            "Yoh 😏 okay okay, we'll go slow",
+            "No stress 😎 but your brain is waiting hey",
+            "Aweh, we can chill… but just one question?",
+            "Eish 😅 don't run away from knowledge!",
+            "Yoh 😄 just try one easy thing",
+            "Hayi 😏 we'll keep it light",
+            "Aweh chommie, even 1 step counts",
+            "Eish 😎 let's warm up slowly",
+            "Yoh don't ghost science 😂",
+            "Aweh 😅 just one quick one",
+            "Eish chommie, come back!",
+            "Yoh 😏 I see you… avoiding work",
+            "No worries 😄 we build slowly",
+            "Aweh 😎 let's ease into it",
+            "Yoh 😅 just try a fun fact?",
+            "Eish don't duck me now 😂",
+            "Aweh 😏 small steps!",
+            "Yoh 😎 you'll enjoy it trust me",
+            "Eish 😄 come let's try"
+        ],
+        unsure: [
+            "Hayi 😅 not sure? Let's test it together",
+            "Yoh 😏 we'll figure it out step by step",
+            "Aweh 😄 no stress, I'll guide you",
+            "Eish 😎 let's try something easy first",
+            "Yoh maybe turns into yes hey 😄",
+            "Aweh chommie, let's experiment",
+            "Hayi 😏 let's see together",
+            "Eish 😄 we build confidence slowly",
+            "Yoh 😎 trust the process",
+            "Aweh 😄 just pick something",
+            "Eish 😏 no wrong answers here",
+            "Yoh 😅 try guess first",
+            "Aweh 😎 we'll fix it together",
+            "Hayi 😄 let's start simple",
+            "Yoh 😏 I got you",
+            "Aweh chommie, step by step",
+            "Eish 😎 let's go easy",
+            "Yoh 😄 pick anything",
+            "Aweh 😏 don't overthink it",
+            "Eish 😅 we'll make it simple"
+        ],
+        topics: [
+            "Pick one: <b>rocks</b>, <b>fossils</b>, or <b>electricity</b> 🔬",
+            "What are we doing — rocks, fossils or electricity?",
+            "Choose your weapon 😎 rocks / fossils / electricity",
+            "Yoh 😄 what topic are we hitting?",
+            "Aweh 💪 pick your topic chommie",
+            "Rocks? Fossils? Electricity?",
+            "Let's choose — science is waiting 😎",
+            "Yoh 🔥 what first?",
+            "Pick one and we go deep 😏",
+            "Aweh 😄 choose your lane",
+            "Science time! What topic?",
+            "Let's go — what are we learning?",
+            "Yoh chommie pick something 🔬",
+            "Aweh 😎 don't be shy — choose",
+            "Let's start somewhere!"
+        ],
+        subtopics: [
+            "Do you want <b>types</b> or <b>how it works</b>?",
+            "Theory or examples first?",
+            "Break it down or go deep?",
+            "Simple explanation or full detail?",
+            "Examples or definitions?",
+            "Quick summary or deep dive?",
+            "Basic or advanced?",
+            "Start easy or go big?",
+            "Definitions or real life examples?",
+            "Yoh 😄 how deep we going?",
+            "Aweh 😎 explain or demonstrate?",
+            "Eish 😏 simple or complex?",
+            "Let's choose direction",
+            "Start small or big?",
+            "Let's go step by step?"
+        ],
+        praise: [
+            "🔥 That's it!", "💯 Nailed it!", "Aweh 😎 you're sharp!",
+            "Yoh 😄 clever thinking!", "Lekker 💪 keep going!", "Eish 😎 you're getting this!",
+            "Aweh chommie, that's solid", "Yoh 🔥 impressive!", "Nice one!", "That's correct!",
+            "Sharp answer!", "Yoh 😄 well done!", "Aweh 😏 brain working!", "Lekker thinking!",
+            "Eish 💪 good job!", "Yoh chommie 🔥", "Aweh 😎 strong answer", "Nice nice!",
+            "Yoh 💯 correct", "Aweh 😄 keep it up", "🔥 Perfect!", "That's it!",
+            "Yoh 😏 you're on fire", "Aweh 💪 nailed it", "Lekker!"
+        ],
+        encouragement: [
+            "Don't stress, we build step by step 💪", "Yoh 😅 this one confuses everyone",
+            "Aweh 😎 you're close!", "Eish 😏 adjust slightly", "Keep pushing!", "Almost there!",
+            "Try again chommie!", "You've got this!", "Yoh 😄 don't give up",
+            "Aweh 😎 one more try", "Eish 💪 keep going", "You're nearly there",
+            "Yoh 😏 focus a bit", "Aweh 😄 retry", "Eish 😎 step by step",
+            "Keep trying!", "Almost!", "You're learning!", "Yoh chommie 💪",
+            "Aweh 😏 don't quit", "Eish 😄 try again", "You're improving!",
+            "Keep going!", "Almost got it!", "Aweh 💪 push!"
+        ],
+        jokes: [
+            "Yoh imagine asking Linda that 😂 he'd say read properly!",
+            "Lexi would already be on Google 😆", "Sadee would guess and hope 😅",
+            "Even Alexis would pause 😂", "Whole class quiet 😶",
+            "Yoh 😂 teacher would just stare", "Aweh 😆 tricky one hey",
+            "Eish 😅 brain freeze moment", "Yoh 😄 pressure question",
+            "Aweh 😂 caught off guard", "Eish 😏 test vibes",
+            "Yoh 😆 silent classroom", "Aweh 😄 no cheating here",
+            "Eish 😂 guess game", "Yoh 😅 tricky tricky",
+            "Aweh 😏 think fast", "Eish 😆 exam vibes",
+            "Yoh 😂 panic mode", "Aweh 😄 deep question",
+            "Eish 😅 brain lag", "Yoh 😆 that's tough",
+            "Aweh 😂 even Google waits", "Eish 😏 slow down",
+            "Yoh 😄 tricky hey", "Aweh 😆 caught you",
+            "Eish 😂 think again", "Yoh 😅 hard one",
+            "Aweh 😄 interesting", "Eish 😆 funny one", "Yoh 😂 pressure!"
+        ]
+    };
+
+    // Merge SA_PERSONALITY arrays with SA_ULTRA_FLOW for maximum variety
+    function mergedRand(key) {
+        const base = SA_PERSONALITY[key] || [];
+        const ultra = SA_ULTRA_FLOW[key] || [];
+        const combined = [...base, ...ultra];
+        return combined[Math.floor(Math.random() * combined.length)];
+    }
+
+    function rand(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function deliverAnswer(answerText) {
+        addMessage('bot', answerText);
+        if (Math.random() < 0.4) {
+            setTimeout(() => addMessage('bot', rand(SA_ULTRA_FLOW.jokes)), 800);
+        }
+    }
+
+    const SA_MEGA_FLOW = {
+        positive: [
+            { user:["yes","yep","sure","definitely","let's go","yebo"], bot:"Lekker! 💪 Do you want to start with <b>rocks</b>, <b>fossils</b> or <b>electricity</b> first?" },
+            { user:["okay","ok","cool","alright"], bot:"Aweh 😄 nice one. Should we do a quick warm-up quiz or jump straight into content?" },
+            { user:["ready","let's do it"], bot:"Sharp! 🔥 I see you're ready. Rocks, fossils, or electricity first?" },
+            { user:["good","fine","lekker"], bot:"Yoh 😄 that's lekker! Shall we dive into some cool science topics or warm up first?" }
+        ],
+        negative: [
+            { user:["not really","maybe later","not now","skip"], bot:"Yoh 😎 we can chill, but your brain might get bored 😏 How about a quick fun fact?" },
+            { user:["not interested"], bot:"Yoh 😎 I feel you. But just one small fact could blow your mind 💥 Rocks, fossils, or electricity?" }
+        ],
+        unsure: [
+            { user:["maybe","not sure","perhaps","let's see","depends","could be","unsure"], bot:"Hayi 😅 that's okay chommie. Do you want me to give a simple example first?" }
+        ],
+        topicFollowUp: [
+            { user:["how they form","formation"], bot:"Aweh 🔥 rocks form in cool ways! Igneous from lava, sedimentary from layers, metamorphic from heat and pressure. Want SA examples?" },
+            { user:["famous sites","fossil sites"], bot:"Yoh 🦖 SA is packed with fossil sites like <b>Cradle of Humankind</b> and the <b>Karoo</b>. Want me to tell a wild story?" },
+            { user:["circuits","circuit"], bot:"Aweh ⚡ circuits are like roads for electrons. Want simple circuit types or a hands-on example?" }
+        ],
+        funFacts: [
+            { user:["fun fact","tell me something","something interesting"], bot:"Yoh 😄 did you know the oldest rock on Earth is over 4 billion years old? 🔥 Wanna know more cool science?" },
+            { user:["wow","amazing"], bot:"Aweh 😄 science is wild hey! Shall we dig deeper into one topic now?" }
+        ],
+        praiseInsert: [
+            { user:["got it","i understand","i see","makes sense"], bot:"Sharp! 🔥 You're getting this! Want to continue?" },
+            { user:["thanks","thank you"], bot:"Aweh 😄 you're learning lekker! Next up — want <b>rocks</b>, <b>fossils</b> or <b>electricity</b>?" }
+        ],
+        dynamicInsert: [
+            "Yoh 🔥 that's lekker thinking!",
+            "Aweh 😄 keep it up chommie!",
+            "Eish 😎 you're smashing this!",
+            "Lekker hey! 💪 I see the brain working.",
+            "Hayi 😅 you're getting there, keep pushing!",
+            "Aweh 🔬 science vibes strong!",
+            "Eish 😎 this one would impress even Leslee!"
+        ]
+    };
+
+    // Only fires for short conversational replies — never intercepts science questions
+    function handleMegaFlow(q) {
+        const steps = [
+            SA_MEGA_FLOW.positive, SA_MEGA_FLOW.negative, SA_MEGA_FLOW.unsure,
+            SA_MEGA_FLOW.topicFollowUp, SA_MEGA_FLOW.funFacts, SA_MEGA_FLOW.praiseInsert
+        ];
+        for (let step of steps) {
+            for (let obj of step) {
+                if (obj.user.some(u => q === u || q === u + '!' || q === u + '.')) {
+                    addMessage('bot', obj.bot);
+                    if (Math.random() < 0.35) {
+                        setTimeout(() => addMessage('bot', rand(SA_ULTRA_FLOW.encouragement)), 750);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // ── Conversation state ───────────────────────────────────────────────
+    let userState = { inLearningMode: false };
+
+    // ── Content detection ─────────────────────────────────────────────────
+    function isContentQuery(q) {
+        q = q.toLowerCase();
+        const contentKeywords = [
+            "what is","what are","define","explain","how does","how do","how is",
+            "types of","examples of","tell me about","describe","name the",
+            "rocks","fossils","electricity","igneous","sedimentary","metamorphic",
+            "circuit","current","voltage","battery","skeleton","bone","metal",
+            "food chain","producer","consumer","fuel","coal","energy","plant",
+            "animal","life cycle","structure","material","fossil","surface","earth",
+            "layer","weathering","erosion","habitat","ecosystem","amphibian",
+            "vertebrate","invertebrate","ligament","tendon","joint","muscle",
+            "photosynthesis","substation","pylon","conductor","insulator"
+        ];
+        return contentKeywords.some(k => q.includes(k));
+    }
+
+    function isLikelyLearningIntent(q) {
+        q = q.toLowerCase();
+        // Must start with a question word AND have a science-like noun
+        const questionStarters = ["what","how","why","when","where","which","name","list","define","explain","describe"];
+        const startsAsQuestion = questionStarters.some(s => q.startsWith(s));
+        if (!startsAsQuestion) return false;
+        // Must be more than 2 words to avoid "what?" or "how?"
+        if (q.split(' ').length < 2) return false;
+        return true;
+    }
+
+    // ── PDF query handler ─────────────────────────────────────────────────
+    function handlePDFQuery(q) {
+        userState.inLearningMode = true;
+
+        if (!fuse) {
+            addMessage('bot', "Eish chommie, I'm still loading the textbook 📚 Give me a moment and try again!");
+            return;
+        }
+
+        // Track topic memory
+        trackTopic(q);
+        lastQuery = q;
+
+        // Skip words guard
+        const skipWords = new Set(['nice','good','ok','okay','cool','yes','no','wow','great','lol','haha','sure','thanks','fine','ready','go']);
+        if (q.split(' ').length <= 2 && skipWords.has(q.replace(/[^a-z]/g,''))) {
+            addMessage('bot', mergedRand('encouragement'));
+            return;
+        }
+
+        let response;
+        const results = fuse.search(q, { limit: 4 });
+        if (results.length > 0) {
+            const rawText = results.map(r => r.item.text).join(' ');
+            lastRawAnswer = rawText;
+            response = formatAnswer(q, rawText);
+        } else {
+            lastRawAnswer = '';
+            response = mergedRand('confusion') + "<br><br>Try asking about <strong>rocks</strong>, <strong>fossils</strong>, <strong>electricity</strong>, <strong>metals</strong>, <strong>skeletons</strong> or <strong>food chains</strong> 🔬";
+        }
+
+        addMessage('bot', response);
+
+        // Personality inserts AFTER answer
+        if (Math.random() < 0.35) {
+            setTimeout(() => addMessage('bot', rand(EXTRA_PERSONALITY.praise)), 600);
+        }
+        if (Math.random() < 0.25) {
+            setTimeout(() => addMessage('bot', rand(SA_ULTRA_FLOW.encouragement)), 1000);
+        }
+
+        // Show clickable suggestion chips
+        followUp(q);
+    }
+
+    // ── Main router ───────────────────────────────────────────────────────
+    const CHAT_PHRASES = new Set([
+        "i don't know","idk","i dont know","okay","ok","cool","nice","good","great",
+        "wow","amazing","sure","yes","no","nah","maybe","thanks","thank you",
+        "lol","haha","okay i will","call my mom","i will try","let's go","ready",
+        "not sure","i see","got it","makes sense","interesting","really","seriously",
+        "that was quick","that was fast","nice one","good one","sweet","lekker",
+        "alright","yebo","sharp","heita","aweh","sho","eish","hayi","yoh"
+    ]);
+
+    function routeQuery(q) {
+        // Block purely conversational phrases from hitting PDF
+        const qClean = q.trim().toLowerCase();
+
+        // Handle typed chip phrases
+        if (qClean === 'explain it simply' || qClean === 'explain') { chipAction('explain', lastQuery); return; }
+        if (qClean === 'give an example' || qClean === 'example') { chipAction('example', lastQuery); return; }
+        if (qClean === 'go deeper' || qClean === 'deeper') { chipAction('deeper', lastQuery); return; }
+        if (qClean === 'quiz me on this' || qClean === 'quiz me') { startQuiz(); return; }
+
+        if (CHAT_PHRASES.has(qClean)) { ultraFlowResponse(q); return; }
+        if (qClean.split(' ').length <= 3 && !isContentQuery(qClean) && !isLikelyLearningIntent(qClean)) {
+            ultraFlowResponse(q); return;
+        }
+        if (isContentQuery(q) || isLikelyLearningIntent(q)) {
+            handlePDFQuery(q);
+        } else {
+            ultraFlowResponse(q);
+        }
+    }
+
+    function handleSend() {
+        const input = document.getElementById('userInput');
+        const query = input.value.trim();
+        if (!query) return; // Exit if input is empty
+
+        addMessage('user', query); // Display the user's message
+        input.value = ''; // Clear the input box
+        
+        setTimeout(() => {
+            const q = query.toLowerCase();
+
+            // Greetings
+            const greetings = ["hi", "hello", "hey chommie", "aweh", "heita", "howzit"];
+            if (greetings.some(g => q === g || q.startsWith(g + ' ') || q.startsWith(g + '!'))) {
+                addMessage('bot', mergedRand('greetings'));
+                return;
+            }
+
+            // How are you
+            if (q.includes("how are you") || q.includes("how's it going") || q.includes("howzit")) {
+                addMessage('bot', mergedRand('mood') + " You chommie? Feeling ready?");
+                return;
+            }
+
+            // Topics list
+            if (q.includes('what topics') || q.includes('what can i learn') || q.includes('what chapters') || q === 'topics') {
+                if (tocChapters.length > 0) {
+                    addMessage('bot', "Sho chommie! 📚 Here are the topics in your Grade 5 textbook:<br><br>" + tocChapters.map(t => "• " + t).join('<br>'));
+                } else {
+                    addMessage('bot', "Sho chommie! 📚 Your textbook covers: <b>Life & Living</b> (plants, animals, skeletons, food chains, life cycles), <b>Matter & Materials</b> (metals, processing), <b>Energy & Change</b> (electricity, circuits, fuels), and <b>Planet Earth</b> (Earth's surface, rocks, fossils). Ask me about any of these!");
+                }
+                return;
+            }
+
+            // Personality: named people
+            if (q.includes("leslee") || q.includes("who is leslee")) {
+                addMessage('bot',
+                    `Yoh 😄 Leslee is not just anyone — she's the <b>visionary behind everything</b> here.<br><br>` +
+                    `She's someone who genuinely wants people to grow, learn and do better 💡<br><br>` +
+                    `Tune in here 🎧:<br><br>` +
+                    `🔴 <b>Live Radio:</b><br>https://coach-l-radio.duckdns.org/public/coach-l-radio<br><br>` +
+                    `🎙️ <b>Podcasts:</b><br>https://coach-l-radio.duckdns.org/public/coach-l-radio/podcasts<br><br>` +
+                    `Yoh chommie… you'll understand the vibe once you listen 😌`
+                );
+                return;
+            }
+            if (q.includes("who is linda") || q === "linda") {
+                addMessage('bot', "Yoh Linda 😄 He's that one who will remind you to stay focused! If you slack, he'll definitely call you out hey 😂");
+                return;
+            }
+            if (q.includes("lexi") || q.includes("alexis")) {
+                addMessage('bot', "Lexi 😆 She's smart but also quick to search things up! But here we actually learn it properly chommie 💪");
+                return;
+            }
+            if (q.includes("sadee")) {
+                addMessage('bot', "Sadee 😂 That one will take chances and hope it works! But we're doing it the right way here 😎");
+                return;
+            }
+
+            // Quiz
+            if (q.includes('quiz') || q.includes('test me') || q.includes('ask me a question') || q.includes('assessment')) {
+                startQuiz();
+                return;
+            }
+
+            // Quiz answer
+            if (quizMode && currentQuiz) {
+                const qText = currentQuiz.question;
+                const aText = currentQuiz.answer;
+                quizMode = false;
+                currentQuiz = null;
+                addMessage('bot', `${rand(SA_ULTRA_FLOW.praise)} Here's what the textbook says:<br><br><strong>Q: ${qText}</strong><br><br>${aText}<br><br>Say <strong>quiz me</strong> for another one!`);
+                return;
+            }
+
+            // Route everything else through the smart router
+            routeQuery(q);
+
+        }, 400); // Delay for simulated processing time
+    }
+
+    // Quiz state
+    let quizMode = false;
+    let currentQuiz = null;
+
+    function startQuiz() {
+        if (!knowledgeBase.length) {
+            addMessage('bot', "Eish, still loading the textbook! 😅 Try again in a sec.");
+            return;
+        }
+
+        const qaPairs = [];
+        knowledgeBase.forEach(chunk => {
+            const text = chunk.text;
+            // Match a question followed by answer content
+            const matches = text.match(/([A-Z][^?]{15,}[?])\s*([^?]{30,}[.!])/g);
+            if (matches) {
+                matches.forEach(m => {
+                    const parts = m.match(/^([^?]+[?])\s*(.+)$/s);
+                    if (parts && parts[1] && parts[2]) {
+                        const q = parts[1].trim();
+                        const a = parts[2].trim().substring(0, 400);
+                        // Skip activity/navigation/diagram instructions
+                        const skip = /^(Do you|Can you|Look at|Think about|Draw|After you|Consider|Which cheek|Which direction|Stand facing|Turn to your|ACTIVITY|NatSci)/i.test(q);
+                        // Must be a proper science question with substance
+                        const hasContent = q.length > 20 && a.length > 30;
+                        if (!skip && hasContent) {
+                            qaPairs.push({ question: q, answer: a });
+                        }
+                    }
+                });
+            }
+        });
+
+        if (qaPairs.length === 0) {
+            addMessage('bot', "Eish, I couldn't pull a question right now. 😅 Try asking me a topic!");
+            return;
+        }
+
+        const pick = qaPairs[Math.floor(Math.random() * qaPairs.length)];
+        quizMode = true;
+        currentQuiz = pick;
+        addMessage('bot', `🧠 Quiz time chommie!<br><br><strong>${pick.question}</strong><br><br>Type your answer — then I'll show you what the textbook says!`);
+    }
+    function formatAnswer(query, rawText, deepMode = false) {
+        const q = query.toLowerCase();
+
+        // Remove page artifacts, file stamps, chapter headers, page numbers
+        const cleaned = rawText
+            .replace(/NatSci&Tech_Gr5_Book\.indb[^\n]*/g, '')
+            .replace(/NatSci&Tech_Gr5_TG_Book\.indb[^\n]*/g, '')
+            .replace(/(Life and living|Matter and materials|Energy and change|Planet Earth and beyond|Systems and control)[^\d]*\d+/g, '')
+            .replace(/Chapter \d+:[^.!?\d]{3,60}/g, '')
+            .replace(/KEY (CONCEPTS|QUESTIONS|WORDS?)[^.!?]*/g, '')
+            .replace(/ACTIVITY \d+\.\d+[^.!?]*/g, '')
+            .replace(/QUESTIONS?[^.!?]{0,10}(?=\s)/g, '')
+            .replace(/REVISION[^.!?]*/g, '')
+            .replace(/INSTRUCTIONS?:[^.!?]*/g, '')
+            .replace(/New words[^.!?]*/g, '')
+            .replace(/indb \d{4}[^.!?]*/g, '')
+            .replace(/\b\d{2,3}\b/g, '')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
+
+        // Split into sentences
+        const sentences = (cleaned.match(/[^.!?]{15,}[.!?]+/g) || []).map(s => s.trim());
+
+        // Keywords from query (all words 2+ chars)
+        const keywords = q.replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+
+        // Score: +3 per keyword match, -10 if question or instruction
+        const scored = sentences.map(s => {
+            const sl = s.toLowerCase();
+            const isJunk = /^(do you|can you|list|find|identify|explain|describe|complete|use the|look at|write|draw|think about|remember|give two|give an|now we|show where|carefully|below is|label|what do)/i.test(s.trim());
+            const isQuestion = s.trim().endsWith('?');
+            const kwScore = keywords.reduce((n, kw) => n + (sl.includes(kw) ? 3 : 0), 0);
+            const lengthBonus = (s.length > 40 && s.length < 350) ? 1 : 0;
+            const score = (isJunk || isQuestion) ? -10 : kwScore + lengthBonus;
+            return { s, score };
+        });
+
+        const top = scored
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, deepMode ? 10 : 6)
+            .map(x => x.s);
+
+        if (top.length === 0) {
+            const topicExists = keywords.some(kw => cleaned.toLowerCase().includes(kw));
+            if (!topicExists) {
+                return "Eish chommie! 😅 I don't think that topic is in our Grade 5 textbook. Try asking about <strong>rocks</strong>, <strong>fossils</strong>, <strong>electricity</strong>, <strong>metals</strong>, <strong>skeletons</strong>, or <strong>food chains</strong>!";
+            }
+            const fallback = sentences.filter(s => s.length > 40 && !/^(do you|can you|list|find|identify|explain|describe|complete|give two|below is)/i.test(s)).slice(0, 3);
+            if (fallback.length === 0) return "Eish chommie, I found something but it's a bit messy. 😅 Try asking differently!";
+            top.push(...fallback);
+        }
+
+        const emoji = q.includes('rock') || q.includes('sediment') ? '🪨'
+                    : q.includes('fossil') ? '🦕'
+                    : q.includes('electr') || q.includes('circuit') || q.includes('batter') ? '⚡'
+                    : q.includes('metal') ? '🔩'
+                    : q.includes('plant') || q.includes('food chain') || q.includes('photosyn') ? '🌿'
+                    : q.includes('animal') ? '🐾'
+                    : q.includes('skeleton') || q.includes('bone') ? '🦴'
+                    : q.includes('earth') || q.includes('season') || q.includes('planet') ? '🌍'
+                    : q.includes('energy') || q.includes('fuel') || q.includes('coal') ? '🔥'
+                    : q.includes('water') || q.includes('cloud') || q.includes('rain') ? '💧'
+                    : q.includes('struct') ? '🏗️'
+                    : q.includes('material') ? '🧱'
+                    : q.includes('ligament') || q.includes('tendon') || q.includes('joint') ? '🦴'
+                    : q.includes('amphibian') || q.includes('reptile') ? '🐸'
+                    : q.includes('producer') || q.includes('consumer') ? '🌿'
+                    : '🔬';
+
+        return `Sho chommie! ${emoji} Here's what the textbook says:<br><br>` + top.join('<br><br>');
+    }
+
+    function addMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = `msg ${role}`;
+        div.innerHTML = text;
+        const box = document.getElementById('messages');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight; // Scroll to the latest message
+    }
+
+    function openChat() { document.getElementById('chat-modal').style.display = 'block'; }
+    function closeChat() { document.getElementById('chat-modal').style.display = 'none'; }
+    window.onload = initResources; // Load resources when the window is ready
+</script>
+
+</body>
+</html>
