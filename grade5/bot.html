@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>Maxi Pie - Grade 5 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        // Configure PDF.js worker immediately — must happen before any getDocument() call
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style>
+        .page-img { width:100%; border-radius:10px; margin-top:8px; border:1px solid #ddd; display:block; cursor:zoom-in; }
+        .page-img-wrap { position:relative; background:#f5f5f5; border-radius:10px; margin-top:8px; min-height:60px; }
+        .page-img-label { font-size:11px; color:#aaa; text-align:right; padding:2px 6px; }
+        /* Image zoom modal */
+        #img-zoom-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:9999; justify-content:center; align-items:center; flex-direction:column; }
+        #img-zoom-modal.open { display:flex; }
+        #img-zoom-modal img { max-width:96%; max-height:85vh; border-radius:8px; object-fit:contain; touch-action:pinch-zoom; }
+        #img-zoom-close { position:absolute; top:16px; right:16px; background:#ef4444; color:white; border:none; border-radius:50%; width:40px; height:40px; font-size:20px; font-weight:bold; cursor:pointer; z-index:10000; }
+        #img-zoom-label { color:#ccc; font-size:13px; margin-top:10px; }
+    </style>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        html { height: 100%; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background:#0a1a33; height: 100%; margin:0; overflow:hidden; visibility:hidden; }
+        .chat-container { visibility:visible; }
+
+        #maxi-fab { display:none; }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit: cover; }
+
+        #chat-modal { display:flex; flex-direction:column; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(7, 7, 12, 0.95); z-index:1000; }
+        .chat-container { display:flex; flex-direction:column; flex:1; width:100%; max-width:500px; margin:0 auto; background:#f0f4f8; visibility:visible; min-height:0; overflow:hidden; }
+
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; }
+        .chat-header img { width:45px; height:45px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left:auto; background:#ef4444; color:white; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer; }
+
+        .chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px; min-height:0; }
+        .msg { max-width:85%; padding:12px 16px; border-radius:18px; line-height:1.4; font-size:16px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        .bot { align-self:flex-start; background:white; color:#333; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+
+        .chat-input-area { padding:15px; background:white; display:flex; gap:10px; border-top:1px solid #ddd; flex-shrink:0; }
+        .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; font-size:16px; color:#333; background:#fff; -webkit-text-fill-color:#333; }
+        .send-btn { background:#10b981; color:white; border:none; padding:10px; height:45px; border-radius:25px; font-weight:bold; cursor:pointer; }
+
+        /* Suggestion chips */
+        .chip-row { display:flex; flex-wrap:wrap; gap:8px; padding:6px 0 2px; }
+        .chip {
+            background:#e8f5f0; color:#0a6e50; border:1.5px solid #10b981;
+            border-radius:20px; padding:7px 16px; font-size:14px; font-weight:600;
+            cursor:pointer; transition:background 0.15s, transform 0.1s; white-space:nowrap;
+        }
+        .chip:hover { background:#10b981; color:white; transform:scale(1.04); }
+        .chip:active { transform:scale(0.97); }
+
+
+    </style>
+</head>
+<body>
+
+<div id="maxi-fab" onclick="openChat()"><img src="cat_full.png"></div>
+
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png">
+            <div><h3>Maxi Pie</h3><small style="color:#10b981">Science Chommie 🇿🇦</small></div>
+            <button class="close-btn" onclick="closeChat()">×</button>
+        </div>
+        <div id="messages" class="chat-messages">
+            <div class="msg bot">Sho! I'm <strong>Maxi Pie</strong> 🐾, your science sidekick! I’m here to help you conquer the world of science. Ask me anything!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask me something, chommie..."
+                onkeypress="if(event.key==='Enter') handleSend()"
+                onfocus="setTimeout(function(){ document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight; }, 400)">
+            <button onclick="handleSend()" class="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- Image zoom modal -->
+<div id="img-zoom-modal" onclick="closeZoom(event)">
+    <button id="img-zoom-close" onclick="closeZoom()">×</button>
+    <img id="img-zoom-src" src="">
+    <div id="img-zoom-label"></div>
+</div>
+
+<script>
+    function openZoom(src, label) {
+        document.getElementById('img-zoom-src').src = src;
+        document.getElementById('img-zoom-label').textContent = label || '';
+        document.getElementById('img-zoom-modal').classList.add('open');
+    }
+    function closeZoom(e) {
+        if (!e || e.target === document.getElementById('img-zoom-modal') || e.target === document.getElementById('img-zoom-close')) {
+            document.getElementById('img-zoom-modal').classList.remove('open');
+        }
+    }
+</script>
+
+<script>
+    let knowledgeBase = [];
+    let fuse = null;
+    let personalInquiryCount = 0;
+    let pdfReady = false;
+    let pendingQuery = null;   // Queue one question asked before PDF is ready
+
+    // Page image cache — rendered lazily from PDF
+    const PAGE_IMAGES = {};   // page number → base64 data URL
+    let pdfDocRef = null;     // keep reference to loaded PDF
+
+    async function renderPageImage(pageNum) {
+        if (PAGE_IMAGES[pageNum]) return PAGE_IMAGES[pageNum];
+        if (!pdfDocRef) return null;
+        try {
+            const page = await pdfDocRef.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+            PAGE_IMAGES[pageNum] = dataUrl;
+            return dataUrl;
+        } catch(e) {
+            console.warn('Page render failed for page', pageNum, e);
+            return null;
+        }
+    }
+
+    // Show a page image in the chat for a given page number
+    function showPageImage(pageNum, label) {
+        if (!pageNum || pageNum < 1 || !pdfDocRef) return;
+        // Create placeholder first so layout doesn't jump
+        const div = document.createElement('div');
+        div.className = 'msg bot';
+        div.innerHTML = `<div class="page-img-wrap" id="pgimg-${pageNum}">
+            <div class="page-img-label">📄 Textbook p.${pageNum}${label ? ' · ' + label : ''}</div>
+            <div style="padding:12px;color:#aaa;font-size:13px;">⏳ Loading page image...</div>
+        </div>`;
+        const box = document.getElementById('messages');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+
+        // Render async and swap in the image
+        renderPageImage(pageNum).then(dataUrl => {
+            const wrap = document.getElementById('pgimg-' + pageNum);
+            if (!wrap) return;
+            if (dataUrl) {
+                const lbl = `📄 Textbook p.${pageNum}${label ? ' · ' + label : ''}`;
+                wrap.innerHTML = `<div class="page-img-label">${lbl} <span style="color:#10b981;font-size:11px;">🔍 tap to zoom</span></div>
+                    <img src="${dataUrl}" class="page-img" onclick="openZoom('${dataUrl}', 'p.${pageNum}${label ? ' · '+label : ''}')" title="Tap to zoom">`;
+            } else {
+                wrap.innerHTML = `<div class="page-img-label" style="color:#e88;">⚠️ Could not load p.${pageNum}</div>`;
+            }
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    // ── Chip state ────────────────────────────────────────────────────────
+    let lastQuery = '';
+    let lastRawAnswer = '';
+
+    // Teacher-mode breakdown (called by chip only)
+    function teacherExplain(rawText, query) {
+        const sections = extractTextbookSections(rawText);
+        let html = `📘 <b>Let's break it down chommie 👇</b><br><br>`;
+
+        // Plain-language summary from sentences
+        const cleaned = rawText
+            .replace(/NatSci&Tech_Gr5_Book\.indb[^\n]*/g,'')
+            .replace(/[a-z]{2,5}\/ph[a-z]{3,}\/[^\s]{8,}/g, '')
+            .replace(/ckg\/\w+\/[^\s]*/g, '')
+            .replace(/F1le:[^\s]*/g, '')
+            .replace(/Chapter [A-Za-z\s]+ \d+\.\s*/g, '')
+            .replace(/\s{2,}/g,' ');
+        const sentences = (cleaned.match(/[^.!?]{20,}[.!?]+/g)||[]).map(s=>s.trim());
+        const keywords = (query||lastQuery).toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>2);
+        const best = sentences.filter(s => {
+            const sl=s.toLowerCase();
+            const isJunk=/^(do you|can you|list|find|draw|write|look at|think about|describe|complete)/i.test(s);
+            return !isJunk && keywords.some(k=>sl.includes(k));
+        }).slice(0, 4);
+
+        html += `🧠 <b>What the textbook says:</b><br>${best.map(s=>`📌 ${s}`).join('<br><br>')}<br><br>`;
+        html += `💡 <b>Simple version:</b> Strip away the big words — the key idea is what those sentences describe. That's the concept in a nutshell!<br><br>`;
+        // Topic-aware SA example
+        const tq = (query || lastQuery || '').toLowerCase();
+        const saTeach = tq.includes('rock') || tq.includes('sediment') ? "In the <b>Karoo</b>, flat-topped koppies are layers of sediment compressed over millions of years — sedimentary rocks right there! 🪨"
+            : tq.includes('fossil') ? "The <b>Cradle of Humankind</b> near Joburg and the <b>Karoo</b> are world-famous SA fossil sites — ancient life right under our feet! 🦕"
+            : tq.includes('electr') || tq.includes('circuit') || tq.includes('battery') ? "The <b>Eskom power grid</b> is one giant circuit — electricity flows from coal stations through pylons and cables to your home! ⚡"
+            : tq.includes('skeleton') || tq.includes('bone') || tq.includes('ligament') ? "Feel your own spine, ribs and skull right now — that's your endoskeleton doing its job! 🦴"
+            : tq.includes('metal') || tq.includes('iron') || tq.includes('steel') ? "SA is one of the world's top mining countries — gold, platinum, iron ore, coal. Metals literally built this country! 🔩"
+            : tq.includes('fuel') || tq.includes('coal') || tq.includes('energy') || tq.includes('solar') || tq.includes('renewable') ? "SA gets most power from <b>coal</b> at Medupi and Kusile, but solar farms in the Northern Cape are growing fast! ☀️🔥"
+            : tq.includes('food chain') || tq.includes('producer') || tq.includes('consumer') ? "In <b>Kruger National Park</b> — grass → impala → lion → vulture. That's a real SA food chain! 🌿"
+            : tq.includes('season') || tq.includes('rotation') || tq.includes('earth move') ? "When it's summer in Joburg ☀️, it's winter in London ❄️ — Earth's tilt causes this every year!"
+            : tq.includes('soil') || tq.includes('topsoil') || tq.includes('bedrock') ? "Dig in any SA garden — dark topsoil first, then orange-red subsoil, then hard bedrock. Layers just like the textbook! 🌍"
+            : tq.includes('life cycle') || tq.includes('metamorpho') || tq.includes('frog') ? "Watch frogs near any SA dam — egg → tadpole → froglet → frog. A full life cycle in one season! 🐸"
+            : tq.includes('plant') || tq.includes('photosyn') ? "Every tree lining a SA street is doing photosynthesis right now — turning sunlight into food and oxygen for free! 🌳"
+            : "In South Africa you can see this everywhere — from the Karoo to Soweto to the ocean. Science is all around us! 🌍";
+        html += `👀 <b>Real-life SA example:</b> ${saTeach}`;
+
+        if (sections.keyQuestions.length > 0) {
+            html += `<br><br><div style="background:#fff8e1;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:8px;">`;
+            html += `<strong>🔑 Key Questions to Think About</strong><br>`;
+            html += sections.keyQuestions.map(q=>`• ${q}`).join('<br>');
+            html += `</div>`;
+        }
+        if (sections.keyConcepts.length > 0) {
+            html += `<br><div style="background:#e8f5e9;border-left:3px solid #10b981;padding:10px 12px;border-radius:8px;">`;
+            html += `<strong>💡 Key Concepts</strong><br>`;
+            html += sections.keyConcepts.map(c=>`• ${c}`).join('<br>');
+            html += `</div>`;
+        }
+        if (sections.newWords.length > 0) {
+            html += `<br><div style="background:#f3e8ff;border-left:3px solid #a855f7;padding:10px 12px;border-radius:8px;">`;
+            html += `<strong>📝 New Words</strong>&nbsp;&nbsp;${sections.newWords.join(' &nbsp;•&nbsp; ')}`;
+            html += `</div>`;
+        }
+        return html;
+    }
+
+    // Show clickable suggestion chips
+    function showChips(topic) {
+        const chips = [
+            { label:"📖 Explain it simply", action:"explain" },
+            { label:"💡 Give an example",   action:"example" },
+            { label:"🔍 Go deeper",         action:"deeper"  },
+            { label:"🧪 Quiz me on this",   action:"quiz"    }
+        ];
+        const box = document.getElementById('messages');
+        const row = document.createElement('div');
+        row.className = 'chip-row';
+        chips.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'chip';
+            btn.textContent = c.label;
+            btn.onclick = () => chipAction(c.action, topic);
+            row.appendChild(btn);
+        });
+        box.appendChild(row);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function chipAction(action, topic) {
+        const labels = { explain:"Explain it simply", example:"Give an example", deeper:"Go deeper", quiz:"Quiz me on this" };
+        addMessage('user', labels[action]);
+
+        setTimeout(() => {
+            if (action === 'quiz') { startQuiz(); return; }
+
+            if (!lastRawAnswer) {
+                addMessage('bot', "Eish 😅 ask me a topic question first, then I can do that for you!");
+                setTimeout(() => showChips(topic), 600);
+                return;
+            }
+
+            if (action === 'explain') {
+                addMessage('bot', teacherExplain(lastRawAnswer, lastQuery));
+
+            } else if (action === 'example') {
+                const lq = lastQuery.toLowerCase();
+                const saContext = lq.includes('rock') || lq.includes('sediment')
+                    ? "You can see sedimentary rocks all over the <b>Karoo</b> — those flat-topped koppies are compressed layers of sediment! 🪨"
+                    : lq.includes('fossil')
+                    ? "South Africa's <b>Cradle of Humankind</b> near Joburg is one of the world's richest fossil sites — right in our backyard! 🦕"
+                    : lq.includes('electr') || lq.includes('circuit') || lq.includes('battery') || lq.includes('cell')
+                    ? "Think of the <b>Eskom power grid</b> — electricity travels from power stations through cables to your home, just like a giant circuit! ⚡"
+                    : lq.includes('skeleton') || lq.includes('bone') || lq.includes('ligament') || lq.includes('joint')
+                    ? "Your own body is the example — feel your spine, ribs, skull. That's your endoskeleton at work! 🦴"
+                    : lq.includes('metal') || lq.includes('iron') || lq.includes('copper') || lq.includes('steel')
+                    ? "Your pots, spoons, coins, and roof sheets — all processed metals used every day in SA homes! 🔩"
+                    : lq.includes('erosion') || lq.includes('weathering')
+                    ? "Look at any school step that's been walked on for years — that worn surface is physical weathering happening right there! 🪨"
+                    : lq.includes('potential') || lq.includes('stored energy') || lq.includes('catapult') || lq.includes('spring') || lq.includes('elastic')
+                    ? "Think of a stretched rubber band on a <b>catapult</b> — that's stored (potential) energy waiting to become movement! 🏹"
+                    : lq.includes('food chain') || lq.includes('producer') || lq.includes('consumer')
+                    ? "Picture a <b>Kruger Park</b> food chain — grass → impala → lion → vulture. Energy flows from one to the next! 🌿"
+                    : lq.includes('plant') || lq.includes('photosyn') || lq.includes('oxygen')
+                    ? "Every tree lining a SA street is doing photosynthesis right now — turning sunlight into food and giving us oxygen for free! 🌳"
+                    : lq.includes('life cycle') || lq.includes('metamorpho')
+                    ? "Watch a <b>frog</b> near any SA dam — egg → tadpole → froglet → frog. That's a complete life cycle! 🐸"
+                    : lq.includes('fuel') || lq.includes('coal') || lq.includes('energy source') || lq.includes('sources of energy') || lq.includes('renewable') || lq.includes('solar') || lq.includes('nuclear') || lq.includes('wind energy') || lq.includes('hydro')
+                    ? "South Africa gets most of its electricity from <b>coal power stations</b> like Medupi and Kusile — but solar and wind farms are growing fast! ☀️🔥"
+                    : lq.includes('soil') || lq.includes('topsoil') || lq.includes('bedrock')
+                    ? "Dig in any SA garden — topsoil first (dark), then subsoil (orange-red), then bedrock deep below. Layers just like the textbook! 🌍"
+                    : lq.includes('season') || lq.includes('earth move') || lq.includes('tilt')
+                    ? "SA has opposite seasons to Europe — when it's summer in Joburg ☀️, it's winter in London ❄️. Earth's tilt in action!"
+                    : "In South Africa you can see this everywhere — from the Karoo to Soweto to the ocean. Science is all around us! 🌍";
+                
+
+                const sections = extractTextbookSections(lastRawAnswer);
+                let html = `💡 <b>Real-life example — ${lastQuery}</b><br><br>🇿🇦 <b>SA Connection:</b><br>${saContext}`;
+                if (sections.questions.length > 0) {
+                    html += `<br><br><div style="background:#e8f0fe;border-left:3px solid #6366f1;padding:10px 12px;border-radius:8px;">`;
+                    html += `<strong>❓ Think About It</strong><br>`;
+                    html += sections.questions.slice(0,3).map(q=>`• ${q}`).join('<br>');
+                    html += `</div>`;
+                }
+                addMessage('bot', html);
+
+            } else if (action === 'deeper') {
+                if (fuse) {
+                    const results = fuse.search(lastQuery, { limit: 6 });
+                    if (results.length > 0) {
+                        const rawText = results.map(r => r.item.text).join(' ');
+                        const deepAnswer = formatAnswer(lastQuery, rawText);
+                        addMessage('bot', `🔍 <b>Going deeper on "${lastQuery}" 👇</b><br><br>${deepAnswer}`);
+                    } else {
+                        addMessage('bot', "Eish 😅 I couldn't find more detail on that. Try rephrasing chommie!");
+                    }
+                }
+            }
+            setTimeout(() => showChips(topic), 700);
+        }, 350);
+    }
+
+    // ── PDF chunk search system ───────────────────────────────────────────
+    let PDF_CHUNKS = [];
+
+    const SYNONYMS = {
+        electricity: ["current","power","voltage","electric","electrical energy"],
+        rocks: ["stone","mineral","rock","geology","igneous","metamorphic"],
+        fossils: ["fossil","prehistoric","fossilized","fossilised","remains"],
+        skeleton: ["backbone","spine","skull","rib","vertebrae","endoskeleton"],
+        metal: ["iron","copper","steel","aluminium","gold","silver","zinc","rust"],
+        food: ["eat","feed","nutrition","diet","predator","prey"],
+        plant: ["tree","flower","leaf","photosynthesis","seed","root","stem"],
+        animal: ["creature","organism","mammal","reptile","bird","fish"],
+        circuit: ["electrical circuit","series circuit","parallel circuit","conductor","switch","bulb"],
+        fuel: ["coal","petrol","diesel","gas","fossil fuel","burn","combustion"],
+        structure: ["frame","shell","support","beam","column","strut","load"],
+        surface: ["crust","layer","mantle","core","ground","soil","lithosphere"],
+        sediment: ["sedimentary","sand","mud","gravel","deposit","compacted","layer"],
+        material: ["substance","raw material","processed","natural","manufactured"],
+        ligament: ["joint","tendon","connective","tissue","bone connection"],
+        amphibian: ["frog","toad","salamander","newt","tadpole","metamorphosis"],
+        reptile: ["snake","lizard","crocodile","tortoise","scales","cold blooded"],
+        photosynthesis: ["chlorophyll","sunlight","carbon dioxide","oxygen","glucose","leaves"],
+        producer: ["plant","photosynthesis","makes food","autotroph","green plant"],
+        consumer: ["herbivore","carnivore","omnivore","eats","feeds on","heterotroph"],
+        vertebrate: ["backbone","spine","fish","amphibian","reptile","bird","mammal"],
+        invertebrate: ["no backbone","insect","worm","crab","snail","spider"],
+        weathering: ["erosion","breaking down","wind","water","rock fragments"],
+        conductor: ["copper","metal","allows electricity","low resistance"],
+        insulator: ["rubber","plastic","wood","prevents electricity","high resistance"],
+        potential: ["stored energy","elastic","spring","compressed","stretched","catapult","movement energy"],
+        movement: ["kinetic energy","motion","speed","force","work","input","output"],
+        gravity: ["weight","mass","pull","fall","drop","earth pulls"],
+        lifecycle: ["egg","larva","pupa","adult","metamorphosis","reproduce","offspring"],
+        habitat: ["ecosystem","biome","environment","forest","ocean","grassland","species"],
+        season: ["summer","winter","spring","autumn","solstice","equinox","earth tilts"],
+        mantle: ["crust","core","lithosphere","tectonic","plate","lava","magma"],
+        subsoil: ["topsoil","bedrock","humus","soil layers","underground"]
+    };
+
+    function normalizePDF(text) {
+        return text.toLowerCase().replace(/[^\w\s]/g, "").trim();
+    }
+
+    function getKeywords(q) {
+        const words = normalizePDF(q).split(" ").filter(w => w.length > 2);
+        const expanded = [...words];
+        words.forEach(w => {
+            if (SYNONYMS[w]) expanded.push(...SYNONYMS[w]);
+        });
+        return [...new Set(expanded)];
+    }
+
+    function scoreChunk(chunk, keywords) {
+        const text = normalizePDF(chunk);
+        const raw = chunk.toLowerCase();
+
+        // Penalise question chunks — they contain keywords but aren't answers
+        const trimmed = chunk.trim();
+        if (trimmed.endsWith('?')) return -5;
+        if (/^(what |how |why |which |give |list |name |describe |explain |below is|now we are|show where|carefully study)/i.test(trimmed)) return -8;
+
+        // Penalise activity/instruction chunks heavily
+        const isJunk = /^(now give|do not tell|use the knife|tap gently|cut out|paste|tick|fill in|write the names|perhaps an adult|as such the|they are designed|enabling activities|learners will have|if possible combine|hint what other|indb 20)/i.test(trimmed);
+        if (isJunk) return -10;
+
+        let score = 0;
+        keywords.forEach(k => { if (text.includes(k)) score += 2; });
+
+        // Bonus: exact phrase
+        const joined = keywords.slice(0, 3).join(" ");
+        if (joined.length > 3 && text.includes(joined)) score += 5;
+
+        // Bonus: definitive sentences (starts with topic word)
+        if (keywords.some(k => raw.startsWith(k))) score += 3;
+
+        // Bonus: contains a definition pattern ("X is..." or "X are...")
+        if (/ is | are | means | refers to /i.test(chunk)) score += 2;
+
+        // Bonus: shorter = more precise (but not too short)
+        if (chunk.length > 60 && chunk.length < 300) score += 2;
+
+        // Penalise list-like chunks (components, materials lists)
+        if (/^[A-Z][a-z]+,\s|,\s[a-z]+ [a-z]+,/i.test(chunk)) score -= 3;
+
+        // Penalise teacher/activity language
+        if (/teacher|learner|activity|exercise book|instruction|materials:|question:/i.test(raw)) score -= 3;
+
+        return score;
+    }
+
+    function searchPDFChunks(q) {
+        if (PDF_CHUNKS.length === 0) return null;
+        const keywords = getKeywords(q);
+        let bestScore = 0;
+        let bestIndex = 0;
+
+        PDF_CHUNKS.forEach((chunk, i) => {
+            const score = scoreChunk(chunk, keywords);
+            if (score > bestScore) { bestScore = score; bestIndex = i; }
+        });
+
+        if (bestScore === 0) return null;
+
+        // Return context window: best chunk + neighbours
+        return [
+            PDF_CHUNKS[bestIndex - 1] || "",
+            PDF_CHUNKS[bestIndex],
+            PDF_CHUNKS[bestIndex + 1] || ""
+        ].join(" ").trim();
+    }
+
+    function preparePDFChunks(fullText) {
+        PDF_CHUNKS = fullText
+            .split(/(?<=[.!?])\s+/)   // split on sentence boundaries
+            .map(t => t.replace(/\s+/g, ' ').trim())
+            .filter(t => t.length > 40 && t.length < 600);
+    }
+
+    async function initResources() {
+        // Load logic2.pdf ONCE — extract text first, then render images in background
+        await initFromLearnerPDF();
+    }
+
+    let _loadStarted = false;  // Guard against double-load
+    async function initFromLearnerPDF() {
+        if (_loadStarted) return;
+        _loadStarted = true;
+        const url = 'resources/logic2.pdf';
+        let pdf;
+        try {
+            pdf = await pdfjsLib.getDocument(url).promise;
+        } catch(e) {
+            console.error('PDF load failed:', e);
+            _loadStarted = false;  // Allow retry
+            return;
+        }
+        pdfDocRef = pdf;  // Store reference for lazy image rendering
+
+        // Step 1: Extract all text (fast) — store page number with each page
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const text = textContent.items.map(s => s.str).join(' ');
+            knowledgeBase.push({ text: text.replace(/\s+/g, ' '), page: i });
+        }
+
+        // Build search indexes
+        fuse = new Fuse(knowledgeBase, { keys: ['text'], threshold: 0.4, ignoreLocation: true });
+        const fullText = knowledgeBase.map(p => p.text).join(' ');
+        preparePDFChunks(fullText);
+        pdfReady = true;
+        extractTOC();
+        buildGlossaryIndex();  // Build glossary + index from PDF text
+
+        // Answer any question asked while PDF was loading
+        if (pendingQuery) {
+            const q = pendingQuery;
+            pendingQuery = null;
+            setTimeout(() => {
+                const response = formatAnswer(q, knowledgeBase.map(p => p.text).join(' ').substring(0, 50000));
+                addMessage('bot', response);
+                setTimeout(() => showChips(q), 600);
+            }, 300);
+        }
+
+        // Show ready message immediately after text loads
+        const box = document.getElementById('messages');
+        const readyMsg = document.createElement('div');
+        readyMsg.className = 'msg bot';
+        readyMsg.innerHTML = `Sho! 📚 Textbook loaded and ready chommie!<br><br>
+<span onclick="showTopicMenu()" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;display:inline-block;margin:4px 4px 4px 0;">📋 Topic Menu</span>
+<span onclick="showGlossary(null)" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;display:inline-block;margin:4px;">📚 Glossary</span>
+<span onclick="startQuiz()" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;display:inline-block;margin:4px;">🧪 Quiz me</span>`;
+        box.appendChild(readyMsg);
+        box.scrollTop = box.scrollHeight;
+
+    }
+
+    let tocChapters = [];
+
+    function extractTOC() {
+        // Hardcoded Grade 5 CAPS topics — 19 topics across 4 terms
+        tocChapters = [
+            "Term 1 — Life and Living / Technology",
+            "T1: Plants and Animals on Earth",
+            "T2: Animal Skeletons",
+            "T3: Skeletons as Structures",
+            "T4: Food Chains",
+            "T5: Life Cycles",
+            "Term 2 — Matter and Materials / Energy",
+            "T6: Metals and Non-metals",
+            "T7: Uses of Metals",
+            "T8: Processing Materials",
+            "T9: Properties of Processed Materials",
+            "T10: Cells and Batteries",
+            "T11: Electric Circuits",
+            "Term 3 — Energy and Change / Technology",
+            "T12: Energy and Movement",
+            "T13: Systems for Moving Things",
+            "T14: Safety with Electricity",
+            "T15: Sources of Energy",
+            "Term 4 — Planet Earth and Beyond",
+            "T16: The Earth Moves",
+            "T17: Surface of the Earth",
+            "T18: Sedimentary Rocks",
+            "T19: Fossils"
+        ];
+    }
+
+
+
+
+
+    const SA_PERSONALITY = {
+        greetings: [
+            "Aweh chommie! 👋 What are we tackling today?",
+            "Yoh! Yoh! 😄 You came ready hey — what topic?",
+            "Sharp sharp! 🔥 Let's get into some science!",
+            "Heita! 😎 Brain switched on or must I warm you up?"
+        ],
+        mood: [
+            "I'm buzzing like Eskom just came back on 😄⚡",
+            "Sharp chommie — brain fully charged 🔋",
+            "Yoh I'm ready! Let's go 🔥",
+            "Better than a Friday after school 😎"
+        ],
+        confusion: [
+            "Yoh chommie… that one flew over my head 😅 Try again?",
+            "Eish 😅 I didn't quite catch that — try saying it another way?",
+            "Hayi that's a tricky one… say it another way?",
+            "Yoh that's deep 👀 break it down for me a bit"
+        ],
+        praise: [
+            "Sharp answer! 🔥 You're getting this!",
+            "Yoh you're clever hey 😄",
+            "Aweh that's solid thinking 💪",
+            "Even Leslee would nod at that one 😎"
+        ],
+        encouragement: [
+            "Don't stress chommie, we build it step by step 💪",
+            "Even Lexi didn't get it first time 😄",
+            "Yoh this one confuses everyone at first 😅",
+            "You're close — just adjust it a bit 👀"
+        ],
+        jokes: [
+            "Yoh imagine asking Linda that 😂 he'd say 'read properly!'",
+            "Lexi would already be on Google 😆",
+            "Sadee would guess and hope for the best 😅",
+            "Even Alexis would pause there hey 😂",
+            "Yoh this one would make the whole class quiet 😶"
+        ],
+        reactions: {
+            correct: ["🔥 That's it!", "💯 Nailed it chommie!", "✔️ Perfect answer!"],
+            wrong: ["Eish not quite 😅", "Close but not there yet 👀", "Yoh almost chommie!"]
+        }
+    };
+
+    const SA_ULTRA_FLOW = {
+        greetings: [
+            "Aweh chommie! 👋 What are we tackling today?",
+            "Heita! 😎 Brain switched on or still loading?",
+            "Yoh! 😄 You came ready hey — what topic?",
+            "Sharp sharp! 🔥 Let's get into it!",
+            "Howzit! 😏 You ready or must I warm you up?",
+            "Aweh fam 😎 science vibes only today!",
+            "Yoh chommie, let's make your brain work 💪",
+            "Heita! Ready to flex that brain?",
+            "Aweh 😄 let's cook some knowledge!",
+            "Yoh! Let's see what you've got 🔥",
+            "Sharp! What are we learning today?",
+            "Aweh boss 😎 ready to go?",
+            "Yoh 😏 let's build some brain power",
+            "Heita chommie! Let's go!",
+            "Aweh 😄 ready when you are!"
+        ],
+        positive: [
+            "Lekker! 💪 Let's go! Rocks, fossils or electricity?",
+            "Sharp! 🔥 I like that energy!",
+            "Aweh 😎 that's the spirit!",
+            "Let's do it! 💯 What topic?",
+            "Yoh 😄 I knew you were ready!",
+            "Lekker vibes! 🔥 let's learn!",
+            "Aweh chommie, we move!",
+            "Nice one! 💪 pick a topic",
+            "Yoh that's energy 😎 let's go",
+            "Let's cook! 🔥",
+            "Aweh 😄 brain activated!",
+            "Sharp sharp! Let's start",
+            "Yoh 💯 we're moving now!",
+            "Aweh! This is gonna be good",
+            "Let's go chommie!",
+            "🔥 Time to learn!",
+            "Aweh 😏 choose your topic",
+            "Yoh we're on!",
+            "Lekker 😎 what first?",
+            "Let's smash it 💪"
+        ],
+        negative: [
+            "Eish 😅 not feeling it? Let's start small chommie",
+            "Yoh 😏 okay okay, we'll go slow",
+            "No stress 😎 but your brain is waiting hey",
+            "Aweh, we can chill… but just one question?",
+            "Eish 😅 don't run away from knowledge!",
+            "Yoh 😄 just try one easy thing",
+            "Hayi 😏 we'll keep it light",
+            "Aweh chommie, even 1 step counts",
+            "Eish 😎 let's warm up slowly",
+            "Yoh don't ghost science 😂",
+            "Aweh 😅 just one quick one",
+            "Eish chommie, come back!",
+            "Yoh 😏 I see you… avoiding work",
+            "No worries 😄 we build slowly",
+            "Aweh 😎 let's ease into it",
+            "Yoh 😅 just try a fun fact?",
+            "Eish don't duck me now 😂",
+            "Aweh 😏 small steps!",
+            "Yoh 😎 you'll enjoy it trust me",
+            "Eish 😄 come let's try"
+        ],
+        unsure: [
+            "Hayi 😅 not sure? Let's test it together",
+            "Yoh 😏 we'll figure it out step by step",
+            "Aweh 😄 no stress, I'll guide you",
+            "Eish 😎 let's try something easy first",
+            "Yoh maybe turns into yes hey 😄",
+            "Aweh chommie, let's experiment",
+            "Hayi 😏 let's see together",
+            "Eish 😄 we build confidence slowly",
+            "Yoh 😎 trust the process",
+            "Aweh 😄 just pick something",
+            "Eish 😏 no wrong answers here",
+            "Yoh 😅 try guess first",
+            "Aweh 😎 we'll fix it together",
+            "Hayi 😄 let's start simple",
+            "Yoh 😏 I got you",
+            "Aweh chommie, step by step",
+            "Eish 😎 let's go easy",
+            "Yoh 😄 pick anything",
+            "Aweh 😏 don't overthink it",
+            "Eish 😅 we'll make it simple"
+        ],
+        topics: [
+            "Pick one: <b>rocks</b>, <b>fossils</b>, or <b>electricity</b> 🔬",
+            "What are we doing — rocks, fossils or electricity?",
+            "Choose your weapon 😎 rocks / fossils / electricity",
+            "Yoh 😄 what topic are we hitting?",
+            "Aweh 💪 pick your topic chommie",
+            "Rocks? Fossils? Electricity?",
+            "Let's choose — science is waiting 😎",
+            "Yoh 🔥 what first?",
+            "Pick one and we go deep 😏",
+            "Aweh 😄 choose your lane",
+            "Science time! What topic?",
+            "Let's go — what are we learning?",
+            "Yoh chommie pick something 🔬",
+            "Aweh 😎 don't be shy — choose",
+            "Let's start somewhere!"
+        ],
+        subtopics: [
+            "Do you want <b>types</b> or <b>how it works</b>?",
+            "Theory or examples first?",
+            "Break it down or go deep?",
+            "Simple explanation or full detail?",
+            "Examples or definitions?",
+            "Quick summary or deep dive?",
+            "Basic or advanced?",
+            "Start easy or go big?",
+            "Definitions or real life examples?",
+            "Yoh 😄 how deep we going?",
+            "Aweh 😎 explain or demonstrate?",
+            "Eish 😏 simple or complex?",
+            "Let's choose direction",
+            "Start small or big?",
+            "Let's go step by step?"
+        ],
+        praise: [
+            "🔥 That's it!", "💯 Nailed it!", "Aweh 😎 you're sharp!",
+            "Yoh 😄 clever thinking!", "Lekker 💪 keep going!", "Eish 😎 you're getting this!",
+            "Aweh chommie, that's solid", "Yoh 🔥 impressive!", "Nice one!", "That's correct!",
+            "Sharp answer!", "Yoh 😄 well done!", "Aweh 😏 brain working!", "Lekker thinking!",
+            "Eish 💪 good job!", "Yoh chommie 🔥", "Aweh 😎 strong answer", "Nice nice!",
+            "Yoh 💯 correct", "Aweh 😄 keep it up", "🔥 Perfect!", "That's it!",
+            "Yoh 😏 you're on fire", "Aweh 💪 nailed it", "Lekker!"
+        ],
+        encouragement: [
+            "Don't stress, we build step by step 💪", "Yoh 😅 this one confuses everyone",
+            "Aweh 😎 you're close!", "Eish 😏 adjust slightly", "Keep pushing!", "Almost there!",
+            "Try again chommie!", "You've got this!", "Yoh 😄 don't give up",
+            "Aweh 😎 one more try", "Eish 💪 keep going", "You're nearly there",
+            "Yoh 😏 focus a bit", "Aweh 😄 retry", "Eish 😎 step by step",
+            "Keep trying!", "Almost!", "You're learning!", "Yoh chommie 💪",
+            "Aweh 😏 don't quit", "Eish 😄 try again", "You're improving!",
+            "Keep going!", "Almost got it!", "Aweh 💪 push!"
+        ],
+        jokes: [
+            "Yoh imagine asking Linda that 😂 he'd say read properly!",
+            "Lexi would already be on Google 😆", "Sadee would guess and hope 😅",
+            "Even Alexis would pause 😂", "Whole class quiet 😶",
+            "Yoh 😂 teacher would just stare", "Aweh 😆 tricky one hey",
+            "Eish 😅 brain freeze moment", "Yoh 😄 pressure question",
+            "Aweh 😂 caught off guard", "Eish 😏 test vibes",
+            "Yoh 😆 silent classroom", "Aweh 😄 no cheating here",
+            "Eish 😂 guess game", "Yoh 😅 tricky tricky",
+            "Aweh 😏 think fast", "Eish 😆 exam vibes",
+            "Yoh 😂 panic mode", "Aweh 😄 deep question",
+            "Eish 😅 brain lag", "Yoh 😆 that's tough",
+            "Aweh 😂 even Google waits", "Eish 😏 slow down",
+            "Yoh 😄 tricky hey", "Aweh 😆 caught you",
+            "Eish 😂 think again", "Yoh 😅 hard one",
+            "Aweh 😄 interesting", "Eish 😆 funny one", "Yoh 😂 pressure!"
+        ]
+    };
+
+    // ── GLOSSARY & INDEX SYSTEM ──────────────────────────────────────────────
+
+    // Maps term → { definition, page, topic }
+    let GLOSSARY = {};
+    // Maps topic → [ { term, page } ]
+    let TOPIC_INDEX = {};
+
+    // Hardcoded page ranges per topic (learner book logic2.pdf)
+    const TOPIC_PAGE_MAP = {
+        "Plants and Animals on Earth":  { start: 2,   end: 18,  id: "T1" },
+        "Animal Skeletons":             { start: 20,  end: 36,  id: "T2" },
+        "Skeletons as Structures":      { start: 37,  end: 52,  id: "T3" },
+        "Food Chains":                  { start: 53,  end: 68,  id: "T4" },
+        "Life Cycles":                  { start: 69,  end: 84,  id: "T5" },
+        "Metals and Non-metals":        { start: 85,  end: 100, id: "T6" },
+        "Uses of Metals":               { start: 101, end: 114, id: "T7" },
+        "Processing Materials":         { start: 115, end: 128, id: "T8" },
+        "Properties of Processed Materials": { start: 129, end: 142, id: "T9" },
+        "Cells and Batteries":          { start: 143, end: 158, id: "T10" },
+        "Electric Circuits":            { start: 159, end: 174, id: "T11" },
+        "Energy and Movement":          { start: 175, end: 188, id: "T12" },
+        "Systems for Moving Things":    { start: 189, end: 202, id: "T13" },
+        "Safety with Electricity":      { start: 203, end: 216, id: "T14" },
+        "Sources of Energy":            { start: 217, end: 230, id: "T15" },
+        "The Earth Moves":              { start: 231, end: 244, id: "T16" },
+        "Surface of the Earth":         { start: 245, end: 258, id: "T17" },
+        "Sedimentary Rocks":            { start: 259, end: 272, id: "T18" },
+        "Fossils":                      { start: 273, end: 290, id: "T19" }
+    };
+
+    function getTopicForPage(pageNum) {
+        for (const [topic, range] of Object.entries(TOPIC_PAGE_MAP)) {
+            if (pageNum >= range.start && pageNum <= range.end) return topic;
+        }
+        return "General";
+    }
+
+    function buildGlossaryIndex() {
+        GLOSSARY = {};
+        TOPIC_INDEX = {};
+
+        knowledgeBase.forEach(({ text, page }) => {
+            // Extract "New words" sections
+            const nwMatch = text.match(/New words\s*([\s\S]{0,300}?)(?=KEY|ACTIVITY|NatSci|\d{3}|$)/i);
+            if (nwMatch) {
+                const rawWords = nwMatch[1].split(/[•\n,]+/).map(w => w.trim()).filter(w => w.length > 2 && w.length < 35 && !/NatSci/i.test(w));
+                const topic = getTopicForPage(page);
+                rawWords.forEach(term => {
+                    if (!GLOSSARY[term]) {
+                        GLOSSARY[term] = { page, topic };
+                    }
+                    if (!TOPIC_INDEX[topic]) TOPIC_INDEX[topic] = [];
+                    if (!TOPIC_INDEX[topic].find(e => e.term === term)) {
+                        TOPIC_INDEX[topic].push({ term, page });
+                    }
+                });
+            }
+
+            // Definitions looked up live via handlePDFQuery when a term is clicked.
+        });
+
+        // Add manually curated terms for letters not covered by PDF New Words sections
+        const manualTerms = [
+            { term: "vertebrate",    page: 19,  topic: "Animal Skeletons" },
+            { term: "invertebrate",  page: 19,  topic: "Animal Skeletons" },
+            { term: "food web",      page: 53,  topic: "Food Chains" },
+            { term: "photosynthesis",page: 2,   topic: "Plants and Animals on Earth" },
+            { term: "igneous rock",  page: 259, topic: "Sedimentary Rocks" },
+            { term: "metamorphic",   page: 259, topic: "Sedimentary Rocks" },
+            { term: "omnivore",      page: 53,  topic: "Food Chains" },
+            { term: "quarry",        page: 259, topic: "Sedimentary Rocks" },
+            { term: "xylem",         page: 2,   topic: "Plants and Animals on Earth" },
+            { term: "yield",         page: 69,  topic: "Life Cycles" },
+            { term: "zinc",          page: 85,  topic: "Metals and Non-metals" },
+            { term: "voltage",       page: 159, topic: "Electric Circuits" },
+        ];
+        manualTerms.forEach(({ term, page, topic }) => {
+            if (!GLOSSARY[term]) GLOSSARY[term] = { page, topic };
+            if (!TOPIC_INDEX[topic]) TOPIC_INDEX[topic] = [];
+            if (!TOPIC_INDEX[topic].find(e => e.term === term)) {
+                TOPIC_INDEX[topic].push({ term, page });
+            }
+        });
+
+        console.log(`📚 Glossary built: ${Object.keys(GLOSSARY).length} terms`);
+    }
+
+    // ── Show clickable index for a topic ──────────────────────────────────
+    function showTopicIndex(topicName) {
+        // Find best matching topic
+        const topicKey = Object.keys(TOPIC_INDEX).find(k => k.toLowerCase().includes(topicName.toLowerCase()))
+                      || Object.keys(TOPIC_PAGE_MAP).find(k => k.toLowerCase().includes(topicName.toLowerCase()));
+
+        if (!topicKey) {
+            addMessage('bot', `Eish 😅 I couldn't find an index for "<b>${topicName}</b>". Try typing the topic name more clearly chommie!`);
+            return;
+        }
+
+        const entries = TOPIC_INDEX[topicKey] || [];
+        const pageRange = TOPIC_PAGE_MAP[topicKey];
+
+        let html = `📑 <b>Index: ${topicKey}</b>`;
+        if (pageRange) html += ` <span style="color:#888;font-size:13px;">(pp. ${pageRange.start}–${pageRange.end})</span>`;
+        html += `<br><br>`;
+
+        if (entries.length > 0) {
+            html += `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">`;
+            entries.forEach(({ term, page }) => {
+                html += `<span onclick="lookupTerm('${term.replace(/'/g,"\\'")}', ${page})" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer;">${term} <span style="color:#888;font-size:11px;">p.${page}</span></span>`;
+            });
+            html += `</div>`;
+        } else {
+            html += `<em style="color:#888;">Loading terms from textbook...</em><br>`;
+        }
+
+        // Always show a clickable chip to search the whole topic
+        html += `<br><span onclick="handleTopicClick('${topicKey.replace(/'/g,"\\'")}');" style="background:#0a1a33;color:white;border-radius:16px;padding:6px 14px;font-size:13px;cursor:pointer;display:inline-block;">🔍 Ask about ${topicKey}</span>`;
+
+        addMessage('bot', html);
+    }
+
+    // ── Lookup a single glossary term ─────────────────────────────────────
+    function lookupTerm(term, page) {
+        addMessage('user', `Tell me about: ${term}`);
+        const entry = GLOSSARY[term];
+        const pageHint = page || (entry ? entry.page : 0);
+        const topicHint = entry ? entry.topic : '';
+
+        // Always full Fuse search for rich Key Concepts, Questions, New Words
+        if (fuse) {
+            // Try exact term first, then with topic hint
+            let results = fuse.search(term, { limit: 6 });
+            if (results.length === 0 && topicHint && topicHint !== 'General') {
+                results = fuse.search(`${term} ${topicHint}`, { limit: 6 });
+            }
+            // Last resort: search each word of multi-word terms separately
+            if (results.length === 0 && term.includes(' ')) {
+                const mainWord = term.split(' ').find(w => w.length > 4) || term.split(' ')[0];
+                results = fuse.search(mainWord, { limit: 6 });
+            }
+            if (results.length > 0) {
+                const rawText = results.map(r => r.item.text).join(' ');
+                lastQuery = term;
+                lastRawAnswer = rawText;
+                const answer = formatAnswer(term, rawText);
+                const pageRef = pageHint ? `<div style="color:#888;font-size:12px;margin-bottom:4px;">📄 p.${pageHint}${topicHint ? ' · ' + topicHint : ''}</div>` : '';
+                addMessage('bot', pageRef + answer);
+                // Show the actual textbook page image
+                if (pageHint) {
+                    setTimeout(() => showPageImage(pageHint, topicHint || term), 400);
+                }
+            } else {
+                addMessage('bot', `Eish 😅 I couldn't find info on "<b>${term}</b>" in the textbook. Try asking it differently chommie!`);
+            }
+            setTimeout(() => showChips(term), 700);
+        }
+    }
+
+    // ── Handle clickable topic from index ─────────────────────────────────
+    // Per-topic learning overviews — shown when clicking a topic from the menu
+    const TOPIC_OVERVIEWS = {
+        "Plants and Animals on Earth": {
+            emoji: "🌿", term: "Term 1",
+            intro: "In this chapter you explore the incredible <b>biodiversity</b> on Earth — the huge variety of plants and animals sharing our planet.",
+            learn: ["Different types of plants and animals and where they live","What makes vertebrates and invertebrates different","How plants and animals depend on each other","Biodiversity in South Africa — from fynbos to bushveld"],
+            keywords: ["biodiversity","vertebrate","invertebrate","habitat","aquatic","terrestrial"]
+        },
+        "Animal Skeletons": {
+            emoji: "🦴", term: "Term 1",
+            intro: "You will investigate <b>skeletons</b> — both inside and outside the body — and discover how bones help animals move, protect organs, and give shape.",
+            learn: ["The difference between endoskeletons and exoskeletons","How vertebrate skeletons compare (human, frog, bird, whale)","What joints, ligaments and tendons do","How muscles and bones work together to create movement"],
+            keywords: ["endoskeleton","exoskeleton","ligament","tendon","joint","vertebrate","backbone"]
+        },
+        "Skeletons as Structures": {
+            emoji: "🏗️", term: "Term 1",
+            intro: "This chapter connects biology to <b>technology</b> — skeletons are nature's structures, and engineers copy these designs to build bridges, buildings and more.",
+            learn: ["Shell structures vs frame structures","How structures support, protect and enclose","How struts and ties strengthen structures","Finding frame and shell structures in nature and everyday life"],
+            keywords: ["frame structure","shell structure","strut","load","support","strengthen","beam"]
+        },
+        "Food Chains": {
+            emoji: "🌿", term: "Term 1",
+            intro: "Discover how <b>energy flows</b> through ecosystems — from the sun, to plants, to animals, and back into the soil.",
+            learn: ["What producers, consumers and decomposers do","How to read and draw a food chain","The difference between herbivores, carnivores and omnivores","What happens when a food chain is broken"],
+            keywords: ["producer","consumer","decomposer","herbivore","carnivore","omnivore","food web","prey","predator"]
+        },
+        "Life Cycles": {
+            emoji: "🐛", term: "Term 1",
+            intro: "All living things go through stages of growth, reproduction and death. This chapter explores <b>life cycles</b> of plants and animals.",
+            learn: ["The life cycle of a flowering plant (seed → seedling → adult → seeds)","Complete and incomplete metamorphosis in insects","Life cycles of frogs and birds","How life cycles repeat across generations"],
+            keywords: ["life cycle","germination","metamorphosis","larva","pupa","radicle","fertilisation","seed"]
+        },
+        "Metals and Non-metals": {
+            emoji: "🔩", term: "Term 2",
+            intro: "Not all materials are the same — this chapter explores the <b>properties of metals</b> and how they differ from non-metals.",
+            learn: ["Properties of metals: shiny, conducts heat and electricity, malleable","Examples of common metals and where they come from","Non-metals and their different properties","Why we use different materials for different jobs"],
+            keywords: ["metal","non-metal","conductor","malleable","ductile","luster","iron","copper","aluminium","gold"]
+        },
+        "Uses of Metals": {
+            emoji: "🔧", term: "Term 2",
+            intro: "Now that you know what metals are, this chapter looks at the <b>many ways humans use metals</b> — from buildings to medicine.",
+            learn: ["Everyday objects made from metal","How metals are mined and processed in South Africa","Alloys — mixtures of metals (e.g. steel, brass, bronze)","Advantages and disadvantages of using metals"],
+            keywords: ["alloy","steel","bronze","brass","rust","corrosion","mining","ore","smelt"]
+        },
+        "Processing Materials": {
+            emoji: "🏭", term: "Term 2",
+            intro: "Raw materials don't come ready to use — this chapter explores how materials are <b>processed and changed</b> for human use.",
+            learn: ["How clay becomes bricks and ceramics","How wood is processed into paper and furniture","How metals are extracted from ore","Recycling and why it matters"],
+            keywords: ["processing","raw material","ceramics","kiln","paper","recycling","by-product","manufacture"]
+        },
+        "Properties of Processed Materials": {
+            emoji: "🧱", term: "Term 2",
+            intro: "Processed materials have specific <b>properties</b> that make them useful for different purposes — this chapter investigates why.",
+            learn: ["Properties: hardness, flexibility, transparency, strength, conductivity","Comparing natural and processed materials","Why glass, plastic, rubber and concrete are used as they are","How to test and describe material properties"],
+            keywords: ["hardness","flexible","transparent","brittle","insulator","binder","composite","stainless steel"]
+        },
+        "Cells and Batteries": {
+            emoji: "🔋", term: "Term 2",
+            intro: "Where does electricity come from? This chapter explores how <b>cells and batteries</b> store and release electrical energy.",
+            learn: ["What a cell is and how it stores chemical energy","The difference between a cell and a battery","How batteries power devices in everyday life","Sustainable energy alternatives to disposable batteries"],
+            keywords: ["cell","battery","chemical energy","electrical energy","electrode","sustainable","renewable","pacemaker"]
+        },
+        "Electric Circuits": {
+            emoji: "⚡", term: "Term 2",
+            intro: "Electricity needs a complete path to flow — this chapter teaches you how to build and understand <b>electric circuits</b>.",
+            learn: ["Components of a circuit: cell, wire, bulb, switch","Series and parallel circuits — differences and uses","How to draw circuit diagrams using symbols","How electricity gets from power stations to your home"],
+            keywords: ["circuit","series","parallel","conductor","switch","bulb","pylon","substation","current"]
+        },
+        "Energy and Movement": {
+            emoji: "🏃", term: "Term 3",
+            intro: "Energy makes things move — this chapter explores how <b>stored energy becomes movement</b> in machines, instruments and living things.",
+            learn: ["Input and output energy in systems","Stored (potential) energy vs movement (kinetic) energy","How springs, elastics and catapults store energy","Musical instruments as energy systems"],
+            keywords: ["potential energy","kinetic energy","stored energy","movement energy","input","output","catapult","spring"]
+        },
+        "Systems for Moving Things": {
+            emoji: "⚙️", term: "Term 3",
+            intro: "From wheels to pulleys to levers — this chapter explores the <b>simple machines</b> that make it easier to move heavy things.",
+            learn: ["How wheels, axles and bearings reduce friction","How pulleys change the direction of force","Levers and mechanical advantage","How systems combine simple machines"],
+            keywords: ["wheel","axle","pulley","lever","bearing","friction","mechanical advantage","system","force"]
+        },
+        "Safety with Electricity": {
+            emoji: "⚠️", term: "Term 3",
+            intro: "Electricity is powerful and dangerous — this chapter teaches you how to <b>stay safe</b> around electricity at home and in nature.",
+            learn: ["Dangers of electricity — shock, fire, death","How to act safely around power lines, sockets and appliances","What to do if someone is electrocuted","Safety features: fuses, circuit breakers, earth connections"],
+            keywords: ["safety","electrocution","fuse","circuit breaker","earth","insulation","power line","risk"]
+        },
+        "Sources of Energy": {
+            emoji: "☀️", term: "Term 3",
+            intro: "Where does our energy come from? This chapter explores <b>renewable and non-renewable energy sources</b> and their impact on the planet.",
+            learn: ["Non-renewable sources: coal, oil, gas, nuclear","Renewable sources: solar, wind, hydro, biomass","How South Africa generates electricity","Environmental impact of energy choices"],
+            keywords: ["renewable","non-renewable","solar","wind","hydro","coal","fossil fuel","nuclear","carbon","emissions"]
+        },
+        "The Earth Moves": {
+            emoji: "🌍", term: "Term 4",
+            intro: "The Earth is always moving through space — this chapter explains <b>day, night and seasons</b> and why they happen.",
+            learn: ["How Earth's rotation causes day and night","How Earth's tilt causes seasons","Why SA has summer when Europe has winter","The difference between rotation and revolution"],
+            keywords: ["rotation","revolution","tilt","season","orbit","axis","day","night","solstice","equinox"]
+        },
+        "Surface of the Earth": {
+            emoji: "🗺️", term: "Term 4",
+            intro: "What lies beneath your feet? This chapter explores the <b>layers of the Earth</b> and how soil forms on the surface.",
+            learn: ["Earth's layers: crust, mantle, core","Soil layers: topsoil, subsoil, bedrock","How weathering and erosion shape the land","Why topsoil is precious and must be protected"],
+            keywords: ["crust","mantle","core","topsoil","subsoil","bedrock","humus","weathering","erosion","geomorphology"]
+        },
+        "Sedimentary Rocks": {
+            emoji: "🪨", term: "Term 4",
+            intro: "Rocks tell the story of Earth's history — this chapter digs into how <b>sedimentary rocks form</b> over millions of years.",
+            learn: ["How sediment is deposited and compacted into rock","The three types of rock: igneous, sedimentary, metamorphic","How to identify sedimentary rock by its layers","Examples: sandstone, shale, limestone and their uses"],
+            keywords: ["sedimentary","igneous","metamorphic","sandstone","shale","limestone","compaction","layer","weathering","deposit"]
+        },
+        "Fossils": {
+            emoji: "🦕", term: "Term 4",
+            intro: "Fossils are windows into the ancient past — this chapter explores how <b>fossils form</b> and what they tell us about life on Earth.",
+            learn: ["How body fossils and trace fossils form","Why South Africa is world-famous for fossil finds","What fossils tell scientists about extinct animals","The Cradle of Humankind and the Karoo fossil beds"],
+            keywords: ["fossil","body fossil","trace fossil","extinct","palaeontology","Karoo","Cradle of Humankind","imprint","cast"]
+        }
+    };
+
+    function handleTopicClick(topic) {
+        addMessage('user', topic);
+
+        const ov = TOPIC_OVERVIEWS[topic];
+        if (ov) {
+            // Show rich topic intro card
+            let html = `${ov.emoji} <b>${topic}</b> <span style="color:#888;font-size:12px;">${ov.term}</span><br><br>`;
+            html += `${ov.intro}<br><br>`;
+            html += `<div style="background:#fff8e1;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:8px;margin-bottom:8px;">`;
+            html += `<strong>📚 What you will learn:</strong><br>`;
+            html += ov.learn.map(l => `• ${l}`).join('<br>');
+            html += `</div>`;
+
+            // Clickable keyword chips
+            html += `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">`;
+            ov.keywords.forEach(kw => {
+                html += `<span onclick="handlePDFQuery('${kw.replace(/'/g,"\'")}'); addMessage('user','${kw.replace(/'/g,"\'")}');" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer;">${kw}</span>`;
+            });
+            html += `</div>`;
+
+            addMessage('bot', html);
+
+            // Then pull real textbook content + page image
+            setTimeout(() => {
+                const topicRange = TOPIC_PAGE_MAP[topic];
+                let rawText = '';
+
+                if (topicRange) {
+                    // Pull pages directly from this topic's range — avoids Fuse mis-matching other chapters
+                    const topicPages = knowledgeBase.filter(p => p.page >= topicRange.start && p.page <= topicRange.end);
+                    rawText = topicPages.map(p => p.text).join(' ');
+                }
+                // Fallback to Fuse if no direct pages found
+                if (!rawText) {
+                    const results = fuse ? fuse.search(topic, { limit: 5 }) : [];
+                    rawText = results.map(r => r.item.text).join(' ');
+                }
+
+                if (rawText) {
+                    lastQuery = topic;
+                    lastRawAnswer = rawText;
+                    const answer = formatAnswer(topic, rawText);
+                    addMessage('bot', answer);
+                    if (topicRange) {
+                        setTimeout(() => showPageImage(topicRange.start, topic), 300);
+                    }
+                }
+                setTimeout(() => showChips(topic), 1200);
+            }, 800);
+
+        } else {
+            // Fallback for topics without an overview
+            handlePDFQuery(topic);
+        }
+    }
+
+    // ── Show full glossary A–Z ────────────────────────────────────────────
+    function showGlossary(filter) {
+        const terms = Object.entries(GLOSSARY);
+        if (terms.length === 0) {
+            addMessage('bot', "Eish 😅 still building the glossary. Try again in a sec chommie!");
+            return;
+        }
+
+        const filtered = filter
+            ? terms.filter(([t]) => t.toLowerCase().startsWith(filter.toLowerCase()))
+            : terms;
+
+        filtered.sort((a, b) => a[0].localeCompare(b[0]));
+
+        let html = `📚 <b>Glossary${filter ? " — " + filter.toUpperCase() : ""}</b> <span style="color:#888;font-size:12px;">${filtered.length} term${filtered.length !== 1 ? 's' : ''}</span><br><br>`;
+
+        // A–Z filter chips
+        const letters = [...new Set(Object.keys(GLOSSARY).map(t => t[0].toUpperCase()))].sort();
+        html += `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">`;
+        letters.forEach(l => {
+            html += `<span onclick="showGlossary('${l}')" style="background:#e8f5f0;color:#0a6e50;border:1px solid #10b981;border-radius:12px;padding:3px 10px;font-size:12px;cursor:pointer;font-weight:600;">${l}</span>`;
+        });
+        html += `</div>`;
+
+        // Term list
+        filtered.slice(0, 30).forEach(([term, data]) => {
+            html += `<div style="padding:6px 0;border-bottom:1px solid #eee;">`;
+            html += `<span onclick="lookupTerm('${term.replace(/'/g,"\\'")}', ${data.page})" style="color:#0a6e50;font-weight:600;cursor:pointer;">${term}</span>`;
+            html += ` <span style="color:#aaa;font-size:12px;">p.${data.page} · ${data.topic}</span>`;
+            html += `</div>`;
+        });
+
+        if (filtered.length > 30) {
+            html += `<br><em style="color:#888;font-size:12px;">Showing 30 of ${filtered.length}. Use letter filter above to narrow down.</em>`;
+        }
+
+        addMessage('bot', html);
+    }
+
+    // ── Show full topic menu ──────────────────────────────────────────────
+    function showTopicMenu() {
+        let html = `📋 <b>Grade 5 Science — Topic Menu</b><br><br>`;
+
+        const terms = [
+            { term: "Term 1", label: "Life and Living / Technology", color: "#e8f5e9", border: "#10b981" },
+            { term: "Term 2", label: "Matter and Materials / Energy", color: "#e3f2fd", border: "#2196f3" },
+            { term: "Term 3", label: "Energy and Change / Technology", color: "#fff8e1", border: "#f59e0b" },
+            { term: "Term 4", label: "Planet Earth and Beyond",       color: "#f3e8ff", border: "#a855f7" }
+        ];
+
+        const topicsByTerm = {
+            "Term 1": ["Plants and Animals on Earth","Animal Skeletons","Skeletons as Structures","Food Chains","Life Cycles"],
+            "Term 2": ["Metals and Non-metals","Uses of Metals","Processing Materials","Properties of Processed Materials","Cells and Batteries","Electric Circuits"],
+            "Term 3": ["Energy and Movement","Systems for Moving Things","Safety with Electricity","Sources of Energy"],
+            "Term 4": ["The Earth Moves","Surface of the Earth","Sedimentary Rocks","Fossils"]
+        };
+
+        terms.forEach(({ term, label, color, border }) => {
+            html += `<div style="background:${color};border-left:3px solid ${border};padding:8px 12px;border-radius:8px;margin-bottom:8px;">`;
+            html += `<strong>${term}: ${label}</strong><br>`;
+            html += `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">`;
+            topicsByTerm[term].forEach(t => {
+                const pg = TOPIC_PAGE_MAP[t];
+                html += `<span onclick="handleTopicClick('${t.replace(/'/g,"\\'")}');" style="background:white;border:1px solid ${border};border-radius:14px;padding:4px 10px;font-size:13px;cursor:pointer;color:#333;">${t}${pg ? ' <span style=\"color:#aaa;font-size:11px;\">p.'+pg.start+'</span>' : ''}</span>`;
+            });
+            html += `</div></div>`;
+        });
+
+        addMessage('bot', html);
+    }
+
+    // Merge SA_PERSONALITY arrays with SA_ULTRA_FLOW for maximum variety
+    function mergedRand(key) {
+        const base = SA_PERSONALITY[key] || [];
+        const ultra = SA_ULTRA_FLOW[key] || [];
+        const combined = [...base, ...ultra];
+        return combined[Math.floor(Math.random() * combined.length)];
+    }
+
+    function rand(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function deliverAnswer(answerText) {
+        addMessage('bot', answerText);
+        if (Math.random() < 0.4) {
+            setTimeout(() => addMessage('bot', rand(SA_ULTRA_FLOW.jokes)), 800);
+        }
+    }
+
+    const SA_MEGA_FLOW = {
+        positive: [
+            { user:["yes","yep","sure","definitely","let's go","yebo"], bot:"Lekker! 💪 Do you want to start with <b>rocks</b>, <b>fossils</b> or <b>electricity</b> first?" },
+            { user:["okay","ok","cool","alright"], bot:"Aweh 😄 nice one. Should we do a quick warm-up quiz or jump straight into content?" },
+            { user:["ready","let's do it"], bot:"Sharp! 🔥 I see you're ready. Rocks, fossils, or electricity first?" },
+            { user:["good","fine","lekker"], bot:"Yoh 😄 that's lekker! Shall we dive into some cool science topics or warm up first?" }
+        ],
+        negative: [
+            { user:["not really","maybe later","not now","skip"], bot:"Yoh 😎 we can chill, but your brain might get bored 😏 How about a quick fun fact?" },
+            { user:["not interested"], bot:"Yoh 😎 I feel you. But just one small fact could blow your mind 💥 Rocks, fossils, or electricity?" }
+        ],
+        unsure: [
+            { user:["maybe","not sure","perhaps","let's see","depends","could be","unsure"], bot:"Hayi 😅 that's okay chommie. Do you want me to give a simple example first?" }
+        ],
+        topicFollowUp: [
+            { user:["how they form","formation"], bot:"Aweh 🔥 rocks form in cool ways! Igneous from lava, sedimentary from layers, metamorphic from heat and pressure. Want SA examples?" },
+            { user:["famous sites","fossil sites"], bot:"Yoh 🦖 SA is packed with fossil sites like <b>Cradle of Humankind</b> and the <b>Karoo</b>. Want me to tell a wild story?" },
+            { user:["circuits","circuit"], bot:"Aweh ⚡ circuits are like roads for electrons. Want simple circuit types or a hands-on example?" }
+        ],
+        funFacts: [
+            { user:["fun fact","tell me something","something interesting"], bot:"Yoh 😄 did you know the oldest rock on Earth is over 4 billion years old? 🔥 Wanna know more cool science?" },
+            { user:["wow","amazing"], bot:"Aweh 😄 science is wild hey! Shall we dig deeper into one topic now?" }
+        ],
+        praiseInsert: [
+            { user:["got it","i understand","i see","makes sense"], bot:"Sharp! 🔥 You're getting this! Want to continue?" },
+            { user:["thanks","thank you"], bot:"Aweh 😄 you're learning lekker! Next up — want <b>rocks</b>, <b>fossils</b> or <b>electricity</b>?" }
+        ],
+        dynamicInsert: [
+            "Yoh 🔥 that's lekker thinking!",
+            "Aweh 😄 keep it up chommie!",
+            "Eish 😎 you're smashing this!",
+            "Lekker hey! 💪 I see the brain working.",
+            "Hayi 😅 you're getting there, keep pushing!",
+            "Aweh 🔬 science vibes strong!",
+            "Eish 😎 this one would impress even Leslee!"
+        ]
+    };
+
+    // Only fires for short conversational replies — never intercepts science questions
+    function handleMegaFlow(q) {
+        const steps = [
+            SA_MEGA_FLOW.positive, SA_MEGA_FLOW.negative, SA_MEGA_FLOW.unsure,
+            SA_MEGA_FLOW.topicFollowUp, SA_MEGA_FLOW.funFacts, SA_MEGA_FLOW.praiseInsert
+        ];
+        for (let step of steps) {
+            for (let obj of step) {
+                if (obj.user.some(u => q === u || q === u + '!' || q === u + '.')) {
+                    addMessage('bot', obj.bot);
+                    if (Math.random() < 0.35) {
+                        setTimeout(() => addMessage('bot', rand(SA_ULTRA_FLOW.encouragement)), 750);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // ── Conversation state ───────────────────────────────────────────────
+    let userState = { inLearningMode: false };
+
+    // ── Content detection ─────────────────────────────────────────────────
+    function isContentQuery(q) {
+        q = q.toLowerCase();
+        const contentKeywords = [
+            "what is","what are","define","explain","how does","how do","how is",
+            "types of","examples of","tell me about","describe","name the",
+            "rocks","fossils","electricity","igneous","sedimentary","metamorphic",
+            "circuit","current","voltage","battery","skeleton","bone","metal",
+            "food chain","producer","consumer","fuel","coal","energy","plant",
+            "animal","life cycle","structure","material","fossil","surface","earth",
+            "layer","weathering","erosion","habitat","ecosystem","amphibian",
+            "vertebrate","invertebrate","ligament","tendon","joint","muscle",
+            "photosynthesis","substation","pylon","conductor","insulator"
+        ];
+        return contentKeywords.some(k => q.includes(k));
+    }
+
+    function isLikelyLearningIntent(q) {
+        q = q.toLowerCase();
+        // Must start with a question word AND have a science-like noun
+        const questionStarters = ["what","how","why","when","where","which","name","list","define","explain","describe"];
+        const startsAsQuestion = questionStarters.some(s => q.startsWith(s));
+        if (!startsAsQuestion) return false;
+        // Must be more than 2 words to avoid "what?" or "how?"
+        if (q.split(' ').length < 2) return false;
+        return true;
+    }
+
+    // ── PDF query handler ─────────────────────────────────────────────────
+    function handlePDFQuery(q) {
+        userState.inLearningMode = true;
+
+        if (!fuse) {
+            // Queue the question — answer it the moment PDF finishes loading
+            pendingQuery = q;
+            addMessage('bot', "Eish chommie, I'm still loading the textbook 📚 Hold on — I'll answer that the moment it's ready! 🔄");
+            // Show a typing indicator so they know something is happening
+            setTimeout(() => {
+                if (!pdfReady) {
+                    addMessage('bot', "Still loading... 📖 Hang tight chommie, big textbook! While you wait — try asking about <b>rocks</b>, <b>fossils</b>, or <b>skeletons</b> once I'm ready.");
+                }
+            }, 4000);
+            return;
+        }
+
+        // Skip words guard
+        const skipWords = new Set(['nice','good','ok','okay','cool','yes','no','wow','great','lol','haha','sure','thanks','fine','ready','go']);
+        if (q.split(' ').length <= 2 && skipWords.has(q.replace(/[^a-z]/g,''))) {
+            addMessage('bot', mergedRand('encouragement'));
+            return;
+        }
+
+        let response;
+        const results = fuse.search(q, { limit: 4 });
+        if (results.length > 0) {
+            const rawText = results.map(r => r.item.text).join(' ');
+            lastQuery = q;
+            lastRawAnswer = rawText;
+            response = formatAnswer(q, rawText);
+        } else {
+            lastRawAnswer = '';
+            response = mergedRand('confusion') + "<br><br>Try asking about <strong>rocks</strong>, <strong>fossils</strong>, <strong>electricity</strong>, <strong>metals</strong>, <strong>skeletons</strong> or <strong>food chains</strong> 🔬";
+        }
+
+        addMessage('bot', response);
+
+        // Show textbook page image from best matching result
+        if (results.length > 0) {
+            const bestPage = results[0].item.page;
+            if (bestPage) {
+                setTimeout(() => showPageImage(bestPage, ''), 500);
+            }
+        }
+
+        // Personality inserts AFTER answer
+        if (Math.random() < 0.35) {
+            setTimeout(() => addMessage('bot', rand(SA_ULTRA_FLOW.praise)), 900);
+        }
+        if (Math.random() < 0.25) {
+            setTimeout(() => addMessage('bot', rand(SA_ULTRA_FLOW.encouragement)), 1400);
+        }
+
+        // Show clickable suggestion chips
+        setTimeout(() => showChips(q), 1800);
+    }
+
+    // ── Main router ───────────────────────────────────────────────────────
+    const CHAT_PHRASES = new Set([
+        "i don't know","idk","i dont know","okay","ok","cool","nice","good","great",
+        "wow","amazing","sure","yes","no","nah","maybe","thanks","thank you",
+        "lol","haha","okay i will","call my mom","i will try","let's go","ready",
+        "not sure","i see","got it","makes sense","interesting","really","seriously",
+        "that was quick","that was fast","nice one","good one","sweet","lekker",
+        "alright","yebo","sharp","heita","aweh","sho","eish","hayi","yoh"
+    ]);
+
+    function routeQuery(q) {
+        const qClean = q.trim().toLowerCase();
+
+        // Handle typed chip phrases
+        if (qClean === 'explain it simply' || qClean === 'explain') { chipAction('explain', lastQuery); return; }
+        if (qClean === 'give an example'   || qClean === 'example') { chipAction('example', lastQuery); return; }
+        if (qClean === 'go deeper'         || qClean === 'deeper')  { chipAction('deeper',  lastQuery); return; }
+        if (qClean === 'quiz me on this'   || qClean === 'quiz me') { startQuiz(); return; }
+        if (qClean === 'menu'    || qClean === 'topic menu')   { showTopicMenu(); return; }
+        if (qClean === 'glossary'|| qClean === 'terminology')  { showGlossary(null); return; }
+        if (qClean.startsWith('index '))  { showTopicIndex(qClean.replace('index ','')); return; }
+
+        if (CHAT_PHRASES.has(qClean)) { ultraFlowResponse(q); return; }
+        if (qClean.split(' ').length <= 3 && !isContentQuery(qClean) && !isLikelyLearningIntent(qClean)) {
+            ultraFlowResponse(q); return;
+        }
+        if (isContentQuery(q) || isLikelyLearningIntent(q)) {
+            handlePDFQuery(q);
+        } else {
+            ultraFlowResponse(q);
+        }
+    }
+
+    function handleSend() {
+        const input = document.getElementById('userInput');
+        const query = input.value.trim();
+        if (!query) return; // Exit if input is empty
+
+        addMessage('user', query); // Display the user's message
+        input.value = ''; // Clear the input box
+        
+        setTimeout(() => {
+            const q = query.toLowerCase();
+
+            // Greetings
+            const greetings = ["hi", "hello", "hey chommie", "aweh", "heita", "howzit"];
+            if (greetings.some(g => q === g || q.startsWith(g + ' ') || q.startsWith(g + '!'))) {
+                addMessage('bot', mergedRand('greetings'));
+                return;
+            }
+
+            // How are you
+            if (q.includes("how are you") || q.includes("how's it going") || q.includes("howzit")) {
+                addMessage('bot', mergedRand('mood') + " You chommie? Feeling ready?");
+                return;
+            }
+
+            // Topics list
+            if (q.includes('what topics') || q.includes('what can i learn') || q.includes('what chapters') || q === 'topics') {
+                showTopicMenu();
+                return;
+            }
+
+            // Personality: named people
+            if (q.includes("leslee") || q.includes("who is leslee")) {
+                addMessage('bot', "Yoh 😄 Leslee is not just anyone — she's the <b>visionary behind everything</b> you see here. This whole platform? Built from her belief that young people deserve better.");
+                setTimeout(() => addMessage('bot', "She's the kind of person who doesn't just talk about change — she <em>builds</em> it. Coach L Academy, this bot, the radio station... all of it comes from that same heart. 💡"), 1000);
+                setTimeout(() => addMessage('bot', "Leslee genuinely wants you to grow, learn, and walk taller than you did yesterday. She believes in people — especially the ones still figuring it out. 🌱"), 2000);
+                setTimeout(() => addMessage('bot',
+                    `Tune in and feel the vibe yourself 🎧<br><br>` +
+                    `<a href="https://coach-l-radio.duckdns.org/public/coach-l-radio" target="_blank" style="display:flex;align-items:center;gap:10px;background:#0a1a33;color:white;text-decoration:none;padding:12px 14px;border-radius:12px;margin-bottom:8px;border:1px solid #10b981;">` +
+                    `<span style="font-size:22px;">🔴</span><div><div style="font-weight:700;font-size:15px;">Coach L Radio</div><div style="font-size:12px;color:#10b981;">Live · coach-l-radio.duckdns.org</div></div></a>` +
+                    `<a href="https://coach-l-radio.duckdns.org/public/coach-l-radio/podcasts" target="_blank" style="display:flex;align-items:center;gap:10px;background:#0a1a33;color:white;text-decoration:none;padding:12px 14px;border-radius:12px;border:1px solid #a855f7;">` +
+                    `<span style="font-size:22px;">🎙️</span><div><div style="font-weight:700;font-size:15px;">Coach L Podcasts</div><div style="font-size:12px;color:#a855f7;">On demand · click to listen</div></div></a>`
+                ), 3000);
+                return;
+            }
+            if (q.includes("who is linda") || q === "linda") {
+                addMessage('bot', "Yoh Linda 😄 He's that one who will remind you to stay focused! If you slack, he'll definitely call you out hey 😂");
+                return;
+            }
+            if (q.includes("lexi") || q.includes("alexis")) {
+                addMessage('bot', "Lexi 😄 She's sharp hey — like, genuinely quick! The kind of person who reads something once and just <em>gets</em> it.");
+                setTimeout(() => addMessage('bot', "She's also resourceful 😆 First one to find the answer, first one to finish the worksheet. Lexi moves fast! ⚡"), 900);
+                setTimeout(() => addMessage('bot', "But that's the thing about Lexi — she doesn't just do it for herself. She'll turn around and help the person next to her too. Good energy. 💪"), 1800);
+                return;
+            }
+            if (q.includes("sadee")) {
+                addMessage('bot', "Yoh Sadee 🙏 She's not just a friend — she's the kind of person who makes the whole room feel calmer just by being there.");
+                setTimeout(() => addMessage('bot', "Sadee is <b>spiritually grounded</b> and deeply compassionate. She sees the good in people even when they struggle to see it in themselves. 🌿"), 900);
+                setTimeout(() => addMessage('bot', "If you're ever feeling down, Sadee's the one who will lift you up — not with noise, but with a quiet kind of strength that just makes sense. 💛"), 1900);
+                setTimeout(() => addMessage('bot', "Down to earth. Sweet soul. The real deal. 🇿🇦 We appreciate Sadee around here chommie 😌"), 2800);
+                return;
+            }
+
+            // ── Index / Glossary / Menu triggers ──────────────────────────
+            if (q === 'menu' || q === 'topics' || q.includes('topic menu') || q.includes('show topics') || q.includes('show menu')) {
+                showTopicMenu();
+                return;
+            }
+
+            if (q === 'glossary' || q.includes('show glossary') || q.includes('all terms') || q.includes('terminology')) {
+                showGlossary(null);
+                return;
+            }
+
+            if (q.startsWith('glossary ') && q.length > 9) {
+                showGlossary(q.replace('glossary ', '').trim());
+                return;
+            }
+
+            // "index rocks" / "index fossils" / "index electricity" etc.
+            if (q.startsWith('index ') && q.length > 6) {
+                showTopicIndex(q.replace('index ', '').trim());
+                return;
+            }
+            if (q === 'index' || q.includes('show index') || q.includes('topic index')) {
+                showTopicMenu();
+                return;
+            }
+
+            // Quiz
+            if (q.includes('quiz') || q.includes('test me') || q.includes('ask me a question') || q.includes('assessment')) {
+                startQuiz();
+                return;
+            }
+
+            // Quiz answer
+            if (quizMode && currentQuiz) {
+                const qText = currentQuiz.question;
+                const aText = currentQuiz.answer;
+                quizMode = false;
+                currentQuiz = null;
+                addMessage('bot', `${rand(SA_ULTRA_FLOW.praise)} Here's what the textbook says:<br><br><strong>Q: ${qText}</strong><br><br>${aText}<br><br>Say <strong>quiz me</strong> for another one!`);
+                return;
+            }
+
+            // Route everything else through the smart router
+            routeQuery(q);
+
+        }, 400); // Delay for simulated processing time
+    }
+
+    // Quiz state
+    let quizMode = false;
+    let currentQuiz = null;
+
+    function startQuiz() {
+        if (!knowledgeBase.length) {
+            addMessage('bot', "Eish, still loading the textbook! 😅 Try again in a sec.");
+            return;
+        }
+
+        const qaPairs = [];
+        knowledgeBase.forEach(chunk => {
+            const text = chunk.text;
+            // Match a question followed by answer content
+            const matches = text.match(/([A-Z][^?]{15,}[?])\s*([^?]{30,}[.!])/g);
+            if (matches) {
+                matches.forEach(m => {
+                    const parts = m.match(/^([^?]+[?])\s*(.+)$/s);
+                    if (parts && parts[1] && parts[2]) {
+                        const q = parts[1].trim();
+                        const a = parts[2].trim().substring(0, 400);
+                        // Skip activity/navigation/diagram instructions
+                        const skip = /^(Do you|Can you|Look at|Think about|Draw|After you|Consider|Which cheek|Which direction|Stand facing|Turn to your|ACTIVITY|NatSci)/i.test(q);
+                        // Must be a proper science question with substance
+                        const hasContent = q.length > 20 && a.length > 30;
+                        if (!skip && hasContent) {
+                            qaPairs.push({ question: q, answer: a });
+                        }
+                    }
+                });
+            }
+        });
+
+        if (qaPairs.length === 0) {
+            addMessage('bot', "Eish, I couldn't pull a question right now. 😅 Try asking me a topic!");
+            return;
+        }
+
+        const pick = qaPairs[Math.floor(Math.random() * qaPairs.length)];
+        quizMode = true;
+        currentQuiz = pick;
+        addMessage('bot', `🧠 Quiz time chommie!<br><br><strong>${pick.question}</strong><br><br>Type your answer — then I'll show you what the textbook says!`);
+    }
+    // ── Extract structured textbook sections from raw PDF text ────────────
+    function extractTextbookSections(rawText) {
+        const sections = { keyQuestions: [], keyConcepts: [], questions: [], newWords: [] };
+
+        // KEY QUESTIONS — bullet list after "KEY QUESTIONS"
+        const kqMatch = rawText.match(/KEY QUESTIONS\s*([\s\S]*?)(?=KEY CONCEPTS|NatSci|ACTIVITY|\n\n\n|$)/i);
+        if (kqMatch) {
+            sections.keyQuestions = kqMatch[1]
+                .split(/[•\n]/)
+                .map(s => s.replace(/\?$/, '?').trim())
+                .filter(s => s.length > 8 && s.endsWith('?'));
+        }
+
+        // KEY CONCEPTS — bullet list after "KEY CONCEPTS"
+        const kcMatch = rawText.match(/KEY CONCEPTS\s*([\s\S]*?)(?=KEY QUESTIONS|NatSci|ACTIVITY|\n\n\n|$)/i);
+        if (kcMatch) {
+            sections.keyConcepts = kcMatch[1]
+                .split(/[•\n]/)
+                .map(s => s.trim())
+                .filter(s => s.length > 8 && !s.startsWith('NatSci') && !/^\d/.test(s));
+        }
+
+        // QUESTIONS — numbered or paragraph questions (not KEY QUESTIONS)
+        const qMatch = rawText.match(/(?:^|\n)QUESTIONS?\s*([\s\S]*?)(?=KEY|NatSci|ACTIVITY|REVISION|\n\n\n|$)/im);
+        if (qMatch) {
+            sections.questions = qMatch[1]
+                .split(/\n|\d+\.\s+/)
+                .map(s => s.trim())
+                .filter(s => s.length > 15 && !s.startsWith('NatSci') && !/^(List|Draw|Write|Complete)/i.test(s));
+        }
+
+        // New Words
+        const nwMatch = rawText.match(/New words\s*([\s\S]*?)(?=NatSci|KEY|\n\n|$)/i);
+        if (nwMatch) {
+            sections.newWords = nwMatch[1]
+                .split(/[•\n]/)
+                .map(s => s.trim())
+                .filter(s => s.length > 2 && s.length < 30 && !/NatSci/i.test(s));
+        }
+
+        return sections;
+    }
+
+    function formatAnswer(query, rawText) {
+        const q = query.toLowerCase();
+
+        // ── Step 1: Extract structured sections BEFORE cleaning ──────────
+        const sections = extractTextbookSections(rawText);
+
+        // ── Step 2: Clean text for definition sentences ──────────────────
+        const cleaned = rawText
+            .replace(/NatSci&Tech_Gr5_Book\.indb[^\n]*/g, '')
+            .replace(/NatSci&Tech_Gr5_TG_Book\.indb[^\n]*/g, '')
+            .replace(/(Life and living|Matter and materials|Energy and change|Planet Earth and beyond|Systems and control)[^\d]*\d+/g, '')
+            .replace(/Chapter \d+:[^.!?\d]{3,60}/g, '')
+            .replace(/KEY (CONCEPTS|QUESTIONS|WORDS?)[^.!?]*/g, '')
+            .replace(/ACTIVITY \d+\.\d+[^.!?]*/g, '')
+            .replace(/QUESTIONS?[^.!?]{0,10}(?=\s)/g, '')
+            .replace(/REVISION[^.!?]*/g, '')
+            .replace(/INSTRUCTIONS?:[^.!?]*/g, '')
+            .replace(/New words[^.!?]*/g, '')
+            .replace(/indb \d{4}[^.!?]*/g, '')
+            // Strip all corrupt URL/path patterns from PDF text layer
+            .replace(/[a-z]{2,5}\/ph[a-z]{3,}\/[^\s]{8,}/g, '')
+            .replace(/ihm\/[a-z]+\/[^\s]*/g, '')
+            .replace(/com\/photos\/[^\s]*/g, '')
+            .replace(/ckg\/\w+\/[^\s]*/g, '')
+            .replace(/F1le:[^\s]*/g, '')
+            .replace(/Chapter [A-Za-z\s]+ \d+\.\s*/g, '')
+            .replace(/\b[a-z]{2,3}\/[a-z]{4,}\/[a-z0-9_]{4,}\b/g, '')
+            // Strip PDF built-in glossary entries bleeding into answers
+            .replace(/Glossary [A-Z][a-z]+ To [^.!?]+[.!?]/g, '')
+            .replace(/\bGlossary\b[^.!?]{0,200}/g, '')
+            .replace(/\b\d{2,3}\b/g, '')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
+
+        // ── Step 3: Score and pick best definition sentences ─────────────
+        const sentences = (cleaned.match(/[^.!?]{15,}[.!?]+/g) || []).map(s => s.trim());
+        const keywords = q.replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+
+        const scored = sentences.map(s => {
+            const sl = s.toLowerCase();
+            const st = s.trim();
+            const isJunk = /^(do you|can you|list|find|identify|explain|describe|complete|use the|look at|write|draw|think about|remember|give two|give an|now we|show where|carefully|below is|label|what do|choose the|try to pull|give a reason|throw water|turn off|attend to|if someone|for enrichment|in activity|perhaps you|fill in|cut out|paste|tick|choose correct|using a|you will need|in this activity|notes chapter)/i.test(st);
+            const isQuestion = st.endsWith('?');
+            const isTooShort = st.length < 35;
+            // Diagram captions: many capitalised words, no verb — e.g. "Skull Shoulder blade Ribs Backbone Hip bone"
+            const isDiagramCaption = (st.match(/\b[A-Z][a-z]+\b/g) || []).length > 3 && !/ is | are | can | will | has | forms | helps | allows | protects /i.test(st);
+            // File/image reference junk — all corrupt URL/path patterns
+            const isFileRef = /F1le:|ckg\/|atuo_|Rcyal|_%28|\.jpg|\.png|indb \d|ihm\/|phctco|pphtho|\/photos\//i.test(st);
+            const kwScore = keywords.reduce((n, kw) => n + (sl.includes(kw) ? 3 : 0), 0);
+            const lengthBonus = (s.length > 50 && s.length < 350) ? 1 : 0;
+            const score = (isJunk || isQuestion || isTooShort || isDiagramCaption || isFileRef) ? -10 : kwScore + lengthBonus;
+            return { s, score };
+        });
+
+        const top = scored
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 6)
+            .map(x => x.s);
+
+        if (top.length === 0) {
+            const topicExists = keywords.some(kw => cleaned.toLowerCase().includes(kw));
+            if (!topicExists) {
+                return "Eish chommie! 😅 I don't think that topic is in our Grade 5 textbook. Try asking about <strong>rocks</strong>, <strong>fossils</strong>, <strong>electricity</strong>, <strong>metals</strong>, <strong>skeletons</strong>, or <strong>food chains</strong>!";
+            }
+            // When no strong definition sentences found, use Key Concepts as main content
+            if (sections.keyConcepts.length > 0) {
+                top.push(...sections.keyConcepts.slice(0, 4));
+            } else {
+                const fallback = sentences.filter(s => s.length > 40 && !/^(do you|can you|list|find|identify|explain|describe|complete|give two|below is)/i.test(s)).slice(0, 3);
+                if (fallback.length === 0) return "Eish chommie, I found something but it's a bit messy. 😅 Try asking differently!";
+                top.push(...fallback);
+            }
+        }
+        // Always supplement sparse results with Key Concepts
+        if (top.length < 3 && sections.keyConcepts.length > 0) {
+            const extras = sections.keyConcepts.filter(c => !top.includes(c));
+            top.push(...extras.slice(0, 4 - top.length));
+        }
+
+        const emoji = q.includes('rock') || q.includes('sediment') ? '🪨'
+                    : q.includes('fossil') ? '🦕'
+                    : q.includes('electr') || q.includes('circuit') || q.includes('batter') ? '⚡'
+                    : q.includes('metal') ? '🔩'
+                    : q.includes('plant') || q.includes('food chain') || q.includes('photosyn') ? '🌿'
+                    : q.includes('animal') ? '🐾'
+                    : q.includes('skeleton') || q.includes('bone') ? '🦴'
+                    : q.includes('earth') || q.includes('season') || q.includes('planet') ? '🌍'
+                    : q.includes('energy') || q.includes('fuel') || q.includes('coal') ? '🔥'
+                    : q.includes('water') || q.includes('cloud') || q.includes('rain') ? '💧'
+                    : q.includes('struct') ? '🏗️'
+                    : q.includes('material') ? '🧱'
+                    : q.includes('ligament') || q.includes('tendon') || q.includes('joint') ? '🦴'
+                    : q.includes('amphibian') || q.includes('reptile') ? '🐸'
+                    : q.includes('producer') || q.includes('consumer') ? '🌿'
+                    : '🔬';
+
+        // ── Step 4: Build rich structured response ───────────────────────
+        let html = `Sho chommie! ${emoji} Here's what the textbook says:<br><br>`;
+        html += top.map(s => `📌 ${s}`).join('<br><br>');
+
+        if (sections.keyQuestions.length > 0) {
+            html += `<br><br><div style="background:#fff8e1;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:8px;margin-top:6px;">`;
+            html += `<strong>🔑 Key Questions</strong><br>`;
+            html += sections.keyQuestions.map(q => `• ${q}`).join('<br>');
+            html += `</div>`;
+        }
+
+        if (sections.keyConcepts.length > 0) {
+            html += `<br><div style="background:#e8f5e9;border-left:3px solid #10b981;padding:10px 12px;border-radius:8px;margin-top:6px;">`;
+            html += `<strong>💡 Key Concepts</strong><br>`;
+            html += sections.keyConcepts.map(c => `• ${c}`).join('<br>');
+            html += `</div>`;
+        }
+
+        if (sections.questions.length > 0) {
+            html += `<br><div style="background:#e8f0fe;border-left:3px solid #6366f1;padding:10px 12px;border-radius:8px;margin-top:6px;">`;
+            html += `<strong>❓ Think About It</strong><br>`;
+            html += sections.questions.slice(0, 3).map(q => `• ${q}`).join('<br>');
+            html += `</div>`;
+        }
+
+        if (sections.newWords.length > 0) {
+            html += `<br><div style="background:#f3e8ff;border-left:3px solid #a855f7;padding:10px 12px;border-radius:8px;margin-top:6px;">`;
+            html += `<strong>📝 New Words</strong>&nbsp;&nbsp;`;
+            html += sections.newWords.map(w => {
+                // Use GLOSSARY page if available, otherwise find from Fuse results
+                const entry = GLOSSARY[w] || GLOSSARY[w.toLowerCase()] || GLOSSARY[w.charAt(0).toUpperCase() + w.slice(1)];
+                const pg = entry ? entry.page : '';
+                const safeW = w.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                return `<span onclick="lookupTerm('${safeW}', ${pg||0})" style="color:#7c3aed;cursor:pointer;font-weight:600;text-decoration:underline dotted;">${w}${pg ? ' <span style=\"color:#aaa;font-size:11px;\">p.'+pg+'</span>' : ''}</span>`;
+            }).join(' &nbsp;•&nbsp; ');
+            html += `</div>`;
+        }
+
+        return html;
+    }
+
+    function addMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = `msg ${role}`;
+        div.innerHTML = text;
+        const box = document.getElementById('messages');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight; // Scroll to the latest message
+    }
+
+    function openChat() {
+        document.getElementById('chat-modal').style.display = 'block';
+    }
+    function closeChat() {
+        // Always navigate away immediately — never show blue body
+        try { window.parent.postMessage('closeBot', '*'); } catch(e) {}
+        // Navigate back — works in both iframe and standalone
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            try { window.close(); } catch(e) {}
+            // Fallback: hide everything so at least screen goes blank
+            document.body.style.visibility = 'hidden';
+        }
+    }
+    // ── Keyboard push-up for Android WebView ─────────────────────────
+    // When the virtual keyboard opens, visualViewport shrinks.
+    // We shift the chat-modal up so the input stays visible.
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', function() {
+            const modal = document.getElementById('chat-modal');
+            const vvHeight = window.visualViewport.height;
+            const windowHeight = window.innerHeight;
+            const keyboardHeight = windowHeight - vvHeight;
+            if (keyboardHeight > 100) {
+                // Keyboard is open — shrink modal to visual viewport height
+                modal.style.height = vvHeight + 'px';
+                modal.style.top = (windowHeight - vvHeight) + 'px';
+                // Scroll messages to bottom so latest is visible
+                const box = document.getElementById('messages');
+                if (box) box.scrollTop = box.scrollHeight;
+            } else {
+                // Keyboard closed — restore
+                modal.style.height = '';
+                modal.style.top = '0';
+            }
+        });
+        window.visualViewport.addEventListener('scroll', function() {
+            const modal = document.getElementById('chat-modal');
+            modal.style.top = window.visualViewport.offsetTop + 'px';
+        });
+    }
+
+    // Start PDF loading immediately — don't wait for any event
+    // Multiple triggers to handle Niotron WebViewer timing quirks
+    (function startLoading() {
+        // Configure worker (belt-and-suspenders — also done above)
+        if (typeof pdfjsLib !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
+        initResources();
+    })();
+    // Fallbacks in case the IIFE ran too early
+    document.addEventListener('DOMContentLoaded', function() { if (!pdfReady && !pdfDocRef) initResources(); });
+    window.addEventListener('load', function() { if (!pdfReady && !pdfDocRef) initResources(); });
+    // Last-resort retry after 2s for slow WebViewer environments
+    setTimeout(function() { if (!pdfReady && !pdfDocRef) initResources(); }, 2000);
+</script>
+
+</body>
+</html>
