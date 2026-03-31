@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Results — Grade 6 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade6/favicon.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#07070c;color:#fff;min-height:100vh;}
+body.light-mode{background:#f5f5f5;color:#222;}
+.header{background:linear-gradient(135deg,#1a237e,#10b981);padding:16px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.back-link{color:#fff;font-size:1.4rem;text-decoration:none;}
+.header-brand{display:flex;align-items:center;gap:10px;flex:1;}
+.header-brand img{width:30px;height:30px;border-radius:6px;}
+.header h1{font-size:1rem;font-weight:700;color:#fff;}
+.theme-toggle{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 10px;border-radius:14px;font-size:0.75rem;cursor:pointer;font-family:inherit;}
+.content{padding:20px;max-width:700px;margin:0 auto;padding-bottom:60px;}
+.summary{background:linear-gradient(135deg,#1a237e,#10b981);border-radius:14px;padding:20px;margin-bottom:20px;text-align:center;}
+.summary h2{font-size:1.3rem;margin-bottom:6px;}
+.summary p{opacity:0.85;font-size:0.9rem;}
+.empty{text-align:center;padding:60px 20px;}
+.empty h2{font-size:1.2rem;margin-bottom:10px;color:#10b981;}
+.empty p{font-size:0.9rem;color:#999;}
+.result-card{padding:16px;border-radius:12px;margin-bottom:14px;border-left:4px solid #10b981;background:rgba(255,255,255,0.05);}
+body.light-mode .result-card{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.result-card.failed{border-left-color:#f44336;}
+.result-card h3{font-size:1rem;margin-bottom:8px;color:#10b981;}
+.result-card.failed h3{color:#f44336;}
+.result-card p{font-size:0.85rem;color:#ccc;margin-bottom:4px;}
+body.light-mode .result-card p{color:#555;}
+.timestamp{font-size:0.75rem;color:#666;margin-top:6px;}
+.clear-btn{display:block;width:100%;padding:14px;background:#f44336;color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:20px;font-family:inherit;}
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+<div class="header">
+  <a href="https://dbeducator.github.io/Natural-Sciences/grade6/index.html" class="back-link">&#x2190;</a>
+  <div class="header-brand">
+    <img src="https://dbeducator.github.io/Natural-Sciences/grade6/favicon.png" alt="Logo" onerror="this.style.display='none'">
+    <h1>&#x1F4CA; My Assessment Results</h1>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#x2600;&#xFE0F;</button>
+</div>
+<div class="content" id="content"><div class="empty"><h2>Loading...</h2></div></div>
+<script>
+function toggleTheme(){
+  var isLight=document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme',isLight?'light':'dark');
+  document.getElementById('themeBtn').textContent=isLight?'🌙':'☀️';
+}
+if(localStorage.getItem('cl_theme')==='light')document.getElementById('themeBtn').textContent='🌙';
+var all=JSON.parse(localStorage.getItem('ns_assessmentResults')||'[]');
+// Filter to Grade 6 results only (courseName contains 'Gr6')
+var g6=all.filter(function(r){return r.courseName&&r.courseName.indexOf('Gr6')!==-1;});
+var content=document.getElementById('content');
+if(!g6.length){
+  content.innerHTML='<div class="empty"><h2>No Results Yet</h2><p>Complete an assessment in any Grade 6 topic to see your results here.</p><a href="https://dbeducator.github.io/Natural-Sciences/grade6/index.html" style="display:inline-block;margin-top:20px;padding:12px 24px;background:linear-gradient(135deg,#1a237e,#10b981);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">Browse Topics &#x2192;</a></div>';
+}else{
+  var passed=g6.filter(function(r){return r.passed==='YES';}).length;
+  var html='<div class="summary"><h2>&#x1F4CB; '+g6.length+' Submission'+(g6.length!==1?'s':'')+'</h2><p>&#x2705; '+passed+' passed &nbsp;|&nbsp; &#x274C; '+(g6.length-passed)+' failed</p></div>';
+  g6.forEach(function(r,i){
+    var p=r.passed==='YES';
+    html+='<div class="result-card'+(p?'':' failed')+'">';
+    html+='<h3>'+(p?'&#x2705; PASSED':'&#x274C; FAILED')+' — Submission #'+(i+1)+'</h3>';
+    html+='<p><strong>Topic:</strong> '+(r.courseName||'')+'</p>';
+    html+='<p><strong>Week:</strong> '+r.week+' &nbsp;|&nbsp; <strong>Score:</strong> '+r.score+'% ('+r.correct+'/'+r.total+')</p>';
+    html+='<p><strong>Learner:</strong> '+r.studentName+'</p>';
+    html+='<p class="timestamp">'+r.timestamp+'</p></div>';
+  });
+  html+='<button class="clear-btn" id="clearBtn">&#x1F5D1; Clear Grade 6 Results</button>';
+  content.innerHTML=html;
+  document.getElementById('clearBtn').onclick=function(){
+    if(confirm('Clear all Grade 6 results? This cannot be undone.')){
+      var remaining=all.filter(function(r){return !r.courseName||r.courseName.indexOf('Gr6')===-1;});
+      localStorage.setItem('ns_assessmentResults',JSON.stringify(remaining));
+      location.reload();
+    }
+  };
+}
+</script>
+</body>
+</html>
