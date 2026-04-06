@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Results — Grade 8 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade8/favicon.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#07070c;color:#fff;min-height:100vh;}
+body.light-mode{background:#f0f2f5;color:#222;}
+.header{background:linear-gradient(135deg,#1a237e,#283593);padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.back-link{color:#fff;font-size:1.4rem;text-decoration:none;}
+.header h1{font-size:0.95rem;font-weight:700;color:#fff;flex:1;}
+.theme-toggle{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 10px;border-radius:14px;font-size:0.75rem;cursor:pointer;font-family:inherit;}
+.hero{background:linear-gradient(135deg,#0a1a33,#10b981);padding:20px;text-align:center;}
+.hero h2{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:4px;}
+.hero p{color:rgba(255,255,255,0.8);font-size:0.82rem;}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:340px;margin:14px auto 0;}
+.summary-stat{background:rgba(255,255,255,0.12);border-radius:10px;padding:10px 6px;text-align:center;}
+.summary-stat h3{font-size:1.3rem;font-weight:900;color:#fff;}
+.summary-stat p{font-size:0.62rem;color:rgba(255,255,255,0.8);margin-top:2px;}
+.content{padding:16px 16px 30px;}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-btn{padding:6px 14px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#aaa;font-size:0.78rem;cursor:pointer;font-family:inherit;}
+.filter-btn.active{background:#10b981;border-color:#10b981;color:#fff;font-weight:700;}
+body.light-mode .filter-btn{background:rgba(0,0,0,0.05);border-color:#ddd;color:#555;}
+body.light-mode .filter-btn.active{background:#10b981;color:#fff;}
+.results-list{display:flex;flex-direction:column;gap:10px;}
+.result-card{background:#12121f;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
+body.light-mode .result-card{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.result-score{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;flex-shrink:0;}
+.result-score.passed{background:rgba(76,175,80,0.2);color:#4caf50;}
+.result-score.failed{background:rgba(244,67,54,0.2);color:#f44336;}
+.result-info{flex:1;min-width:0;}
+.result-course{font-size:0.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+body.light-mode .result-course{color:#222;}
+.result-meta{font-size:0.72rem;color:#777;margin-top:3px;}
+.result-badge{font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:10px;flex-shrink:0;}
+.result-badge.passed{background:rgba(76,175,80,0.15);color:#4caf50;}
+.result-badge.failed{background:rgba(244,67,54,0.15);color:#f44336;}
+.empty-state{text-align:center;padding:50px 20px;color:#555;}
+.empty-state .icon{font-size:3rem;margin-bottom:16px;}
+.empty-state h3{font-size:1.1rem;margin-bottom:8px;}
+.clear-btn{display:block;margin:20px auto 0;padding:10px 24px;background:rgba(244,67,54,0.15);border:1px solid rgba(244,67,54,0.3);color:#f44336;border-radius:12px;font-size:0.85rem;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div class="header">
+  <a href="index.html" class="back-link">&#x2190;</a>
+  <h1>&#128202; My Results &mdash; Grade 8 NS</h1>
+  <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#9728;</button>
+</div>
+
+<div class="hero">
+  <h2>&#128202; Assessment Results</h2>
+  <p>Grade 8 Natural Sciences</p>
+  <div class="summary-grid">
+    <div class="summary-stat"><h3 id="totalCount">0</h3><p>Assessments</p></div>
+    <div class="summary-stat"><h3 id="passCount">0</h3><p>Passed</p></div>
+    <div class="summary-stat"><h3 id="avgScore">0%</h3><p>Average</p></div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterResults('all',this)">All</button>
+    <button class="filter-btn" onclick="filterResults('passed',this)">Passed</button>
+    <button class="filter-btn" onclick="filterResults('failed',this)">Not Yet</button>
+  </div>
+  <div class="results-list" id="resultsList"></div>
+  <button class="clear-btn" onclick="clearResults()">&#128465; Clear All Results</button>
+</div>
+
+<script>
+function toggleTheme(){
+  var isLight=document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme',isLight?'light':'dark');
+  document.getElementById('themeBtn').textContent=isLight?'&#127761;':'&#9728;';
+}
+if(localStorage.getItem('cl_theme')==='light')document.getElementById('themeBtn').textContent='&#127761;';
+
+var allResults=[];
+
+function loadResults(){
+  var all=JSON.parse(localStorage.getItem('ns_assessmentResults')||'[]');
+  allResults=all.filter(function(r){return r.courseName&&r.courseName.indexOf('Gr8')>-1;});
+  allResults.sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
+  var total=allResults.length;
+  var passed=allResults.filter(function(r){return r.passed==='YES';}).length;
+  var avg=total>0?Math.round(allResults.reduce(function(s,r){return s+(r.score||0);},0)/total):0;
+  document.getElementById('totalCount').textContent=total;
+  document.getElementById('passCount').textContent=passed;
+  document.getElementById('avgScore').textContent=avg+'%';
+  renderResults(allResults);
+}
+
+function filterResults(filter,btn){
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  var filtered=allResults.filter(function(r){
+    if(filter==='all') return true;
+    if(filter==='passed') return r.passed==='YES';
+    if(filter==='failed') return r.passed==='NO';
+    return true;
+  });
+  renderResults(filtered);
+}
+
+function renderResults(list){
+  var el=document.getElementById('resultsList');
+  if(!list||list.length===0){
+    el.innerHTML='<div class="empty-state"><div class="icon">&#128203;</div><h3>No results yet</h3><p>Complete topic assessments to see your results here.</p></div>';
+    return;
+  }
+  el.innerHTML=list.map(function(r){
+    var passed=r.passed==='YES';
+    var score=r.score||0;
+    return '<div class="result-card">'+
+      '<div class="result-score '+(passed?'passed':'failed')+'">'+score+'%</div>'+
+      '<div class="result-info">'+
+        '<div class="result-course">'+(r.courseName||'Assessment')+'</div>'+
+        '<div class="result-meta">'+(r.correct||0)+'/'+(r.total||5)+' correct &nbsp;&bull;&nbsp; '+(r.timestamp||'')+'</div>'+
+      '</div>'+
+      '<span class="result-badge '+(passed?'passed':'failed')+'">'+(passed?'PASS':'REDO')+'</span>'+
+    '</div>';
+  }).join('');
+}
+
+function clearResults(){
+  if(!confirm('Clear all Grade 8 results? This cannot be undone.')) return;
+  var all=JSON.parse(localStorage.getItem('ns_assessmentResults')||'[]');
+  var kept=all.filter(function(r){return !r.courseName||r.courseName.indexOf('Gr8')===-1;});
+  localStorage.setItem('ns_assessmentResults',JSON.stringify(kept));
+  loadResults();
+}
+
+loadResults();
+</script>
+</body>
+</html>

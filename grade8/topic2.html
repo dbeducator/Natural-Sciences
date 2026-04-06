@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grade 8 NS — Interactions and Interdependence</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png">
+<style>
+
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #07070c;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .course-title h1 { font-size: 1.8rem; margin-bottom: 5px; }
+  .course-title p { font-size: 0.9rem; opacity: 0.9; }
+
+  .user-info { display: flex; align-items: center; gap: 15px; }
+
+  .avatar {
+    width: 45px; height: 45px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: bold;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+  .progress-overview {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .progress-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    color: white; padding: 20px; border-radius: 12px; text-align: center;
+  }
+  .stat-card h3 { font-size: 2rem; margin-bottom: 5px; }
+  .stat-card p { font-size: 0.9rem; opacity: 0.9; }
+
+  .progress-bar {
+    width: 100%; height: 25px; background: #e0e0e0;
+    border-radius: 15px; overflow: hidden; margin: 20px 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50 0%, #4caf50cc 100%);
+    border-radius: 15px; transition: width 0.5s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 10px; color: white; font-weight: 600; font-size: 0.9rem;
+    min-width: 45px;
+  }
+
+  .tabs {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0; flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 12px 25px; background: #12121f; border: none;
+    border-radius: 10px 10px 0 0; cursor: pointer;
+    font-size: 1rem; font-weight: 600; color: #aaa; transition: all 0.3s ease;
+  }
+  .tab.active { background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%); color: white; }
+
+  .module-selector {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    overflow-x: auto; padding-bottom: 10px;
+  }
+
+  .module-btn {
+    padding: 12px 25px; background: #12121f;
+    border: 2px solid #4caf50; border-radius: 25px;
+    cursor: pointer; font-size: 1rem; font-weight: 600;
+    color: #4caf50; white-space: nowrap; transition: all 0.3s ease;
+  }
+  .module-btn.active {
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    color: white; border-color: transparent;
+  }
+  .module-btn.completed { background: #4caf50; color: white; border-color: #4caf50; }
+
+  .content-section { display: block; height: 0; overflow: hidden; }
+  .content-section.active { height: auto; overflow: visible; }
+
+  .video-section {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .video-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px; margin-top: 20px;
+  }
+
+  .video-player {
+    background: #000; border-radius: 12px; overflow: hidden;
+    position: relative; padding-top: 56.25%;
+  }
+
+  .video-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  }
+
+  .play-btn {
+    width: 70px; height: 70px;
+    background: rgba(102, 126, 234, 0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .play-btn:hover { background: #4caf50; transform: scale(1.1); }
+  .play-btn::after { content: '▶'; color: white; font-size: 2rem; margin-left: 5px; }
+
+  .video-title { margin-top: 15px; font-size: 1.1rem; font-weight: 600; color: #fff; }
+  body.light-mode .video-title { color: #333; }
+
+  .lesson-content {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+  .lesson-content h2 { color: #4caf50; margin-bottom: 20px; font-size: 1.8rem; }
+  .lesson-content h3 { color: #4caf50cc; margin-top: 25px; margin-bottom: 15px; font-size: 1.3rem; }
+  .lesson-content h4 { color: #4caf50; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+  .lesson-content p { line-height: 1.8; margin-bottom: 15px; color: #ccc; }
+  .lesson-content ul { margin-left: 25px; margin-bottom: 15px; }
+  .lesson-content li { margin-bottom: 10px; line-height: 1.6; color: #ccc; }
+
+  .assessment-section {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .quiz-question {
+    background: #1a1a2e; padding: 20px; border-radius: 12px;
+    margin-bottom: 20px; border-left: 4px solid #4caf50;
+  }
+  .quiz-question h4 { margin-bottom: 15px; color: #fff; font-size: 1.1rem; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .quiz-option {
+    padding: 12px 20px; background: #12121f; border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .quiz-option:hover { border-color: #4caf50; background: #f0f4ff; }
+  .quiz-option input { margin-right: 10px; }
+
+  .submit-btn {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    color: white; border: none; border-radius: 25px;
+    font-size: 1.1rem; font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; margin-top: 20px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+  .already-passed-notice {
+    background: #e8f5e9; border: 2px solid #4caf50; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; text-align: center;
+  }
+  .already-passed-notice h3 { color: #2e7d32; margin-bottom: 8px; }
+  .already-passed-notice p { color: #388e3c; }
+
+  .resources-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  a.resource-card { display: block; text-decoration: none; color: inherit; cursor: pointer; }
+  .resource-card {
+    display: block; text-decoration: none; color: inherit;
+    background: #12121f; border-radius: 12px; padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;
+    cursor: pointer; border: 2px solid transparent;
+  }
+  .resource-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: #4caf50; }
+
+  .resource-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.5rem; margin-bottom: 15px;
+  }
+  .resource-card h4 { margin-bottom: 10px; color: #fff; }
+  .resource-card p { color: #aaa; font-size: 0.9rem; }
+
+  .download-badge {
+    display: inline-block; padding: 5px 12px; background: #4caf50;
+    color: white; border-radius: 15px; font-size: 0.75rem; margin-top: 10px;
+  }
+
+  .admin-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white; border: none; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(240,147,251,0.4); z-index: 50; transition: all 0.3s ease;
+  }
+  .admin-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(240,147,251,0.6); }
+
+  @media (max-width: 768px) {
+    .header-content { flex-direction: column; gap: 15px; text-align: center; }
+    .video-grid { grid-template-columns: 1fr; }
+    .module-selector { flex-wrap: wrap; }
+    .resources-grid { grid-template-columns: 1fr; }
+  }
+
+/* ── DARK THEME ADDITIONS ── */
+.lesson-content h2, .lesson-content h3, .lesson-content h4 { color: #c4b5fd; }
+.lesson-content p, .lesson-content li { color: #ccc; }
+.lesson-content strong { color: #e0d7ff; }
+.quiz-option { color: #ccc; }
+.quiz-option:hover { background: rgba(102,126,234,0.15); border-color: #4caf50; }
+.resource-card h4 { color: #fff; }
+.resource-card p { color: #aaa; }
+.already-passed-notice { background: rgba(76,175,80,0.1); border: 2px solid #4caf50; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.already-passed-notice h3 { color: #4caf50; }
+.already-passed-notice p { color: #aaa; }
+
+
+/* ── LIGHT MODE ── */
+body.light-mode { background: #ffffff !important; color: #222 !important; }
+body.light-mode .header { background: linear-gradient(135deg, #4caf50 0%, #4caf50cc 100%) !important; }
+body.light-mode .progress-overview { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .tabs { background: #f5f5f5 !important; }
+body.light-mode .tab { color: #666 !important; background: transparent !important; }
+body.light-mode .tab.active { background: linear-gradient(135deg, #4caf50, #4caf50cc) !important; color: #fff !important; }
+body.light-mode .module-selector { background: #f5f5f5 !important; }
+body.light-mode .module-btn { background: #fff !important; color: #4caf50 !important; border-color: #4caf50 !important; }
+body.light-mode .module-btn.active { background: linear-gradient(135deg, #4caf50, #4caf50cc) !important; color: #fff !important; }
+body.light-mode .module-btn.completed { background: #4caf50 !important; color: #fff !important; border-color: #4caf50 !important; }
+body.light-mode .video-section { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .lesson-content { background: #fff !important; color: #333 !important; }
+body.light-mode .lesson-content h2, body.light-mode .lesson-content h3, body.light-mode .lesson-content h4 { color: #4caf50 !important; }
+body.light-mode .lesson-content p, body.light-mode .lesson-content li { color: #444 !important; }
+body.light-mode .resource-card { background: #fff !important; border-color: #e0e0e0 !important; }
+body.light-mode .resource-card h4 { color: #222 !important; }
+body.light-mode .resource-card p { color: #666 !important; }
+body.light-mode .quiz-question { background: #f8f9fa !important; }
+body.light-mode .quiz-question h4 { color: #333 !important; }
+body.light-mode .quiz-option { background: #fff !important; border-color: #e0e0e0 !important; color: #333 !important; }
+body.light-mode .live-section { background: #fff !important; }
+body.light-mode .support-card { background: #f8f9fa !important; }
+
+
+.resource-card { display:block; text-decoration:none; color:inherit; }
+.resource-icon { font-size:1.5rem; margin-bottom:8px; }
+.resources-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.already-passed-notice { background:rgba(76,175,80,0.1); border:2px solid #4caf50; border-radius:10px; padding:16px; margin-bottom:20px; }
+.already-passed-notice h3 { color:#4caf50; }
+.assess-week {}
+.theme-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-family:inherit; }
+body.light-mode .theme-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.2); color:#333; }
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button onclick="window.location.href='https://dbeducator.github.io/Natural-Sciences/grade5/index.html'" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:0;">&#8592;</button>
+      <img src="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png" alt="Logo" style="width:36px;height:36px;border-radius:8px;" onerror="this.style.display=&quot;none&quot;">
+      <div class="course-title">
+        <h1 class="course-title">Interactions and Interdependence</h1>
+        <p>Grade 8 Natural Sciences &middot; Term 1 &middot; Life and Living</p>
+      </div>
+    </div>
+    <div class="user-info">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#9728; Light</button>
+      <div class="avatar" id="avatar">?</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-overview">
+    <h2>Your Progress — <span id="studentName"></span></h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%">0%</div>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-card"><h3 id="weeksComplete">0/2</h3><p>Weeks Complete</p></div>
+      <div class="stat-card"><h3 id="videosWatched">0/4</h3><p>Videos</p></div>
+      <div class="stat-card"><h3 id="assessmentsPassed">0/2</h3><p>Passed</p></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('content', this)">Content</button>
+    <button class="tab" onclick="showTab('resources', this)">Resources</button>
+    <button class="tab" onclick="showTab('assessment', this)">Assessment</button>
+  </div>
+
+  <div class="module-selector"><button class="module-btn  active" onclick="selectModule(1)">Week 1</button> <button class="module-btn" onclick="selectModule(2)">Week 2</button> <button class="module-btn" onclick="selectModule(3)">Week 3</button></div>
+
+  <div id="content" class="content-section active">
+    <div class="video-section">
+      <h2 id="weekTitle" style="margin-bottom:15px;">Videos</h2>
+      <div class="video-grid">
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="tutorialVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="tutorialTitle">Loading...</div>
+        </div>
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="basicVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="basicTitle">Loading...</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+
+  <div id="resources" class="content-section">
+  <h2 id="resourcesTitle" style="margin-bottom:20px;">Resources</h2>
+  <div class="week-resources" data-week="1" style="display:none;">
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/notes-b.pdf" class="resource-card"><div class="resource-icon">&#128196;</div><h4>Study Notes B</h4><p>Core concepts and definitions — Set B</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/pastpaper-b.pdf" class="resource-card"><div class="resource-icon">&#128203;</div><h4>Past Exam Paper B</h4><p>Grade 8 NS past exam paper — Set B</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/workbook-b.pdf" class="resource-card"><div class="resource-icon">&#128221;</div><h4>Workbook B</h4><p>Practice exercises and activities — Set B</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/examprep-b.pdf" class="resource-card"><div class="resource-icon">&#127919;</div><h4>Exam Preparation B</h4><p>Exam tips, revision questions — Set B</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  <div class="week-resources" data-week="2" style="display:none;">
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/notes-d.pdf" class="resource-card"><div class="resource-icon">&#128196;</div><h4>Study Notes D</h4><p>Core concepts and definitions — Set D</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/pastpaper-d.pdf" class="resource-card"><div class="resource-icon">&#128203;</div><h4>Past Exam Paper D</h4><p>Grade 8 NS past exam paper — Set D</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/workbook-d.pdf" class="resource-card"><div class="resource-icon">&#128221;</div><h4>Workbook D</h4><p>Practice exercises and activities — Set D</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/examprep-d.pdf" class="resource-card"><div class="resource-icon">&#127919;</div><h4>Exam Preparation D</h4><p>Exam tips, revision questions — Set D</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  <div class="week-resources" data-week="3" style="display:none;">
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/notes-b.pdf" class="resource-card"><div class="resource-icon">&#128196;</div><h4>Study Notes B</h4><p>Core concepts and definitions — Set B</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/pastpaper-b.pdf" class="resource-card"><div class="resource-icon">&#128203;</div><h4>Past Exam Paper B</h4><p>Grade 8 NS past exam paper — Set B</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/workbook-b.pdf" class="resource-card"><div class="resource-icon">&#128221;</div><h4>Workbook B</h4><p>Practice exercises and activities — Set B</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade8/resources/examprep-b.pdf" class="resource-card"><div class="resource-icon">&#127919;</div><h4>Exam Preparation B</h4><p>Exam tips, revision questions — Set B</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+</div>
+<div id="assessment" class="content-section">
+    <div id="assessmentContent">
+<div class="assess-week" data-week="1" style="display:block;">
+<h2>Week 1 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: What is the main purpose of a structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q0" value="0" onchange="saveAnswer(1,0,0)"> To look beautiful</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="1" onchange="saveAnswer(1,0,1)"> To support a load or force</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="2" onchange="saveAnswer(1,0,2)"> To create jobs</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="3" onchange="saveAnswer(1,0,3)"> To use up materials</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: Which of the following is a FRAME structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q1" value="0" onchange="saveAnswer(1,1,0)"> An egg shell</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="1" onchange="saveAnswer(1,1,1)"> A tortoise shell</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="2" onchange="saveAnswer(1,1,2)"> The human skeleton</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="3" onchange="saveAnswer(1,1,3)"> A tin can</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: Which of the following is a SHELL structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q2" value="0" onchange="saveAnswer(1,2,0)"> A bicycle frame</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="1" onchange="saveAnswer(1,2,1)"> An electricity pylon</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="2" onchange="saveAnswer(1,2,2)"> A roof truss</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="3" onchange="saveAnswer(1,2,3)"> A snail shell</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: The human skeleton has 206 bones. What type of structure is it?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q3" value="0" onchange="saveAnswer(1,3,0)"> Shell structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="1" onchange="saveAnswer(1,3,1)"> Frame structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="2" onchange="saveAnswer(1,3,2)"> Solid structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="3" onchange="saveAnswer(1,3,3)"> Flat structure</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: What connects bones to other bones?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q4" value="0" onchange="saveAnswer(1,4,0)"> Tendons</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="1" onchange="saveAnswer(1,4,1)"> Muscles</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="2" onchange="saveAnswer(1,4,2)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="3" onchange="saveAnswer(1,4,3)"> Cartilage</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: Which South African structure is an example of a shell structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q5" value="0" onchange="saveAnswer(1,5,0)"> Orlando Towers</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="1" onchange="saveAnswer(1,5,1)"> Bloukrans Bridge</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="2" onchange="saveAnswer(1,5,2)"> FNB Stadium</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="3" onchange="saveAnswer(1,5,3)"> Electricity pylons</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: What does "rigid" mean?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q6" value="0" onchange="saveAnswer(1,6,0)"> Can bend easily</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="1" onchange="saveAnswer(1,6,1)"> Stiff and does not change shape</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="2" onchange="saveAnswer(1,6,2)"> Very heavy</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="3" onchange="saveAnswer(1,6,3)"> Made of metal</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: Bones are hollow inside. Why is this important?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q7" value="0" onchange="saveAnswer(1,7,0)"> To make them look nice</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="1" onchange="saveAnswer(1,7,1)"> So they can bend</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="2" onchange="saveAnswer(1,7,2)"> To make them lightweight but still strong</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="3" onchange="saveAnswer(1,7,3)"> To store food</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: What is a "load" in terms of structures?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q8" value="0" onchange="saveAnswer(1,8,0)"> A truck on the road</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="1" onchange="saveAnswer(1,8,1)"> A force or weight on a structure</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="2" onchange="saveAnswer(1,8,2)"> The material used to build</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="3" onchange="saveAnswer(1,8,3)"> The colour of a structure</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: What do muscles attach to in order to allow movement?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q9" value="0" onchange="saveAnswer(1,9,0)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="1" onchange="saveAnswer(1,9,1)"> Other muscles</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="2" onchange="saveAnswer(1,9,2)"> Bones via tendons</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="3" onchange="saveAnswer(1,9,3)"> Skin</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_SKS_1.html" onclick="localStorage.setItem('cl_submit_course','SKS');localStorage.setItem('cl_submit_week','1');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+<div class="assess-week" data-week="2" style="display:none;">
+<h2>Week 2 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: Why is a triangle the strongest shape for structures?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q0" value="0" onchange="saveAnswer(2,0,0)"> It looks the best</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="1" onchange="saveAnswer(2,0,1)"> It cannot change shape without changing the length of its sides</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="2" onchange="saveAnswer(2,0,2)"> It uses the least material</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="3" onchange="saveAnswer(2,0,3)"> It is the heaviest shape</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: A square frame can collapse sideways. How can you make it stronger?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q1" value="0" onchange="saveAnswer(2,1,0)"> Add more weight to the top</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="1" onchange="saveAnswer(2,1,1)"> Add a diagonal brace to make triangles</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="2" onchange="saveAnswer(2,1,2)"> Remove some sides</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="3" onchange="saveAnswer(2,1,3)"> Paint it a bright colour</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: What is the first step in the Technology design process?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q2" value="0" onchange="saveAnswer(2,2,0)"> Make the product</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="1" onchange="saveAnswer(2,2,1)"> Evaluate the product</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="2" onchange="saveAnswer(2,2,2)"> Investigate the problem</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="3" onchange="saveAnswer(2,2,3)"> Communicate your findings</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: Which of the following structures uses triangles to be strong?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q3" value="0" onchange="saveAnswer(2,3,0)"> A cylinder</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="1" onchange="saveAnswer(2,3,1)"> A sphere</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="2" onchange="saveAnswer(2,3,2)"> A roof truss</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="3" onchange="saveAnswer(2,3,3)"> A wall</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: How is a helmet similar to a skull?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q4" value="0" onchange="saveAnswer(2,4,0)"> Both are made of bone</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="1" onchange="saveAnswer(2,4,1)"> Both are shell structures that protect what is inside</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="2" onchange="saveAnswer(2,4,2)"> Both are frame structures</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="3" onchange="saveAnswer(2,4,3)"> Both are made of metal</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: What does "evaluate" mean in the design process?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q5" value="0" onchange="saveAnswer(2,5,0)"> To build the structure</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="1" onchange="saveAnswer(2,5,1)"> To draw the design</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="2" onchange="saveAnswer(2,5,2)"> To test and judge how well something works</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="3" onchange="saveAnswer(2,5,3)"> To present to the class</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: Which factor makes a structure MORE stable?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q6" value="0" onchange="saveAnswer(2,6,0)"> A narrower base</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="1" onchange="saveAnswer(2,6,1)"> A wider base</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="2" onchange="saveAnswer(2,6,2)"> Being taller</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="3" onchange="saveAnswer(2,6,3)"> Being made of lighter material</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: A spine in the human body is similar to what man-made structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q7" value="0" onchange="saveAnswer(2,7,0)"> A bridge</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="1" onchange="saveAnswer(2,7,1)"> A roof</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="2" onchange="saveAnswer(2,7,2)"> A steel column in a building</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="3" onchange="saveAnswer(2,7,3)"> A window</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: What holds joints in the human skeleton together?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q8" value="0" onchange="saveAnswer(2,8,0)"> Tendons</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="1" onchange="saveAnswer(2,8,1)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="2" onchange="saveAnswer(2,8,2)"> Muscles</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="3" onchange="saveAnswer(2,8,3)"> Cartilage</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: In Technology, what does "communicate" mean?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q9" value="0" onchange="saveAnswer(2,9,0)"> To telephone someone</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="1" onchange="saveAnswer(2,9,1)"> To argue with a partner</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="2" onchange="saveAnswer(2,9,2)"> To present and share your findings and design</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="3" onchange="saveAnswer(2,9,3)"> To write a letter</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_SKS_2.html" onclick="localStorage.setItem('cl_submit_course','SKS');localStorage.setItem('cl_submit_week','2');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:30px;">
+    <a href="https://dbeducator.github.io/Natural-Sciences/grade5/results.html" class="admin-btn" style="text-decoration:none;display:inline-block;">View My Results</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'coachL8_ECO_';
+const TOTAL_WEEKS = 3;
+const COURSE_NAME = 'Interactions and Interdependence';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz89hcA4Z70ZyOKnk2MBBc5kVWKG5aXljNgSzpXZbfXDOhGvtpeZXGSOadoZB_RdyPK/exec';
+const SECRET_KEY = 'CoachL2025SecureKey';
+const BASE_URL = 'https://dbeducator.github.io/Natural-Sciences/grade8/';
+const coursePrefixForSubmit = 'ECO';
+
+const CORRECT_ANSWERS = {
+  1: [3, 3, 3, 4, 2],
+  2: [3, 1, 2, 3, 2],
+  3: []
+};
+Object.keys(CORRECT_ANSWERS).forEach(function(w) {
+  localStorage.setItem(STORAGE_PREFIX + 'correct_' + w, JSON.stringify(CORRECT_ANSWERS[parseInt(w)]));
+});
+
+let currentWeek = 1;
+let completedWeeks = new Set(JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'completedWeeks') || '[]'));
+let studentInfo = { name: '', email: '' };
+
+function toggleTheme() {
+  const isLight = document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').innerHTML = isLight ? '&#9790; Dark' : '&#9728; Light';
+}
+
+function saveAnswer(week, q, val) {
+  var k = STORAGE_PREFIX + 'answers_' + week;
+  var saved = JSON.parse(localStorage.getItem(k) || '{}');
+  saved['q' + q] = val;
+  localStorage.setItem(k, JSON.stringify(saved));
+}
+
+function selectModule(week) {
+  currentWeek = week;
+  refreshModuleButtons();
+  updateWeekContent();
+}
+
+function refreshModuleButtons() {
+  document.querySelectorAll('.module-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (completedWeeks.has(i+1)) {
+      btn.classList.add('completed');
+      btn.textContent = 'Week ' + (i+1) + ' ✓';
+    } else {
+      btn.textContent = 'Week ' + (i+1);
+    }
+  });
+  document.querySelectorAll('.module-btn')[currentWeek - 1].classList.add('active');
+}
+
+function showTab(tabName, tabBtn) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  if (tabBtn) tabBtn.classList.add('active');
+}
+
+function updateVideoSection() {
+  const v = weekVideos[currentWeek];
+  const PLACEHOLDER = 'x0lauGbQWvQ';
+  const CS = '<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;"><div style="font-size:2.5rem;">&#127916;</div><p style="color:#fff;font-weight:700;margin-top:10px;">Video Coming Soon</p><p style="color:#aaa;font-size:0.8rem;margin-top:6px;">Check back later</p></div>';
+  const iframe = function(id) {
+    return '<iframe src="https://www.youtube.com/embed/'+id+'?rel=0&modestbranding=1&iv_load_policy=3" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>';
+  };
+  document.getElementById('tutorialVideo').innerHTML = (v.t && v.t !== PLACEHOLDER) ? iframe(v.t) : CS;
+  document.getElementById('basicVideo').innerHTML = (v.b && v.b !== PLACEHOLDER) ? iframe(v.b) : CS;
+  document.getElementById('tutorialTitle').textContent = v.tTitle;
+  document.getElementById('basicTitle').textContent = v.bTitle;
+  document.getElementById('weekTitle').textContent = 'Videos \u2014 Week ' + currentWeek;
+}
+
+function updateWeekContent() {
+  const week = weekData[currentWeek];
+  updateVideoSection();
+  document.getElementById('lessonContent').innerHTML = week.content;
+  document.getElementById('resourcesTitle').textContent = 'Resources — Week ' + currentWeek;
+  document.querySelectorAll('.week-resources').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.assess-week').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+}
+
+function updateProgress() {
+  const done = completedWeeks.size;
+  const pct = Math.round(done / TOTAL_WEEKS * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').textContent = pct + '%';
+  document.getElementById('weeksComplete').textContent = done + '/' + TOTAL_WEEKS;
+  document.getElementById('videosWatched').textContent = (done*2) + '/' + (TOTAL_WEEKS*2);
+  document.getElementById('assessmentsPassed').textContent = done + '/' + TOTAL_WEEKS;
+}
+
+window.onload = function() {
+  studentInfo.name = 'Anonymous';
+  document.getElementById('studentName').textContent = studentInfo.name;
+  document.getElementById('avatar') && (document.getElementById('avatar').textContent = '👤');
+  const isLight = localStorage.getItem('cl_theme') === 'light';
+  if(isLight) { document.getElementById('body').classList.add('light-mode'); document.getElementById('themeBtn').innerHTML = '&#9790; Dark'; }
+  updateProgress();
+  selectModule(1);
+};
+
+const weekVideos = {
+  1: {t:'srpl5YRw-_U',tTitle:'Week 1: Ecosystems and Food Webs',b:'0glkXIj1DgE',bTitle:'Week 1: Trophic Levels and Energy Flow'},
+  2: {t:'IWAA75k-UWI',tTitle:'Week 2: Adaptations and Symbiosis',b:'wShaj7IUO5g',bTitle:'Week 2: Predator-Prey Relationships'},
+  3: {t:'yJX1Te0jey0',tTitle:'Week 3: Biodiversity and Conservation',b:'mOEYup6FyR4',bTitle:'Week 3: Community-Based Conservation in SA'}
+};
+
+const weekData = {
+  1: {
+    content: `<h2 style="color:#4caf50;">&#127758; Interactions and Interdependence — Week 1</h2>
+<div style="background:linear-gradient(135deg,#4caf50,#4caf5099);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;"><div style="font-size:3rem;">&#127758;</div><h3 style="color:#fff;margin:8px 0;">Ecology and Ecosystems</h3><p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">The science of how living things relate to each other and their environment</p></div>
+<h3>&#127919; What You Will Learn</h3>
+<ul><li>Define ecology and explain key ecological terms</li><li>Distinguish biotic and abiotic factors</li><li>Describe different types of feeding relationships</li><li>Construct and interpret food chains and food webs</li></ul>
+<h3>&#127758; Ecology — Key Terms</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4caf50;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#4caf50;margin-bottom:8px;">&#128203; Essential Ecology Vocabulary</h4><ul style="line-height:1.8;"><li><strong>Ecology</strong>: the study of interactions between living organisms and their environment</li><li><strong>Ecosystem</strong>: all the living organisms in an area together with their non-living environment (interacting as a system)</li><li><strong>Biotic factors</strong>: living components — plants, animals, microorganisms</li><li><strong>Abiotic factors</strong>: non-living components — temperature, rainfall, light, soil type, pH, wind</li><li><strong>Population</strong>: all individuals of the SAME species in an area</li><li><strong>Community</strong>: all populations of DIFFERENT species in an area</li><li><strong>Habitat</strong>: the physical place where an organism lives</li><li><strong>Niche</strong>: the role an organism plays in its ecosystem (what it eats, when it is active, where it shelters)</li></ul></div>
+<h3>&#127859; Feeding Relationships</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4caf50;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#4caf50;margin-bottom:8px;">&#129302; Trophic Levels</h4><ul style="line-height:1.8;"><li><strong>Producers</strong> (1st trophic level): make their own food via photosynthesis — all green plants, algae, phytoplankton</li><li><strong>Primary consumers</strong> (2nd): herbivores that eat producers — wildebeest, zebra, caterpillars</li><li><strong>Secondary consumers</strong> (3rd): carnivores/omnivores eating primary consumers — cheetah, fox, frog</li><li><strong>Tertiary consumers</strong> (4th): top predators eating secondary consumers — lion, great white shark, eagle</li><li><strong>Decomposers</strong>: bacteria and fungi that break down dead organisms returning nutrients to soil</li></ul></div>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4caf50;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#4caf50;margin-bottom:8px;">&#127809; Food Chains and Food Webs</h4><p><strong>Food chain</strong>: linear sequence showing energy flow. Arrow means "is eaten by" / "energy flows to".<br>Example: Grass &#x2192; Zebra &#x2192; Lion &#x2192; Vulture</p><p style="margin-top:8px;"><strong>Food web</strong>: interconnected food chains showing all feeding relationships in an ecosystem. More realistic — most organisms eat multiple prey species.</p><p style="margin-top:8px;"><strong>Energy loss</strong>: only about 10% of energy transfers between trophic levels (90% lost as heat, movement, waste). This limits food chain length to 4-5 levels.</p></div>
+<div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>&#11088; <strong>Did You Know?</strong> The Serengeti-Mara ecosystem in East Africa has the largest land animal migration on Earth — 1.5 million wildebeest, 200,000 zebra and 300,000 gazelle migrate in a circular route following rainfall and fresh grass. This migration directly feeds approximately 7,000 lions, 3,000 cheetahs, 9,000 spotted hyenas and millions of vultures. Remove the migration and the entire predator community collapses — a perfect example of how interconnected food webs are.</p></div>
+<div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>&#127466;&#127462; <strong>SA Focus:</strong> Kruger National Park is one of the world's best examples of an intact savanna ecosystem with all trophic levels present. It supports 147 mammal species, 507 bird species, 114 reptile species and over 1,750 plant species. The park's top predators — lion, leopard, wild dog, cheetah and spotted hyena — all occupy different niches despite hunting similar prey, reducing competition. Wild dogs, with a 70-80% hunting success rate, are actually the most successful predators but are critically endangered with fewer than 700 left in South Africa.</p></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #4caf50;"><h3 style="color:#4caf50;margin-bottom:10px;">&#128203; Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">Ecosystem = community of organisms + abiotic environment interacting together.</li><li style="margin-bottom:6px;">Biotic = living. Abiotic = non-living (temperature, rainfall, soil, light, pH).</li><li style="margin-bottom:6px;">Trophic levels: Producers &#x2192; Primary consumers &#x2192; Secondary &#x2192; Tertiary consumers &#x2192; Decomposers.</li><li style="margin-bottom:6px;">Food chain: linear. Food web: network of all feeding relationships — more realistic.</li><li style="margin-bottom:6px;">Energy transfer: only 10% moves up each trophic level. 90% lost as heat/movement/waste.</li></ul></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#4caf50;margin-bottom:10px;">&#128257; Quick Recap</h3><p style="margin-bottom:8px;"><strong>Q: What is the difference between a population, a community and an ecosystem?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Population: all individuals of the SAME species in an area (e.g. all lions in Kruger). Community: all populations of DIFFERENT species in the same area (all the lions, zebras, trees, grasses, bacteria etc in Kruger). Ecosystem: the community PLUS the abiotic environment (soil, climate, water) — all interacting together.</span></p><p style="margin-bottom:8px;"><strong>Q: Explain why only about 10% of energy is transferred between trophic levels.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: When a herbivore eats grass, most of the grass's energy is used by the herbivore for its own life processes: movement, keeping warm, digestion, reproduction. Only about 10% is stored in the herbivore's body tissues. The same happens at each level. This is why food chains rarely exceed 4-5 levels — by then, too little energy remains to support another predator.</span></p><p style="margin-bottom:8px;"><strong>Q: What is the difference between a food chain and a food web?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: A food chain shows a single linear sequence of who eats whom (e.g. Grass &#x2192; Rabbit &#x2192; Fox). A food web shows ALL the feeding relationships in an ecosystem — it is made up of many interlocking food chains. Food webs are more realistic because most organisms eat more than one type of food and are eaten by more than one predator.</span></p></div>`,
+    assessment: [
+      { question: "What term describes all living organisms in an ecosystem together with their non-living environment?", options: ["Population", "Community", "Ecosystem", "Habitat"], correct: 2 },
+      { question: "Which term means the role an organism plays in its ecosystem?", options: ["Habitat", "Population", "Niche", "Biome"], correct: 2 },
+      { question: "Approximately what percentage of energy is transferred between trophic levels?", options: ["50%", "25%", "10%", "1%"], correct: 2 },
+      { question: "Oxpecker birds eating ticks off buffalo is an example of?", options: ["Parasitism", "Competition", "Predation", "Mutualism"], correct: 3 },
+      { question: "Which is the greatest single threat to biodiversity globally?", options: ["Pollution", "Habitat destruction", "Invasive species", "Climate change"], correct: 1 }
+    ]
+  },
+  2: {
+    content: `<h2 style="color:#4caf50;">&#127758; Interactions and Interdependence — Week 2</h2>
+<div style="background:linear-gradient(135deg,#4caf50,#4caf5099);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;"><div style="font-size:3rem;">&#129432;</div><h3 style="color:#fff;margin:8px 0;">Adaptations and Balance</h3><p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">How organisms fit their environment and how ecosystems stay stable</p></div>
+<h3>&#127919; What You Will Learn</h3>
+<ul><li>Describe structural, behavioural and physiological adaptations</li><li>Explain predator-prey relationships and population balance</li><li>Describe symbiotic relationships</li><li>Explain the effects of human activity on ecosystem balance</li></ul>
+<h3>&#129432; Adaptations</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4caf50;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#4caf50;margin-bottom:8px;">&#129432; Three Types of Adaptation</h4><ul style="line-height:1.8;"><li><strong>Structural (morphological)</strong>: physical body features — camouflage, sharp claws, thick skin, long roots, waxy cuticle, large ears (cooling)</li><li><strong>Behavioural</strong>: actions and responses — migration, hibernation, nocturnal activity, schooling in fish, warning calls, alarm pheromones</li><li><strong>Physiological</strong>: internal body processes — concentrated urine (desert animals), antifreeze proteins (polar fish), venom production, nitrogen fixation in legume root bacteria</li></ul></div>
+<h3>&#128257; Predator-Prey Relationships</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4caf50;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#4caf50;margin-bottom:8px;">&#128200; Population Cycles</h4><p>Predator and prey populations are linked in a cycle:</p><ul style="line-height:1.8;margin-top:8px;"><li>Prey increases &#x2192; predators have more food &#x2192; predator population rises</li><li>More predators &#x2192; more prey eaten &#x2192; prey population drops</li><li>Less prey &#x2192; predators starve &#x2192; predator population drops</li><li>Fewer predators &#x2192; prey recovers &#x2192; cycle repeats</li></ul><p style="margin-top:8px;"><strong>Classic example</strong>: Snowshoe hare and Canadian lynx — populations peak and crash on approximately 10-year cycles.</p></div>
+<h3>&#129309; Symbiotic Relationships</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:10px 0;"><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#129309; <strong>Mutualism</strong><br>Both benefit<br>Oxpecker birds on rhino<br>Clownfish in anemone</div><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#128561; <strong>Commensalism</strong><br>One benefits, other unharmed<br>Barnacles on whale<br>Remora on shark</div><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#128027; <strong>Parasitism</strong><br>One benefits, other harmed<br>Ticks on mammals<br>Tapeworm in gut</div><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#128178; <strong>Competition</strong><br>Both harmed (for resources)<br>Lions vs hyenas<br>Plants competing for light</div></div>
+<div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>&#11088; <strong>Did You Know?</strong> The African oxpecker bird (Buphagus) and large mammals like rhinos, buffaloes and giraffes have one of Africa's most famous mutualistic relationships. Oxpeckers eat ticks and parasites from the mammals' skin (up to 100 ticks per day), providing pest control. In return they get food and protection near a large animal. However, research has shown oxpeckers also eat the mammals' blood from wounds and prevent wound healing — suggesting the relationship may be closer to parasitism than pure mutualism.</p></div>
+<div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>&#127466;&#127462; <strong>SA Focus:</strong> The reintroduction of wolves to Yellowstone in 1995 showed how removing or adding a single top predator can cascade through an entire ecosystem (a "trophic cascade"). SA has its own example: the removal of lions from areas around Kruger has led to overgrazing by buffalo and impala, degrading vegetation. Conversely, SA's Wild Dog reintroduction programme and lion management in reserves like Pilanesberg have restored ecological balance, with knock-on benefits for plant diversity and smaller animals.</p></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #4caf50;"><h3 style="color:#4caf50;margin-bottom:10px;">&#128203; Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">Adaptations: structural (body features), behavioural (actions), physiological (internal processes).</li><li style="margin-bottom:6px;">Predator-prey cycle: populations oscillate as each controls the other's numbers.</li><li style="margin-bottom:6px;">Mutualism: both benefit. Commensalism: one benefits, other unaffected. Parasitism: one benefits, other harmed.</li><li style="margin-bottom:6px;">Removing a top predator can cascade through the whole ecosystem (trophic cascade).</li><li style="margin-bottom:6px;">SA Wild Dog: 70-80% hunting success, critically endangered, fewer than 700 left in SA.</li></ul></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#4caf50;margin-bottom:10px;">&#128257; Quick Recap</h3><p style="margin-bottom:8px;"><strong>Q: Give one example each of a structural, behavioural and physiological adaptation in a South African animal.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Structural: the springbok's white rump patch is a warning signal to other springbok (structural feature for communication). Behavioural: meerkats post sentinels who stand watch and give alarm calls when predators approach. Physiological: the African elephant produces dilute urine even in dry conditions — its kidneys and metabolism are adapted to conserve water in hot savanna environments.</span></p><p style="margin-bottom:8px;"><strong>Q: Explain the difference between mutualism and parasitism with one example of each.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Mutualism: both organisms benefit. Example: oxpecker birds eat ticks from rhinos — bird gets food, rhino gets pest removal. Parasitism: one organism (parasite) benefits at the expense of the other (host) which is harmed. Example: ticks on mammals — tick gets blood/nutrients, mammal loses blood, may get disease.</span></p><p style="margin-bottom:8px;"><strong>Q: Describe how a predator-prey population cycle works.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: When prey is abundant, predators have lots of food and their population grows. As more predators hunt, prey numbers decline. With less food, predator numbers fall too. With fewer predators, prey can recover and increase again — and the cycle repeats. The predator population always lags slightly behind the prey population because it takes time for breeding to increase numbers.</span></p></div>`,
+    assessment: [
+      { question: "An adaptation where an animal is active at night to avoid heat is called?", options: ["Structural adaptation", "Physiological adaptation", "Behavioural adaptation", "Morphological adaptation"], correct: 2 },
+      { question: "When a prey population decreases, what happens to the predator population shortly after?", options: ["It also decreases due to less food", "It increases because prey is easier to catch", "It stays the same", "It immediately goes extinct"], correct: 0 },
+      { question: "What are ecosystem services?", options: ["Services provided by conservation organisations", "Benefits humans receive from healthy ecosystems for free", "Government conservation programmes", "Wildlife management activities"], correct: 1 },
+      { question: "South Africa has approximately how many private game reserves?", options: ["100+", "1,000+", "10,000+", "100,000+"], correct: 2 },
+      { question: "What does community-based conservation provide to local people?", options: ["Fence patrols only", "Economic benefits from wildlife tourism and hunting rights", "Free food from national parks", "Government grants"], correct: 1 }
+    ]
+  },
+  3: {
+    content: `<h2 style="color:#4caf50;">&#127758; Interactions and Interdependence — Week 3</h2>
+<div style="background:linear-gradient(135deg,#4caf50,#4caf5099);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;"><div style="font-size:3rem;">&#127807;</div><h3 style="color:#fff;margin:8px 0;">Conservation and Ecosystem Threats</h3><p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Protecting what we have</p></div>
+<h3>&#127919; What You Will Learn</h3>
+<ul><li>Describe major threats to ecosystems</li><li>Explain the concept of biodiversity and why it matters</li><li>Discuss conservation strategies in South Africa</li><li>Evaluate the role of ecotourism</li></ul>
+<h3>&#9888; Major Threats to Ecosystems</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:10px 0;"><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#127968; <strong>Habitat loss</strong><br>Deforestation, urbanisation<br>Greatest global threat</div><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#127807; <strong>Invasive species</strong><br>Outcompete natives<br>Wattle, trout, bass</div><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#128268; <strong>Pollution</strong><br>Air, water, soil<br>Pesticides, plastics</div><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#127777; <strong>Climate change</strong><br>Shifts seasons/ranges<br>Bleaches coral reefs</div><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#128011; <strong>Overhunting</strong><br>Rhino poaching<br>Illegal wildlife trade</div><div style="background:rgba(255,255,255,0.07);border-radius:8px;padding:10px;text-align:center;font-size:0.83rem;">&#127813; <strong>Overexploitation</strong><br>Overfishing, logging<br>Depletes resources</div></div>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4caf50;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#4caf50;margin-bottom:8px;">&#129432; Why Biodiversity Matters</h4><ul style="line-height:1.8;"><li><strong>Ecosystem services</strong>: clean water, clean air, pollination, soil formation, flood control, climate regulation — all provided FREE by healthy ecosystems</li><li><strong>Food security</strong>: crop wild relatives provide genetic diversity for developing resistant crop varieties</li><li><strong>Medicine</strong>: 50% of modern medicines derived from natural compounds. Many undiscovered species may hold cures</li><li><strong>Resilience</strong>: diverse ecosystems recover faster from disturbances like drought or fire</li></ul></div>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4caf50;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#4caf50;margin-bottom:8px;">&#127482; Conservation in South Africa</h4><p>SA has one of the world's most sophisticated conservation systems:</p><ul style="line-height:1.8;margin-top:8px;"><li><strong>National parks</strong>: 21 SANParks reserves covering 4 million hectares</li><li><strong>Private game reserves</strong>: 10,000+ private reserves — more land than national parks</li><li><strong>CITES</strong>: SA is party to Convention on International Trade in Endangered Species</li><li><strong>Anti-poaching</strong>: ranger units, helicopters, night vision, DNA databases for rhino horn</li><li><strong>Biodiversity Act</strong>: National Environmental Management: Biodiversity Act (NEM:BA) 2004</li></ul></div>
+<div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>&#11088; <strong>Did You Know?</strong> South Africa loses approximately 1.4% of its natural habitat every year to agriculture and urbanisation — one of the highest rates in the world. At this rate, within 70 years half of SA's remaining natural land will be converted. However, SA is also one of the world's leaders in community-based conservation — giving local communities rights to wildlife and income from ecotourism, creating a direct economic incentive to protect rather than destroy wildlife.</p></div>
+<div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>&#127466;&#127462; <strong>SA Focus:</strong> Rhino poaching has devastated SA's white and black rhino populations. Between 2008 and 2021, over 10,000 rhinos were poached in South Africa — mostly for horn sold to Asian markets (primarily Vietnam and China) where it is used in traditional medicine despite no scientific evidence of medicinal value. Kruger National Park lost over 8,000 rhinos during this period. SA has responded with controversial strategies including legal horn trade debates, dehorning, high-tech monitoring, and community ranger programmes. The black rhino remains critically endangered with only ~6,000 remaining worldwide.</p></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #4caf50;"><h3 style="color:#4caf50;margin-bottom:10px;">&#128203; Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">Main threats: habitat loss (greatest), invasive species, pollution, climate change, overhunting, overexploitation.</li><li style="margin-bottom:6px;">Ecosystem services: clean water, air, pollination, soil formation, climate regulation — all free from healthy ecosystems.</li><li style="margin-bottom:6px;">SA conservation: 21 SANParks, 10,000+ private reserves, CITES signatory, NEM:BA 2004.</li><li style="margin-bottom:6px;">Community-based conservation: gives locals economic benefit from wildlife, incentivising protection.</li><li style="margin-bottom:6px;">Rhino crisis: 10,000+ poached 2008-2021 in SA. Black rhino critically endangered, ~6,000 worldwide.</li></ul></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#4caf50;margin-bottom:10px;">&#128257; Quick Recap</h3><p style="margin-bottom:8px;"><strong>Q: What is an ecosystem service and give three examples.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Ecosystem services are the benefits that healthy ecosystems provide to humans for free. Examples: clean water purification (wetlands filter pollutants), pollination of crops (bees and other insects), carbon sequestration (forests absorb CO&#8322; slowing climate change), flood control (wetlands and forests absorb rainfall), soil formation (decomposers break down organic matter into fertile soil). Without these services humans would need to spend trillions to replicate them artificially.</span></p><p style="margin-bottom:8px;"><strong>Q: Why is biodiversity important for food security?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Crop wild relatives (wild plants related to our crops) contain enormous genetic diversity built up over millions of years of natural selection — including resistance to pests, diseases, drought and heat. Plant breeders use this wild genetic material to develop improved crop varieties. If wild relatives go extinct, we lose this genetic library permanently. A single wild wheat species found in Turkey in the 1960s has since contributed billions of dollars worth of disease resistance to commercial wheat varieties worldwide.</span></p><p style="margin-bottom:8px;"><strong>Q: Explain how community-based conservation works and why it is more effective than simply creating fences around parks.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Community-based conservation gives local communities legal rights to wildlife on their land, a share of hunting and ecotourism revenue, employment as rangers and guides, and decision-making power over conservation. This creates a direct economic incentive to protect wildlife rather than poach it. Simple fence-based conservation fails when communities receive no benefit from wildlife — if a lion kills your cattle and you get nothing from the park, you will kill the lion. When communities profit from lions being alive, they protect them.</span></p></div>`,
+    assessment: [
+      
+    ]
+  }
+};
+</script>
+
+
+
+
+
+
+
+
+
+<!-- Maxi Pie FAB -->
+<style>
+#mfab{position:fixed;bottom:24px;left:20px;width:56px;height:56px;background:#10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(16,185,129,0.5);z-index:2147483647;border:3px solid #fff;transition:opacity 0.2s;}
+#mfab.hidden{opacity:0;pointer-events:none;}
+#mfab svg{width:26px;height:26px;fill:white;}
+#mbot-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:2147483646;}
+#mbot-modal iframe{width:100%;height:100%;border:none;}
+</style>
+<div id="mfab" onclick="mBotOpen()">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/><circle cx="8" cy="11" r="1.3"/><circle cx="12" cy="11" r="1.3"/><circle cx="16" cy="11" r="1.3"/></svg>
+</div>
+<div id="mbot-modal">
+  <iframe id="mbot-frame" src="" allow="microphone"></iframe>
+</div>
+<script>
+function mBotOpen(){document.getElementById('mbot-frame').src='bot.html';document.getElementById('mbot-modal').style.display='block';document.getElementById('mfab').classList.add('hidden');window.history.pushState({bot:'open'},'');}
+function mBotClose(){document.getElementById('mbot-modal').style.display='none';document.getElementById('mbot-frame').src='';document.getElementById('mfab').classList.remove('hidden');}
+window.addEventListener('message',function(e){if(e.data==='closeBot')mBotClose();});
+window.addEventListener('popstate',function(){if(document.getElementById('mbot-modal').style.display==='block')mBotClose();});
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grade 8 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade8/favicon.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#07070c;color:#fff;min-height:100vh;}
+body.light-mode{background:#f0f2f5;color:#222;}
+.header{background:linear-gradient(135deg,#1a237e,#283593);padding:16px 20px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+.header-content{display:flex;justify-content:space-between;align-items:center;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand img{width:36px;height:36px;border-radius:8px;}
+.brand h1{font-size:0.95rem;font-weight:700;color:#fff;}
+.brand p{font-size:0.7rem;color:rgba(255,255,255,0.75);}
+.header-actions{display:flex;align-items:center;gap:8px;}
+.theme-toggle{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:16px;font-size:0.8rem;cursor:pointer;font-family:inherit;}
+.avatar{width:34px;height:34px;background:linear-gradient(135deg,#10b981,#1a237e);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem;}
+.hero{background:linear-gradient(135deg,#0a1a33,#10b981);padding:22px 20px;text-align:center;}
+.hero h2{font-size:1.2rem;color:#fff;margin-bottom:5px;font-weight:800;}
+.hero p{color:rgba(255,255,255,0.8);font-size:0.82rem;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:340px;margin:16px auto 0;}
+.stat{background:rgba(255,255,255,0.12);border-radius:12px;padding:12px 8px;text-align:center;}
+.stat h3{font-size:1.4rem;font-weight:900;color:#fff;}
+.stat p{font-size:0.65rem;color:rgba(255,255,255,0.8);margin-top:2px;}
+.content{padding:16px 16px 90px;}
+.welcome-msg{font-size:0.88rem;color:#aaa;margin-bottom:4px;padding:0 2px;}
+body.light-mode .welcome-msg{color:#666;}
+.term-section{margin-top:20px;}
+.term-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.term-badge{padding:4px 14px;border-radius:20px;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;}
+.term-title{font-size:1rem;font-weight:700;}
+body.light-mode .term-title{color:#222;}
+.topics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.topic-card{background:#12121f;border-radius:14px;padding:14px 12px;border-top:3px solid;cursor:pointer;text-decoration:none;display:block;transition:transform 0.15s;}
+body.light-mode .topic-card{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.topic-card:active{transform:scale(0.96);}
+.topic-icon{font-size:1.9rem;margin-bottom:8px;line-height:1;}
+.topic-name{font-size:0.83rem;font-weight:700;color:#fff;line-height:1.35;margin-bottom:4px;}
+body.light-mode .topic-name{color:#222;}
+.topic-strand{font-size:0.7rem;color:#777;display:flex;align-items:center;gap:4px;}
+.strand-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.topic-weeks{font-size:0.68rem;color:#555;margin-top:3px;}
+body.light-mode .topic-weeks{color:#999;}
+.results-btn{position:fixed;bottom:22px;right:16px;padding:12px 20px;background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;border-radius:28px;font-size:0.85rem;font-weight:700;box-shadow:0 4px 18px rgba(240,147,251,0.45);text-decoration:none;z-index:50;}
+#nameModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.88);z-index:200;align-items:center;justify-content:center;}
+.modal-box{background:#12121f;border-radius:22px;padding:32px 24px;max-width:340px;width:90%;text-align:center;}
+body.light-mode .modal-box{background:#fff;}
+.modal-box h2{font-size:1.3rem;margin-bottom:8px;}
+.modal-box p{color:#aaa;font-size:0.9rem;margin-bottom:20px;}
+body.light-mode .modal-box p{color:#666;}
+.modal-btn{width:100%;padding:14px;background:linear-gradient(135deg,#1a237e,#10b981);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div id="nameModal">
+  <div class="modal-box">
+    <div style="font-size:2.5rem;margin-bottom:12px;">&#128300;</div>
+    <h2>Welcome!</h2>
+    <p>Grade 8 Natural Sciences</p>
+    <button class="modal-btn" onclick="document.getElementById('nameModal').style.display='none'">Enter Site &#x2192;</button>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-content">
+    <div class="brand">
+      <img src="https://dbeducator.github.io/Natural-Sciences/grade8/favicon.png" alt="Logo" onerror="this.style.display='none'">
+      <div>
+        <h1>&#128300; Grade 8 Natural Sciences</h1>
+        <p>CAPS Curriculum | Department of Basic Education</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#9728;&#xFE0F; Light</button>
+      <div class="avatar" id="avatar">&#128100;</div>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <h2>&#127462;&#127466; Grade 8 Natural Sciences</h2>
+  <p>Department of Basic Education &mdash; CAPS Curriculum</p>
+  <div class="stats">
+    <div class="stat"><h3>13</h3><p>Topics</p></div>
+    <div class="stat"><h3>4</h3><p>Terms</p></div>
+    <div class="stat"><h3>31</h3><p>Lessons</p></div>
+  </div>
+</div>
+
+<div class="content">
+  <p class="welcome-msg" id="welcomeMsg">Pick a topic to get started.</p>
+
+  <!-- TERM 1 -->
+  <div class="term-section">
+    <div class="term-header">
+      <span class="term-badge" style="background:#4caf50;">Term 1</span>
+      <span class="term-title">Life and Living</span>
+    </div>
+    <div class="topics-grid">
+      <a href="topic1.html" class="topic-card" style="border-color:#4caf50;">
+        <div class="topic-icon">&#127807;</div>
+        <div class="topic-name">Photosynthesis and Respiration</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#4caf50;"></span>Life &amp; Living</div>
+        <div class="topic-weeks">3 weeks</div>
+      </a>
+      <a href="topic2.html" class="topic-card" style="border-color:#4caf50;">
+        <div class="topic-icon">&#127758;</div>
+        <div class="topic-name">Interactions and Interdependence</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#4caf50;"></span>Life &amp; Living</div>
+        <div class="topic-weeks">3 weeks</div>
+      </a>
+      <a href="topic3.html" class="topic-card" style="border-color:#4caf50;">
+        <div class="topic-icon">&#129440;</div>
+        <div class="topic-name">Microorganisms</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#4caf50;"></span>Life &amp; Living</div>
+        <div class="topic-weeks">2 weeks</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- TERM 2 -->
+  <div class="term-section">
+    <div class="term-header">
+      <span class="term-badge" style="background:#2196f3;">Term 2</span>
+      <span class="term-title">Matter and Materials</span>
+    </div>
+    <div class="topics-grid">
+      <a href="topic4.html" class="topic-card" style="border-color:#2196f3;">
+        <div class="topic-icon">&#9883;</div>
+        <div class="topic-name">Atoms and Building Blocks</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#2196f3;"></span>Matter &amp; Materials</div>
+        <div class="topic-weeks">3 weeks</div>
+      </a>
+      <a href="topic5.html" class="topic-card" style="border-color:#2196f3;">
+        <div class="topic-icon">&#129514;</div>
+        <div class="topic-name">Particle Model of Matter</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#2196f3;"></span>Matter &amp; Materials</div>
+        <div class="topic-weeks">3 weeks</div>
+      </a>
+      <a href="topic6.html" class="topic-card" style="border-color:#2196f3;">
+        <div class="topic-icon">&#128293;</div>
+        <div class="topic-name">Chemical Reactions</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#2196f3;"></span>Matter &amp; Materials</div>
+        <div class="topic-weeks">2 weeks</div>
+      </a>
+      <a href="topic7.html" class="topic-card" style="border-color:#2196f3;">
+        <div class="topic-icon">&#127754;</div>
+        <div class="topic-name">Hydrosphere &amp; Processing Materials</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#2196f3;"></span>Matter &amp; Materials</div>
+        <div class="topic-weeks">2 weeks</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- TERM 3 -->
+  <div class="term-section">
+    <div class="term-header">
+      <span class="term-badge" style="background:#ff9800;">Term 3</span>
+      <span class="term-title">Energy and Change</span>
+    </div>
+    <div class="topics-grid">
+      <a href="topic8.html" class="topic-card" style="border-color:#ff9800;">
+        <div class="topic-icon">&#9889;</div>
+        <div class="topic-name">Static Electricity</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#ff9800;"></span>Energy &amp; Change</div>
+        <div class="topic-weeks">2 weeks</div>
+      </a>
+      <a href="topic9.html" class="topic-card" style="border-color:#ff9800;">
+        <div class="topic-icon">&#128268;</div>
+        <div class="topic-name">Current Electricity &amp; Circuits</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#ff9800;"></span>Energy &amp; Change</div>
+        <div class="topic-weeks">3 weeks</div>
+      </a>
+      <a href="topic10.html" class="topic-card" style="border-color:#ff9800;">
+        <div class="topic-icon">&#129517;</div>
+        <div class="topic-name">Electromagnetism</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#ff9800;"></span>Energy &amp; Change</div>
+        <div class="topic-weeks">2 weeks</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- TERM 4 -->
+  <div class="term-section">
+    <div class="term-header">
+      <span class="term-badge" style="background:#9c27b0;">Term 4</span>
+      <span class="term-title">Planet Earth and Beyond</span>
+    </div>
+    <div class="topics-grid">
+      <a href="topic11.html" class="topic-card" style="border-color:#9c27b0;">
+        <div class="topic-icon">&#127754;</div>
+        <div class="topic-name">The Atmosphere</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#9c27b0;"></span>Planet Earth &amp; Beyond</div>
+        <div class="topic-weeks">2 weeks</div>
+      </a>
+      <a href="topic12.html" class="topic-card" style="border-color:#9c27b0;">
+        <div class="topic-icon">&#127756;</div>
+        <div class="topic-name">The Lithosphere</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#9c27b0;"></span>Planet Earth &amp; Beyond</div>
+        <div class="topic-weeks">2 weeks</div>
+      </a>
+      <a href="topic13.html" class="topic-card" style="border-color:#9c27b0;">
+        <div class="topic-icon">&#127764;</div>
+        <div class="topic-name">The Solar System</div>
+        <div class="topic-strand"><span class="strand-dot" style="background:#9c27b0;"></span>Planet Earth &amp; Beyond</div>
+        <div class="topic-weeks">2 weeks</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<a href="results.html" class="results-btn">&#128202; My Results</a>
+
+<script>
+function toggleTheme(){
+  var isLight=document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme',isLight?'light':'dark');
+  document.getElementById('themeBtn').textContent=isLight?'&#127761; Dark':'&#9728;&#xFE0F; Light';
+}
+if(localStorage.getItem('cl_theme')==='light')document.getElementById('themeBtn').textContent='&#127761; Dark';
+window.addEventListener('load',function(){
+  document.getElementById('nameModal').style.display='flex';
+});
+</script>
+</body>
+</html>

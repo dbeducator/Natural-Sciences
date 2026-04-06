@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Result - Grade 8 Natural Sciences</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade8/favicon.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#07070c;color:#fff;min-height:100vh;display:flex;flex-direction:column;}
+.header{background:linear-gradient(135deg,#4caf50,#4caf50cc);padding:14px 20px;display:flex;align-items:center;gap:12px;}
+.back-link{color:#fff;font-size:1.4rem;text-decoration:none;}
+.header h1{font-size:0.9rem;font-weight:700;color:#fff;flex:1;}
+.body{flex:1;display:flex;align-items:center;justify-content:center;padding:30px 20px;}
+.card{background:rgba(255,255,255,0.05);border-radius:20px;padding:30px 24px;max-width:360px;width:100%;text-align:center;}
+.icon{font-size:3.5rem;margin-bottom:16px;}
+h1{font-size:1.4rem;margin-bottom:10px;}
+p{color:#aaa;font-size:0.9rem;line-height:1.6;margin-bottom:8px;}
+.score{font-size:2.5rem;font-weight:800;margin:10px 0;}
+.passed{color:#4caf50;}.failed{color:#f44336;}
+.btn{display:block;padding:14px 20px;border-radius:12px;text-decoration:none;font-weight:700;font-size:1rem;margin-top:12px;text-align:center;}
+.btn-primary{background:linear-gradient(135deg,#4caf50,#4caf5099);color:#fff;}
+.btn-results{background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;}
+.btn-home{background:rgba(255,255,255,0.08);color:#aaa;border:1px solid rgba(255,255,255,0.15);}
+</style>
+</head>
+<body>
+<div class="header">
+  <a href="https://dbeducator.github.io/Natural-Sciences/grade8/topic3.html" class="back-link">&#x2190;</a>
+  <h1>Microorganisms &mdash; Week 2 Assessment</h1>
+</div>
+<div class="body">
+<div class="card" id="card"><div class="icon">&#x23F3;</div><h1>Marking...</h1><p>Please wait</p></div>
+</div>
+<script>
+var TOTAL=5;
+var SK='coachL8_MCR_';
+var W=2;
+var BACK='https://dbeducator.github.io/Natural-Sciences/grade8/topic3.html';
+var sa=JSON.parse(localStorage.getItem(SK+'answers_'+W)||'{}');
+var answered=Object.keys(sa).length;
+if(answered<TOTAL){
+  document.getElementById('card').innerHTML='<div class="icon">&#x26A0;&#xFE0F;</div><h1>Incomplete</h1><p>You answered '+answered+' of '+TOTAL+' questions. Go back and answer all questions first.</p><a href="'+BACK+'" class="btn btn-primary">&#x2190; Back</a>';
+}else{
+  var stored=JSON.parse(localStorage.getItem(SK+'correct_'+W)||'[]');
+  var score=0;
+  for(var i=0;i<TOTAL;i++){if(parseInt(sa['q'+i])===stored[i])score++;}
+  var pct=Math.round(score/TOTAL*100),passed=pct>=70;
+  var payload={secretKey:'CoachL2025SecureKey',timestamp:new Date().toLocaleString(),studentName:'Anonymous',studentEmail:'anonymous@natsci.app',courseName:'Gr8 NS: Microorganisms Week 2',week:2,score:pct,correct:score,total:TOTAL,passed:passed?'YES':'NO'};
+  try{var img=new Image();img.src='https://script.google.com/macros/s/AKfycbz89hcA4Z70ZyOKnk2MBBc5kVWKG5aXljNgSzpXZbfXDOhGvtpeZXGSOadoZB_RdyPK/exec?data='+encodeURIComponent(JSON.stringify(payload));}catch(e){}
+  var allR=JSON.parse(localStorage.getItem('ns_assessmentResults')||'[]');allR.push(payload);
+  localStorage.setItem('ns_assessmentResults',JSON.stringify(allR));
+  localStorage.removeItem(SK+'answers_'+W);
+  if(passed){var cw=new Set(JSON.parse(localStorage.getItem(SK+'completedWeeks')||'[]'));cw.add(W);localStorage.setItem(SK+'completedWeeks',JSON.stringify([...cw]));}
+  document.getElementById('card').innerHTML=
+    '<div class="icon">'+(passed?'&#x1F389;':'&#x1F614;')+'</div>'+
+    '<h1 class="'+(passed?'passed':'failed')+'">'+(passed?'Well Done!':'Try Again')+'</h1>'+
+    '<div class="score '+(passed?'passed':'failed')+'">'+pct+'%</div>'+
+    '<p>'+score+'/'+TOTAL+' correct.</p>'+
+    '<a href="'+BACK+'" class="btn btn-primary">'+(passed?'Continue &#x2192;':'Try Again &#x2192;')+'</a>'+
+    '<a href="https://dbeducator.github.io/Natural-Sciences/grade8/results.html" class="btn btn-results">&#x1F4CA; My Results</a>'+
+    '<a href="https://dbeducator.github.io/Natural-Sciences/grade8/index.html" class="btn btn-home">&#x1F3E0; All Topics</a>';
+}
+</script>
+</body>
+</html>
