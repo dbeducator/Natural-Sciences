@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grade 7 NS — The Sun-Earth Relationship</title>
+<link rel="icon" type="image/png" href="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png">
+<style>
+
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #07070c;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .course-title h1 { font-size: 1.8rem; margin-bottom: 5px; }
+  .course-title p { font-size: 0.9rem; opacity: 0.9; }
+
+  .user-info { display: flex; align-items: center; gap: 15px; }
+
+  .avatar {
+    width: 45px; height: 45px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: bold;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+  .progress-overview {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .progress-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    color: white; padding: 20px; border-radius: 12px; text-align: center;
+  }
+  .stat-card h3 { font-size: 2rem; margin-bottom: 5px; }
+  .stat-card p { font-size: 0.9rem; opacity: 0.9; }
+
+  .progress-bar {
+    width: 100%; height: 25px; background: #e0e0e0;
+    border-radius: 15px; overflow: hidden; margin: 20px 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #9c27b0 0%, #9c27b0cc 100%);
+    border-radius: 15px; transition: width 0.5s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 10px; color: white; font-weight: 600; font-size: 0.9rem;
+    min-width: 45px;
+  }
+
+  .tabs {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0; flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 12px 25px; background: #12121f; border: none;
+    border-radius: 10px 10px 0 0; cursor: pointer;
+    font-size: 1rem; font-weight: 600; color: #aaa; transition: all 0.3s ease;
+  }
+  .tab.active { background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%); color: white; }
+
+  .module-selector {
+    display: flex; gap: 10px; margin-bottom: 30px;
+    overflow-x: auto; padding-bottom: 10px;
+  }
+
+  .module-btn {
+    padding: 12px 25px; background: #12121f;
+    border: 2px solid #9c27b0; border-radius: 25px;
+    cursor: pointer; font-size: 1rem; font-weight: 600;
+    color: #9c27b0; white-space: nowrap; transition: all 0.3s ease;
+  }
+  .module-btn.active {
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    color: white; border-color: transparent;
+  }
+  .module-btn.completed { background: #9c27b0; color: white; border-color: #9c27b0; }
+
+  .content-section { display: block; height: 0; overflow: hidden; }
+  .content-section.active { height: auto; overflow: visible; }
+
+  .video-section {
+    background: #12121f; border-radius: 15px; padding: 25px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .video-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px; margin-top: 20px;
+  }
+
+  .video-player {
+    background: #000; border-radius: 12px; overflow: hidden;
+    position: relative; padding-top: 56.25%;
+  }
+
+  .video-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #434343 0%, #000000 100%);
+  }
+
+  .play-btn {
+    width: 70px; height: 70px;
+    background: rgba(102, 126, 234, 0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .play-btn:hover { background: #9c27b0; transform: scale(1.1); }
+  .play-btn::after { content: '▶'; color: white; font-size: 2rem; margin-left: 5px; }
+
+  .video-title { margin-top: 15px; font-size: 1.1rem; font-weight: 600; color: #fff; }
+  body.light-mode .video-title { color: #333; }
+
+  .lesson-content {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+  .lesson-content h2 { color: #9c27b0; margin-bottom: 20px; font-size: 1.8rem; }
+  .lesson-content h3 { color: #9c27b0cc; margin-top: 25px; margin-bottom: 15px; font-size: 1.3rem; }
+  .lesson-content h4 { color: #9c27b0; margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+  .lesson-content p { line-height: 1.8; margin-bottom: 15px; color: #ccc; }
+  .lesson-content ul { margin-left: 25px; margin-bottom: 15px; }
+  .lesson-content li { margin-bottom: 10px; line-height: 1.6; color: #ccc; }
+
+  .assessment-section {
+    background: #12121f; border-radius: 15px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  }
+
+  .quiz-question {
+    background: #1a1a2e; padding: 20px; border-radius: 12px;
+    margin-bottom: 20px; border-left: 4px solid #9c27b0;
+  }
+  .quiz-question h4 { margin-bottom: 15px; color: #fff; font-size: 1.1rem; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .quiz-option {
+    padding: 12px 20px; background: #12121f; border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .quiz-option:hover { border-color: #9c27b0; background: #f0f4ff; }
+  .quiz-option input { margin-right: 10px; }
+
+  .submit-btn {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    color: white; border: none; border-radius: 25px;
+    font-size: 1.1rem; font-weight: 600; cursor: pointer;
+    transition: all 0.3s ease; margin-top: 20px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+
+  .already-passed-notice {
+    background: #e8f5e9; border: 2px solid #9c27b0; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px; text-align: center;
+  }
+  .already-passed-notice h3 { color: #2e7d32; margin-bottom: 8px; }
+  .already-passed-notice p { color: #388e3c; }
+
+  .resources-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px; margin-top: 20px;
+  }
+
+  a.resource-card { display: block; text-decoration: none; color: inherit; cursor: pointer; }
+  .resource-card {
+    display: block; text-decoration: none; color: inherit;
+    background: #12121f; border-radius: 12px; padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;
+    cursor: pointer; border: 2px solid transparent;
+  }
+  .resource-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: #9c27b0; }
+
+  .resource-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.5rem; margin-bottom: 15px;
+  }
+  .resource-card h4 { margin-bottom: 10px; color: #fff; }
+  .resource-card p { color: #aaa; font-size: 0.9rem; }
+
+  .download-badge {
+    display: inline-block; padding: 5px 12px; background: #9c27b0;
+    color: white; border-radius: 15px; font-size: 0.75rem; margin-top: 10px;
+  }
+
+  .admin-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white; border: none; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(240,147,251,0.4); z-index: 50; transition: all 0.3s ease;
+  }
+  .admin-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(240,147,251,0.6); }
+
+  @media (max-width: 768px) {
+    .header-content { flex-direction: column; gap: 15px; text-align: center; }
+    .video-grid { grid-template-columns: 1fr; }
+    .module-selector { flex-wrap: wrap; }
+    .resources-grid { grid-template-columns: 1fr; }
+  }
+
+/* ── DARK THEME ADDITIONS ── */
+.lesson-content h2, .lesson-content h3, .lesson-content h4 { color: #c4b5fd; }
+.lesson-content p, .lesson-content li { color: #ccc; }
+.lesson-content strong { color: #e0d7ff; }
+.quiz-option { color: #ccc; }
+.quiz-option:hover { background: rgba(102,126,234,0.15); border-color: #9c27b0; }
+.resource-card h4 { color: #fff; }
+.resource-card p { color: #aaa; }
+.already-passed-notice { background: rgba(76,175,80,0.1); border: 2px solid #9c27b0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.already-passed-notice h3 { color: #9c27b0; }
+.already-passed-notice p { color: #aaa; }
+
+
+/* ── LIGHT MODE ── */
+body.light-mode { background: #ffffff !important; color: #222 !important; }
+body.light-mode .header { background: linear-gradient(135deg, #9c27b0 0%, #9c27b0cc 100%) !important; }
+body.light-mode .progress-overview { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .tabs { background: #f5f5f5 !important; }
+body.light-mode .tab { color: #666 !important; background: transparent !important; }
+body.light-mode .tab.active { background: linear-gradient(135deg, #9c27b0, #9c27b0cc) !important; color: #fff !important; }
+body.light-mode .module-selector { background: #f5f5f5 !important; }
+body.light-mode .module-btn { background: #fff !important; color: #9c27b0 !important; border-color: #9c27b0 !important; }
+body.light-mode .module-btn.active { background: linear-gradient(135deg, #9c27b0, #9c27b0cc) !important; color: #fff !important; }
+body.light-mode .module-btn.completed { background: #9c27b0 !important; color: #fff !important; border-color: #9c27b0 !important; }
+body.light-mode .video-section { background: #fff !important; box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important; }
+body.light-mode .lesson-content { background: #fff !important; color: #333 !important; }
+body.light-mode .lesson-content h2, body.light-mode .lesson-content h3, body.light-mode .lesson-content h4 { color: #9c27b0 !important; }
+body.light-mode .lesson-content p, body.light-mode .lesson-content li { color: #444 !important; }
+body.light-mode .resource-card { background: #fff !important; border-color: #e0e0e0 !important; }
+body.light-mode .resource-card h4 { color: #222 !important; }
+body.light-mode .resource-card p { color: #666 !important; }
+body.light-mode .quiz-question { background: #f8f9fa !important; }
+body.light-mode .quiz-question h4 { color: #333 !important; }
+body.light-mode .quiz-option { background: #fff !important; border-color: #e0e0e0 !important; color: #333 !important; }
+body.light-mode .live-section { background: #fff !important; }
+body.light-mode .support-card { background: #f8f9fa !important; }
+
+
+.resource-card { display:block; text-decoration:none; color:inherit; }
+.resource-icon { font-size:1.5rem; margin-bottom:8px; }
+.resources-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.already-passed-notice { background:rgba(76,175,80,0.1); border:2px solid #9c27b0; border-radius:10px; padding:16px; margin-bottom:20px; }
+.already-passed-notice h3 { color:#9c27b0; }
+.assess-week {}
+.theme-toggle { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-family:inherit; }
+body.light-mode .theme-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.2); color:#333; }
+</style>
+</head>
+<body id="body">
+<script>if(localStorage.getItem('cl_theme')==='light')document.getElementById('body').classList.add('light-mode');</script>
+
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button onclick="window.location.href='https://dbeducator.github.io/Natural-Sciences/grade5/index.html'" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:0;">&#8592;</button>
+      <img src="https://dbeducator.github.io/Natural-Sciences/grade5/favicon.png" alt="Logo" style="width:36px;height:36px;border-radius:8px;" onerror="this.style.display=&quot;none&quot;">
+      <div class="course-title">
+        <h1 class="course-title">The Sun-Earth Relationship</h1>
+        <p>Grade 7 Natural Sciences &middot; Term 4 &middot; Planet Earth and Beyond</p>
+      </div>
+    </div>
+    <div class="user-info">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#9728; Light</button>
+      <div class="avatar" id="avatar">?</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-overview">
+    <h2>Your Progress — <span id="studentName"></span></h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%">0%</div>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-card"><h3 id="weeksComplete">0/2</h3><p>Weeks Complete</p></div>
+      <div class="stat-card"><h3 id="videosWatched">0/4</h3><p>Videos</p></div>
+      <div class="stat-card"><h3 id="assessmentsPassed">0/2</h3><p>Passed</p></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('content', this)">Content</button>
+    <button class="tab" onclick="showTab('resources', this)">Resources</button>
+    <button class="tab" onclick="showTab('assessment', this)">Assessment</button>
+  </div>
+
+  <div class="module-selector"><button class="module-btn  active" onclick="selectModule(1)">Week 1</button> <button class="module-btn" onclick="selectModule(2)">Week 2</button></div>
+
+  <div id="content" class="content-section active">
+    <div class="video-section">
+      <h2 id="weekTitle" style="margin-bottom:15px;">Videos</h2>
+      <div class="video-grid">
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="tutorialVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="tutorialTitle">Loading...</div>
+        </div>
+        <div>
+          <div class="video-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:10px;overflow:hidden;">
+            <div id="basicVideo" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+          </div>
+          <div class="video-title" id="basicTitle">Loading...</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+
+  <div id="resources" class="content-section">
+  <h2 id="resourcesTitle" style="margin-bottom:20px;">Resources — Week 1</h2>
+  <div class="week-resources" data-week="1" style="display:none;">
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade7/resources/notes-a.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes A</h4><p>Core concepts and definitions — Set A</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade7/resources/pastpaper-a.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Exam Paper A</h4><p>Grade 7 NST past exam paper — Set A</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade7/resources/workbook-a.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Workbook A</h4><p>Practice exercises and activities — Set A</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade7/resources/examprep-a.pdf" class="resource-card"><div class="resource-icon">🎯</div><h4>Exam Preparation A</h4><p>Exam tips, revision questions — Set A</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+  <div class="week-resources" data-week="2" style="display:none;">
+    <div class="resources-grid">
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade7/resources/notes-c.pdf" class="resource-card"><div class="resource-icon">📄</div><h4>Study Notes C</h4><p>Core concepts and definitions — Set C</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade7/resources/pastpaper-c.pdf" class="resource-card"><div class="resource-icon">📋</div><h4>Past Exam Paper C</h4><p>Grade 7 NST past exam paper — Set C</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade7/resources/workbook-c.pdf" class="resource-card"><div class="resource-icon">📝</div><h4>Workbook C</h4><p>Practice exercises and activities — Set C</p><span class="download-badge">View PDF</span></a>
+      <a href="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://dbeducator.github.io/Natural-Sciences/grade7/resources/examprep-c.pdf" class="resource-card"><div class="resource-icon">🎯</div><h4>Exam Preparation C</h4><p>Exam tips, revision questions — Set C</p><span class="download-badge">View PDF</span></a>
+    </div>
+  </div>
+</div>
+<div id="assessment" class="content-section">
+    <div id="assessmentContent">
+<div class="assess-week" data-week="1" style="display:block;">
+<h2>Week 1 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: What is the main purpose of a structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q0" value="0" onchange="saveAnswer(1,0,0)"> To look beautiful</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="1" onchange="saveAnswer(1,0,1)"> To support a load or force</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="2" onchange="saveAnswer(1,0,2)"> To create jobs</label>
+<label class="quiz-option"><input type="radio" name="w1q0" value="3" onchange="saveAnswer(1,0,3)"> To use up materials</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: Which of the following is a FRAME structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q1" value="0" onchange="saveAnswer(1,1,0)"> An egg shell</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="1" onchange="saveAnswer(1,1,1)"> A tortoise shell</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="2" onchange="saveAnswer(1,1,2)"> The human skeleton</label>
+<label class="quiz-option"><input type="radio" name="w1q1" value="3" onchange="saveAnswer(1,1,3)"> A tin can</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: Which of the following is a SHELL structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q2" value="0" onchange="saveAnswer(1,2,0)"> A bicycle frame</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="1" onchange="saveAnswer(1,2,1)"> An electricity pylon</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="2" onchange="saveAnswer(1,2,2)"> A roof truss</label>
+<label class="quiz-option"><input type="radio" name="w1q2" value="3" onchange="saveAnswer(1,2,3)"> A snail shell</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: The human skeleton has 206 bones. What type of structure is it?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q3" value="0" onchange="saveAnswer(1,3,0)"> Shell structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="1" onchange="saveAnswer(1,3,1)"> Frame structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="2" onchange="saveAnswer(1,3,2)"> Solid structure</label>
+<label class="quiz-option"><input type="radio" name="w1q3" value="3" onchange="saveAnswer(1,3,3)"> Flat structure</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: What connects bones to other bones?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q4" value="0" onchange="saveAnswer(1,4,0)"> Tendons</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="1" onchange="saveAnswer(1,4,1)"> Muscles</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="2" onchange="saveAnswer(1,4,2)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w1q4" value="3" onchange="saveAnswer(1,4,3)"> Cartilage</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: Which South African structure is an example of a shell structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q5" value="0" onchange="saveAnswer(1,5,0)"> Orlando Towers</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="1" onchange="saveAnswer(1,5,1)"> Bloukrans Bridge</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="2" onchange="saveAnswer(1,5,2)"> FNB Stadium</label>
+<label class="quiz-option"><input type="radio" name="w1q5" value="3" onchange="saveAnswer(1,5,3)"> Electricity pylons</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: What does "rigid" mean?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q6" value="0" onchange="saveAnswer(1,6,0)"> Can bend easily</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="1" onchange="saveAnswer(1,6,1)"> Stiff and does not change shape</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="2" onchange="saveAnswer(1,6,2)"> Very heavy</label>
+<label class="quiz-option"><input type="radio" name="w1q6" value="3" onchange="saveAnswer(1,6,3)"> Made of metal</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: Bones are hollow inside. Why is this important?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q7" value="0" onchange="saveAnswer(1,7,0)"> To make them look nice</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="1" onchange="saveAnswer(1,7,1)"> So they can bend</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="2" onchange="saveAnswer(1,7,2)"> To make them lightweight but still strong</label>
+<label class="quiz-option"><input type="radio" name="w1q7" value="3" onchange="saveAnswer(1,7,3)"> To store food</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: What is a "load" in terms of structures?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q8" value="0" onchange="saveAnswer(1,8,0)"> A truck on the road</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="1" onchange="saveAnswer(1,8,1)"> A force or weight on a structure</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="2" onchange="saveAnswer(1,8,2)"> The material used to build</label>
+<label class="quiz-option"><input type="radio" name="w1q8" value="3" onchange="saveAnswer(1,8,3)"> The colour of a structure</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: What do muscles attach to in order to allow movement?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w1q9" value="0" onchange="saveAnswer(1,9,0)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="1" onchange="saveAnswer(1,9,1)"> Other muscles</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="2" onchange="saveAnswer(1,9,2)"> Bones via tendons</label>
+<label class="quiz-option"><input type="radio" name="w1q9" value="3" onchange="saveAnswer(1,9,3)"> Skin</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_SKS_1.html" onclick="localStorage.setItem('cl_submit_course','SKS');localStorage.setItem('cl_submit_week','1');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+<div class="assess-week" data-week="2" style="display:none;">
+<h2>Week 2 Assessment</h2>
+<p style="color:#888;margin-bottom:20px;font-size:0.9rem;">10 questions. You need 70% to pass. Based on CAPS DBE format.</p>
+<div class="quiz-question"><h4>Q1: Why is a triangle the strongest shape for structures?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q0" value="0" onchange="saveAnswer(2,0,0)"> It looks the best</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="1" onchange="saveAnswer(2,0,1)"> It cannot change shape without changing the length of its sides</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="2" onchange="saveAnswer(2,0,2)"> It uses the least material</label>
+<label class="quiz-option"><input type="radio" name="w2q0" value="3" onchange="saveAnswer(2,0,3)"> It is the heaviest shape</label>
+</div></div>
+<div class="quiz-question"><h4>Q2: A square frame can collapse sideways. How can you make it stronger?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q1" value="0" onchange="saveAnswer(2,1,0)"> Add more weight to the top</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="1" onchange="saveAnswer(2,1,1)"> Add a diagonal brace to make triangles</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="2" onchange="saveAnswer(2,1,2)"> Remove some sides</label>
+<label class="quiz-option"><input type="radio" name="w2q1" value="3" onchange="saveAnswer(2,1,3)"> Paint it a bright colour</label>
+</div></div>
+<div class="quiz-question"><h4>Q3: What is the first step in the Technology design process?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q2" value="0" onchange="saveAnswer(2,2,0)"> Make the product</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="1" onchange="saveAnswer(2,2,1)"> Evaluate the product</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="2" onchange="saveAnswer(2,2,2)"> Investigate the problem</label>
+<label class="quiz-option"><input type="radio" name="w2q2" value="3" onchange="saveAnswer(2,2,3)"> Communicate your findings</label>
+</div></div>
+<div class="quiz-question"><h4>Q4: Which of the following structures uses triangles to be strong?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q3" value="0" onchange="saveAnswer(2,3,0)"> A cylinder</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="1" onchange="saveAnswer(2,3,1)"> A sphere</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="2" onchange="saveAnswer(2,3,2)"> A roof truss</label>
+<label class="quiz-option"><input type="radio" name="w2q3" value="3" onchange="saveAnswer(2,3,3)"> A wall</label>
+</div></div>
+<div class="quiz-question"><h4>Q5: How is a helmet similar to a skull?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q4" value="0" onchange="saveAnswer(2,4,0)"> Both are made of bone</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="1" onchange="saveAnswer(2,4,1)"> Both are shell structures that protect what is inside</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="2" onchange="saveAnswer(2,4,2)"> Both are frame structures</label>
+<label class="quiz-option"><input type="radio" name="w2q4" value="3" onchange="saveAnswer(2,4,3)"> Both are made of metal</label>
+</div></div>
+<div class="quiz-question"><h4>Q6: What does "evaluate" mean in the design process?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q5" value="0" onchange="saveAnswer(2,5,0)"> To build the structure</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="1" onchange="saveAnswer(2,5,1)"> To draw the design</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="2" onchange="saveAnswer(2,5,2)"> To test and judge how well something works</label>
+<label class="quiz-option"><input type="radio" name="w2q5" value="3" onchange="saveAnswer(2,5,3)"> To present to the class</label>
+</div></div>
+<div class="quiz-question"><h4>Q7: Which factor makes a structure MORE stable?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q6" value="0" onchange="saveAnswer(2,6,0)"> A narrower base</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="1" onchange="saveAnswer(2,6,1)"> A wider base</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="2" onchange="saveAnswer(2,6,2)"> Being taller</label>
+<label class="quiz-option"><input type="radio" name="w2q6" value="3" onchange="saveAnswer(2,6,3)"> Being made of lighter material</label>
+</div></div>
+<div class="quiz-question"><h4>Q8: A spine in the human body is similar to what man-made structure?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q7" value="0" onchange="saveAnswer(2,7,0)"> A bridge</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="1" onchange="saveAnswer(2,7,1)"> A roof</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="2" onchange="saveAnswer(2,7,2)"> A steel column in a building</label>
+<label class="quiz-option"><input type="radio" name="w2q7" value="3" onchange="saveAnswer(2,7,3)"> A window</label>
+</div></div>
+<div class="quiz-question"><h4>Q9: What holds joints in the human skeleton together?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q8" value="0" onchange="saveAnswer(2,8,0)"> Tendons</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="1" onchange="saveAnswer(2,8,1)"> Ligaments</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="2" onchange="saveAnswer(2,8,2)"> Muscles</label>
+<label class="quiz-option"><input type="radio" name="w2q8" value="3" onchange="saveAnswer(2,8,3)"> Cartilage</label>
+</div></div>
+<div class="quiz-question"><h4>Q10: In Technology, what does "communicate" mean?</h4><div class="quiz-options">
+<label class="quiz-option"><input type="radio" name="w2q9" value="0" onchange="saveAnswer(2,9,0)"> To telephone someone</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="1" onchange="saveAnswer(2,9,1)"> To argue with a partner</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="2" onchange="saveAnswer(2,9,2)"> To present and share your findings and design</label>
+<label class="quiz-option"><input type="radio" name="w2q9" value="3" onchange="saveAnswer(2,9,3)"> To write a letter</label>
+</div></div>
+<a href="https://dbeducator.github.io/Natural-Sciences/grade5/submit_SKS_2.html" onclick="localStorage.setItem('cl_submit_course','SKS');localStorage.setItem('cl_submit_week','2');" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Submit Assessment</a>
+</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:30px;">
+    <a href="https://dbeducator.github.io/Natural-Sciences/grade7/results.html" class="admin-btn" style="text-decoration:none;display:inline-block;">View My Results</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'coachL7_SER_';
+const TOTAL_WEEKS = 2;
+const COURSE_NAME = 'The Sun-Earth Relationship';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz89hcA4Z70ZyOKnk2MBBc5kVWKG5aXljNgSzpXZbfXDOhGvtpeZXGSOadoZB_RdyPK/exec';
+const SECRET_KEY = 'CoachL2025SecureKey';
+const BASE_URL = 'https://dbeducator.github.io/Natural-Sciences/grade7/';
+const coursePrefixForSubmit = 'SER';
+
+const CORRECT_ANSWERS = {
+  1: [3, 3, 3, 2, 3],
+  2: [2, 2, 3, 4, 3]
+};
+Object.keys(CORRECT_ANSWERS).forEach(function(w) {
+  localStorage.setItem(STORAGE_PREFIX + 'correct_' + w, JSON.stringify(CORRECT_ANSWERS[parseInt(w)]));
+});
+
+let currentWeek = 1;
+let completedWeeks = new Set(JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'completedWeeks') || '[]'));
+let studentInfo = { name: '', email: '' };
+
+function toggleTheme() {
+  const isLight = document.getElementById('body').classList.toggle('light-mode');
+  localStorage.setItem('cl_theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').innerHTML = isLight ? '&#9790; Dark' : '&#9728; Light';
+}
+
+function saveAnswer(week, q, val) {
+  var k = STORAGE_PREFIX + 'answers_' + week;
+  var saved = JSON.parse(localStorage.getItem(k) || '{}');
+  saved['q' + q] = val;
+  localStorage.setItem(k, JSON.stringify(saved));
+}
+
+function selectModule(week) {
+  currentWeek = week;
+  refreshModuleButtons();
+  updateWeekContent();
+}
+
+function refreshModuleButtons() {
+  document.querySelectorAll('.module-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+    if (completedWeeks.has(i+1)) {
+      btn.classList.add('completed');
+      btn.textContent = 'Week ' + (i+1) + ' ✓';
+    } else {
+      btn.textContent = 'Week ' + (i+1);
+    }
+  });
+  document.querySelectorAll('.module-btn')[currentWeek - 1].classList.add('active');
+}
+
+function showTab(tabName, tabBtn) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  if (tabBtn) tabBtn.classList.add('active');
+}
+
+function updateVideoSection() {
+  const v = weekVideos[currentWeek];
+  const PLACEHOLDER = 'x0lauGbQWvQ';
+  const CS = '<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;"><div style="font-size:2.5rem;">&#127916;</div><p style="color:#fff;font-weight:700;margin-top:10px;">Video Coming Soon</p><p style="color:#aaa;font-size:0.8rem;margin-top:6px;">Check back later</p></div>';
+  const iframe = function(id) {
+    return '<iframe src="https://www.youtube.com/embed/'+id+'?rel=0&modestbranding=1&iv_load_policy=3" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;"></iframe>';
+  };
+  document.getElementById('tutorialVideo').innerHTML = (v.t && v.t !== PLACEHOLDER) ? iframe(v.t) : CS;
+  document.getElementById('basicVideo').innerHTML = (v.b && v.b !== PLACEHOLDER) ? iframe(v.b) : CS;
+  document.getElementById('tutorialTitle').textContent = v.tTitle;
+  document.getElementById('basicTitle').textContent = v.bTitle;
+  document.getElementById('weekTitle').textContent = 'Videos — Week ' + currentWeek;
+}
+
+function updateWeekContent() {
+  const week = weekData[currentWeek];
+  updateVideoSection();
+  document.getElementById('lessonContent').innerHTML = week.content;
+  document.getElementById('resourcesTitle').textContent = 'Resources — Week ' + currentWeek;
+  document.querySelectorAll('.week-resources').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.assess-week').forEach(function(el) {
+    el.style.display = (parseInt(el.getAttribute('data-week')) === currentWeek) ? 'block' : 'none';
+  });
+}
+
+function updateProgress() {
+  const done = completedWeeks.size;
+  const pct = Math.round(done / TOTAL_WEEKS * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').textContent = pct + '%';
+  document.getElementById('weeksComplete').textContent = done + '/' + TOTAL_WEEKS;
+  document.getElementById('videosWatched').textContent = (done*2) + '/' + (TOTAL_WEEKS*2);
+  document.getElementById('assessmentsPassed').textContent = done + '/' + TOTAL_WEEKS;
+}
+
+window.onload = function() {
+  studentInfo.name = 'Anonymous';
+  document.getElementById('studentName').textContent = studentInfo.name;
+  document.getElementById('avatar') && (document.getElementById('avatar').textContent = '👤');
+  const isLight = localStorage.getItem('cl_theme') === 'light';
+  if(isLight) { document.getElementById('body').classList.add('light-mode'); document.getElementById('themeBtn').innerHTML = '&#9790; Dark'; }
+  updateProgress();
+  selectModule(1);
+};
+
+const weekVideos = {
+  1: {t:'MtRzy2TJAOQ',tTitle:'Week 1: Earth Structure and Day and Night',b:'WgHmqv_-UbQ',bTitle:'Week 1: Seasons and the Axial Tilt'},
+  2: {t:'n7tnHPDH5d8',tTitle:'Week 2: Eclipses Explained',b:'6LkmD6B2ncs',bTitle:'Week 2: The Atmosphere and Climate Change'}
+};
+
+const weekData = {
+  1: {
+    content: `<h2 style="color:#9c27b0;">🌍 The Sun-Earth Relationship — Week 1</h2>
+<div style="background:linear-gradient(135deg,#9c27b0,#9c27b099);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;"><div style="font-size:3rem;">☀</div><h3 style="color:#fff;margin:8px 0;">Earth in Space</h3><p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">How our position relative to the Sun shapes life on Earth</p></div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>Describe Earth's shape, size and structure</li><li>Explain how Earth's rotation causes day and night</li><li>Explain how Earth's revolution and axial tilt cause seasons</li><li>Calculate time differences between locations</li></ul>
+<h3>🌍 Earth's Structure</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">🔬 Layers of the Earth</h4><ul style="line-height:1.8;"><li><strong>Inner core</strong>: solid iron-nickel ball, ~6,000°C, ~1,220 km radius</li><li><strong>Outer core</strong>: liquid iron-nickel, ~5,000°C. Convection here generates Earth's magnetic field.</li><li><strong>Mantle</strong>: solid rock (but flows slowly), 2,900 km thick. Convection drives tectonic plates.</li><li><strong>Crust</strong>: solid rock, 5-70 km thick. Continental crust (thick, less dense granite) vs oceanic crust (thin, denser basalt).</li></ul></div>
+<h3>🔄 Rotation — Day and Night</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">⏰ Day and Night</h4><p>Earth rotates on its axis once every <strong>24 hours</strong> (west to east). This causes day and night:</p><ul style="line-height:1.8;margin-top:8px;"><li>The side facing the Sun = day</li><li>The side facing away = night</li><li>Sunrise in the east → noon (Sun overhead) → sunset in the west</li><li>The Earth rotates 15° per hour → every 15° of longitude = 1 hour time difference</li></ul></div>
+<h3>🌍 Revolution and Seasons</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">🌞 Why We Have Seasons</h4><p>Earth revolves around the Sun once every <strong>365.25 days</strong>. Earth's axis is tilted 23.5° from vertical. This tilt causes seasons:</p><ul style="line-height:1.8;margin-top:8px;"><li><strong>December 21</strong>: Southern Hemisphere tilted TOWARD Sun → South African summer (longest day)</li><li><strong>June 21</strong>: Southern Hemisphere tilted AWAY from Sun → South African winter (shortest day)</li><li><strong>March 21 and September 21</strong>: equinoxes — equal day and night globally</li><li>Seasons are caused by tilt, NOT by Earth's distance from the Sun (Earth is actually CLOSER to the Sun in January — SA summer!)</li></ul></div>
+<div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>⭐ <strong>Did You Know?</strong> The Earth is actually slightly CLOSER to the Sun during SA's summer (January) than during SA's winter (July) — by about 5 million km. This proves that distance is NOT the cause of seasons. If distance were the cause, the whole Earth would have summer and winter at the same time. The axial tilt is the real cause — when the Southern Hemisphere tilts toward the Sun, sunlight hits at a more direct angle AND days are longer, providing more heating.</p></div>
+<div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>🇿🇦 <strong>SA Focus:</strong> South Africa's latitude (approximately 22°S to 35°S) means it experiences warm to hot summers and mild winters in most of the country. The Western Cape has a Mediterranean climate (wet winters, dry summers) due to the seasonal shift of the high-pressure belt. KwaZulu-Natal has warm humid summers and mild dry winters. The Highveld (Johannesburg, Pretoria) gets afternoon thunderstorms in summer from convective heating. The Karoo and Northern Cape are extremely arid year-round due to rain shadow effects.</p></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #9c27b0;"><h3 style="color:#9c27b0;margin-bottom:10px;">📋 Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">Earth structure: inner core (solid iron), outer core (liquid iron, generates magnetic field), mantle (flows slowly, drives plates), crust (thin outer shell).</li><li style="margin-bottom:6px;">Rotation: 24 hours, west to east → day and night. Earth rotates 15° per hour = 1 hour time zone difference.</li><li style="margin-bottom:6px;">Revolution: 365.25 days around Sun. Axial tilt 23.5° causes seasons.</li><li style="margin-bottom:6px;">SA summer = December (Southern Hemisphere tilted toward Sun). SA winter = June (tilted away).</li><li style="margin-bottom:6px;">Seasons caused by axial tilt, NOT distance. Earth is closest to Sun in January (SA summer).</li></ul></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#9c27b0;margin-bottom:10px;">🔁 Quick Recap</h3><p style="margin-bottom:8px;"><strong>Q: Explain why South Africa has summer in December and winter in June.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Earth's axis is tilted at 23.5°. During December, the Southern Hemisphere (where SA is located) is tilted TOWARD the Sun. This means sunlight hits at a more direct angle and days are longer — giving SA summer. During June, the Southern Hemisphere tilts AWAY from the Sun — less direct sunlight and shorter days — giving SA winter.</span></p><p style="margin-bottom:8px;"><strong>Q: South Africa is at approximately 28°E longitude. London is at 0° (Greenwich meridian). What time is it in SA when it is noon in London?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Earth rotates 15° per hour. SA is 28° east of London. Time difference = 28 ÷ 15 = approximately 2 hours ahead. When it is noon (12:00) in London, it is approximately 14:00 (2 pm) in South Africa. (SA officially uses UTC+2.)</span></p><p style="margin-bottom:8px;"><strong>Q: Why does Earth have a magnetic field and why is it important?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Electric currents generated by the movement of liquid iron in Earth's outer core create a magnetic field (geodynamo). This magnetic field (magnetosphere) extends into space and deflects the solar wind — a stream of charged particles from the Sun. Without this protection, the solar wind would strip away Earth's atmosphere and oceans over time, making the planet uninhabitable.</span></p></div>`,
+    assessment: [
+      { question: "Earth's seasons are caused by?", options: ["Earth's changing distance from the Sun", "The Moon's gravitational pull", "Earth's 23.5° axial tilt as it orbits the Sun", "Variations in the Sun's energy output"], correct: 2 },
+      { question: "When does South Africa experience summer?", options: ["June", "July", "December", "March"], correct: 2 },
+      { question: "Earth rotates 15° per hour. SA is at 30°E. What is the time difference with London (0°)?", options: ["1 hour behind London", "2 hours behind London", "2 hours ahead of London", "3 hours ahead of London"], correct: 2 },
+      { question: "Which layer of Earth's outer core generates the magnetic field?", options: ["Solid inner core", "Liquid outer core", "Rocky mantle", "Continental crust"], correct: 1 },
+      { question: "Earth is actually closest to the Sun in?", options: ["June (SA winter)", "September", "January (SA summer)", "March"], correct: 2 }
+    ]
+  },
+  2: {
+    content: `<h2 style="color:#9c27b0;">🌍 The Sun-Earth Relationship — Week 2</h2>
+<div style="background:linear-gradient(135deg,#9c27b0,#9c27b099);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center;"><div style="font-size:3rem;">🌑</div><h3 style="color:#fff;margin:8px 0;">Eclipses and the Atmosphere</h3><p style="color:rgba(255,255,255,0.85);font-size:0.9rem;">Shadows in space and the air that protects us</p></div>
+<h3>🎯 What You Will Learn</h3>
+<ul><li>Explain solar and lunar eclipses</li><li>Describe the layers of the atmosphere</li><li>Explain the greenhouse effect and global warming</li><li>Discuss climate change impacts on South Africa</li></ul>
+<h3>🌑 Eclipses</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">🌑 Solar and Lunar Eclipses</h4><ul style="line-height:1.8;"><li><strong>Solar eclipse</strong>: Moon passes between Earth and Sun → Moon's shadow falls on Earth. In the <strong>umbra</strong> (total shadow): total eclipse. In the <strong>penumbra</strong> (partial shadow): partial eclipse. Total solar eclipses are rare at any given location — about once every 375 years on average.</li><li><strong>Lunar eclipse</strong>: Earth passes between Sun and Moon → Earth's shadow falls on Moon. Moon turns dark red/orange (blood moon) — sunlight refracted through Earth's atmosphere illuminates it. More common than solar eclipses because Earth casts a larger shadow.</li><li><strong>Why not every month?</strong> Moon's orbit is tilted 5° to Earth's orbit — so the three bodies don't align every new/full Moon.</li></ul></div>
+<h3>🌬 Earth's Atmosphere</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">🌬 Layers of the Atmosphere</h4><table style="width:100%;font-size:0.82rem;"><tr><th style="color:#9c27b0;padding:3px;">Layer</th><th style="color:#9c27b0;padding:3px;">Height</th><th style="color:#9c27b0;padding:3px;">Key feature</th></tr><tr><td style="padding:3px;"><strong>Troposphere</strong></td><td style="padding:3px;">0-12 km</td><td style="padding:3px;">Weather occurs here. Gets colder going up.</td></tr><tr><td style="padding:3px;"><strong>Stratosphere</strong></td><td style="padding:3px;">12-50 km</td><td style="padding:3px;">Ozone layer (absorbs UV). Gets warmer going up.</td></tr><tr><td style="padding:3px;"><strong>Mesosphere</strong></td><td style="padding:3px;">50-80 km</td><td style="padding:3px;">Meteors burn up here. Gets colder going up.</td></tr><tr><td style="padding:3px;"><strong>Thermosphere</strong></td><td style="padding:3px;">80-600 km</td><td style="padding:3px;">Extremely hot (1,000°C+). Auroras. ISS orbits here.</td></tr></table></div>
+<h3>🌡 Climate Change and SA</h3>
+<div style="background:rgba(255,255,255,0.05);border-left:4px solid #9c27b0;border-radius:0 10px 10px 0;padding:14px;margin:12px 0;"><h4 style="color:#9c27b0;margin-bottom:8px;">🌍 Climate Change Impacts on South Africa</h4><ul style="line-height:1.8;"><li>SA is projected to warm <strong>faster</strong> than the global average — up to 3-4°C by 2100</li><li>Western Cape: more severe droughts (Day Zero 2018 a preview)</li><li>KwaZulu-Natal: more intense rainfall and flooding events (April 2022 floods killed 400 people)</li><li>Northern Cape/Limpopo: desertification and extreme heat events</li><li>Coastal cities (Durban, Cape Town): sea level rise threatening low-lying areas</li><li>Agriculture: reduced yields of maize, wheat; livestock heat stress</li></ul></div>
+<div style="background:rgba(255,215,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border-left:4px solid #ffc107;"><p>⭐ <strong>Did You Know?</strong> The ozone layer in SA's stratosphere has thinned significantly over Antarctica (the ozone hole), but is slowly recovering since the Montreal Protocol (1987) banned chlorofluorocarbons (CFCs). The recovery is projected to reach pre-1980 levels by 2066 over Antarctica. SA scientists at the South African Weather Service monitor ozone levels and UV radiation — SA receives some of the world's highest UV levels due to its latitude and high altitude (Johannesburg is at 1,753m above sea level).</p></div>
+<div style="background:rgba(0,150,0,0.1);border-radius:10px;padding:12px;margin:10px 0;border:1px solid rgba(0,200,0,0.3);"><p>🇿🇦 <strong>SA Focus:</strong> The April 2022 KwaZulu-Natal floods were one of the worst natural disasters in SA's history — 461 people died, 40,000 homes were damaged, and infrastructure damage exceeded R17 billion. Scientists confirmed this event was made more likely and more intense by climate change. The floods disproportionately affected informal settlements built in flood-prone areas, highlighting the connection between poverty, inequality and climate vulnerability. SA's poorest communities bear the greatest climate risk despite contributing least to emissions.</p></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;border-top:3px solid #9c27b0;"><h3 style="color:#9c27b0;margin-bottom:10px;">📋 Week Summary</h3><ul style="padding-left:18px;line-height:1.8;"><li style="margin-bottom:6px;">Solar eclipse: Moon between Earth and Sun → Moon shadow on Earth. Umbra (total) vs penumbra (partial).</li><li style="margin-bottom:6px;">Lunar eclipse: Earth between Sun and Moon → Earth shadow on Moon → blood moon. More common than solar.</li><li style="margin-bottom:6px;">Atmosphere layers: troposphere (weather), stratosphere (ozone, UV protection), mesosphere (meteor burnup), thermosphere (auroras, ISS).</li><li style="margin-bottom:6px;">SA climate change: warming faster than global average. Western Cape: droughts. KZN: flooding. Rising sea levels.</li><li style="margin-bottom:6px;">April 2022 KZN floods: 461 deaths, R17 billion damage — made more likely by climate change.</li></ul></div>
+<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;margin:12px 0;"><h3 style="color:#9c27b0;margin-bottom:10px;">🔁 Quick Recap</h3><p style="margin-bottom:8px;"><strong>Q: Explain why the Moon turns red/orange during a total lunar eclipse.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: During a lunar eclipse, Earth blocks direct sunlight from reaching the Moon. However, Earth's atmosphere refracts (bends) some sunlight around the edge of Earth. The atmosphere scatters shorter blue wavelengths and allows longer red/orange wavelengths to pass through — this refracted orange-red light reaches the Moon and illuminates it, creating the blood moon effect.</span></p><p style="margin-bottom:8px;"><strong>Q: Why does the ozone layer matter and what damaged it?</strong><br><span style="color:#aaa;font-size:0.88rem;">A: The ozone layer in the stratosphere absorbs most of the Sun's harmful ultraviolet (UV) radiation. UV radiation causes skin cancer, eye damage and harms ecosystems. Chlorofluorocarbons (CFCs) — used in old refrigerants and aerosols — react with ozone and break it down. The Montreal Protocol (1987) banned CFCs worldwide. The ozone layer is slowly recovering but is still depleted, particularly over Antarctica.</span></p><p style="margin-bottom:8px;"><strong>Q: Describe two specific ways climate change is affecting South Africa.</strong><br><span style="color:#aaa;font-size:0.88rem;">A: Any two with explanation: Western Cape experiencing more severe and frequent droughts (Day Zero 2018). KwaZulu-Natal experiencing more intense rainfall/flooding events (April 2022 floods killed 461 people). Northern Cape/Limpopo facing desertification and extreme heat. Coastal areas (Durban, Cape Town) at risk from sea level rise. Agriculture facing reduced crop yields. All impacts hit poorer communities hardest.</span></p></div>`,
+    assessment: [
+      { question: "During a TOTAL solar eclipse, the Moon is?", options: ["Behind Earth", "Directly between Earth and Sun, casting shadow on Earth", "Larger than normal", "Illuminated red by Earth's atmosphere"], correct: 1 },
+      { question: "Why does the Moon appear red/orange during a lunar eclipse?", options: ["Earth's shadow is orange", "Sunlight refracts through Earth's atmosphere and illuminates the Moon with red wavelengths", "The Moon's surface reflects orange light", "Solar flares colour the Moon"], correct: 1 },
+      { question: "Which atmospheric layer contains the ozone layer and absorbs UV radiation?", options: ["Troposphere", "Mesosphere", "Stratosphere", "Thermosphere"], correct: 2 },
+      { question: "The April 2022 KwaZulu-Natal floods killed approximately how many people?", options: ["50", "100", "250", "461"], correct: 3 },
+      { question: "SA is projected to warm by how much more than the global average by 2100?", options: ["The same amount", "Less than average", "More than average, possibly 3-4°C", "SA will actually cool"], correct: 2 }
+    ]
+  }
+};
+</script>
+
+
+
+
+
+
+
+
+<!-- Maxi Pie FAB -->
+<style>
+#mfab{position:fixed;bottom:24px;left:20px;width:56px;height:56px;background:#10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(16,185,129,0.5);z-index:2147483647;border:3px solid #fff;transition:opacity 0.2s;}
+#mfab.hidden{opacity:0;pointer-events:none;}
+#mfab svg{width:26px;height:26px;fill:white;}
+#mbot-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:2147483646;}
+#mbot-modal iframe{width:100%;height:100%;border:none;}
+</style>
+<div id="mfab" onclick="mBotOpen()">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/><circle cx="8" cy="11" r="1.3"/><circle cx="12" cy="11" r="1.3"/><circle cx="16" cy="11" r="1.3"/></svg>
+</div>
+<div id="mbot-modal">
+  <iframe id="mbot-frame" src="" allow="microphone"></iframe>
+</div>
+<script>
+function mBotOpen(){document.getElementById('mbot-frame').src='bot.html';document.getElementById('mbot-modal').style.display='block';document.getElementById('mfab').classList.add('hidden');window.history.pushState({bot:'open'},'');}
+function mBotClose(){document.getElementById('mbot-modal').style.display='none';document.getElementById('mbot-frame').src='';document.getElementById('mfab').classList.remove('hidden');}
+window.addEventListener('message',function(e){if(e.data==='closeBot')mBotClose();});
+window.addEventListener('popstate',function(){if(document.getElementById('mbot-modal').style.display==='block')mBotClose();});
+
+window.addEventListener('load', function() {
+  var modal = document.getElementById('nameModal');
+  if (modal) modal.style.display = 'flex';
+  var av = document.getElementById('avatar');
+  if (av) av.textContent = '👤';
+  var wm = document.getElementById('welcomeMsg');
+  if (wm) wm.textContent = 'Pick a topic to get started.';
+});
+function saveName() {
+  var modal = document.getElementById('nameModal');
+  if (modal) modal.style.display = 'none';
+}
+</script>
+</body>
+</html>
