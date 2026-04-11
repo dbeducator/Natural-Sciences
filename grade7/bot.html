@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>Maxi Pie - Grade 7 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
+    </script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html, body { height:100%; font-family:'Segoe UI', Roboto, sans-serif; background:#0a1a33; overflow:hidden; }
+
+        #maxi-fab { position:fixed; bottom:25px; left:25px; width:60px; height:60px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); z-index:999; border:3px solid #fff; transition:opacity 0.2s; }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit:cover; }
+        #maxi-fab.hidden { opacity:0; pointer-events:none; }
+
+        #chat-modal { display:flex; flex-direction:column; position:fixed; top:0; left:0; right:0; bottom:0; z-index:1000; }
+        .chat-container { display:flex; flex-direction:column; flex:1; width:100%; max-width:500px; margin:0 auto; background:#f0f4f8; min-height:0; overflow:hidden; }
+
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; flex-shrink:0; }
+        .chat-header img { width:45px; height:45px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left:auto; background:#ef4444; color:white; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer; font-size:18px; }
+
+        .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; min-height:0; }
+        .msg { max-width:88%; padding:12px 16px; border-radius:18px; line-height:1.5; font-size:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        .bot { align-self:flex-start; background:white; color:#333; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+        .thinking { align-self:flex-start; background:#e8f5f0; color:#0a6e50; border-radius:18px; padding:10px 16px; font-size:13px; font-style:italic; border-bottom-left-radius:2px; animation:pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+        .chat-input-area { padding:12px 15px; background:white; display:flex; gap:10px; border-top:1px solid #ddd; flex-shrink:0; }
+        .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; font-size:16px; color:#333; background:#fff; }
+        .send-btn { background:#10b981; color:white; border:none; padding:10px 18px; border-radius:25px; font-weight:bold; cursor:pointer; font-size:15px; }
+        .send-btn:disabled { background:#aaa; cursor:not-allowed; }
+
+        .chip-row { display:flex; flex-wrap:wrap; gap:8px; padding:4px 0; max-width:88%; }
+        .chip { background:#e8f5f0; color:#0a6e50; border:1.5px solid #10b981; border-radius:20px; padding:7px 14px; font-size:13px; font-weight:600; cursor:pointer; transition:background 0.15s; white-space:nowrap; }
+        .chip:hover, .chip:active { background:#10b981; color:white; }
+
+        .page-img { width:100%; border-radius:8px; margin-top:6px; border:1px solid #ddd; display:block; cursor:zoom-in; }
+        .page-img-wrap { background:#f5f5f5; border-radius:10px; overflow:hidden; }
+        .page-img-label { font-size:11px; color:#888; padding:4px 8px; background:#eee; }
+
+        #img-zoom-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.94); z-index:9999; justify-content:center; align-items:center; flex-direction:column; }
+        #img-zoom-modal.open { display:flex; }
+        #img-zoom-modal img { max-width:96%; max-height:88vh; border-radius:8px; object-fit:contain; touch-action:pinch-zoom; }
+        #img-zoom-close { position:absolute; top:16px; right:16px; background:#ef4444; color:white; border:none; border-radius:50%; width:40px; height:40px; font-size:22px; font-weight:bold; cursor:pointer; z-index:10000; }
+        #img-zoom-label { color:#ccc; font-size:13px; margin-top:8px; }
+
+        .answer-box { border-left:3px solid #10b981; padding:10px 14px; margin-top:4px; font-size:14px; line-height:1.65; }
+        .answer-box b { color:#0a6e50; }
+        .page-ref { font-size:11px; color:#aaa; margin-top:6px; }
+    </style>
+</head>
+<body>
+
+<div id="maxi-fab" onclick="openChat()"><img src="cat_full.png" onerror="this.innerHTML='&#x1F43E;';"></div>
+
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png" onerror="this.style.display='none';">
+            <div>
+                <div style="font-weight:700;font-size:16px;">Maxi Pie</div>
+                <div style="font-size:12px;color:#10b981;">Grade 7 Science Chommie &#x1F1FF;&#x1F1E6;</div>
+            </div>
+            <button class="close-btn" onclick="closeChat()">&#x00D7;</button>
+        </div>
+        <div id="messages" class="chat-messages">
+            <div class="msg bot">Sho! I'm <strong>Maxi Pie</strong> &#x1F43E;, your Grade 7 science chommie! Loading your textbook now...</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask me anything chommie..."
+                onkeypress="if(event.key==='Enter') handleSend()">
+            <button id="sendBtn" onclick="handleSend()" class="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<div id="img-zoom-modal" onclick="closeZoom(event)">
+    <button id="img-zoom-close" onclick="closeZoom()">&#x00D7;</button>
+    <img id="img-zoom-src" src="">
+    <div id="img-zoom-label"></div>
+</div>
+
+<script>
+// ================================================================
+// CONFIGURATION
+// ================================================================
+
+// Your Anthropic API key - get one free at console.anthropic.com
+const ANTHROPIC_API_KEY = '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';
+
+// Page offset: PDF front-matter pages before textbook page 1.
+// HOW TO CALIBRATE: Open logic7.pdf. Find where the textbook
+// shows "17" at the bottom (start of Biodiversity unit).
+// Note what page number the PDF viewer shows. offset = that number - 17.
+// Example: PDF viewer shows 21 for textbook page 17 --> offset = 4
+const PDF_PAGE_OFFSET = 4;
+
+// ================================================================
+// TOPIC MAP
+// ================================================================
+const TOPIC_PAGE_MAP = {
+    "The Biosphere":                          { start:2,   end:16  },
+    "Biodiversity":                           { start:17,  end:49  },
+    "Sexual Reproduction":                    { start:50,  end:81  },
+    "Variation":                              { start:82,  end:88  },
+    "Properties of Materials":                { start:94,  end:111 },
+    "Separating Mixtures":                    { start:112, end:133 },
+    "Acids, Bases and Neutral Substances":    { start:134, end:147 },
+    "The Periodic Table of Elements":         { start:148, end:164 },
+    "Renewable and Non-renewable Energy":     { start:168, end:178 },
+    "Potential and Kinetic Energy":           { start:179, end:203 },
+    "Heat: Energy Transfer":                  { start:204, end:219 },
+    "Heat Insulation and Energy Saving":      { start:220, end:232 },
+    "Energy Transfer to Surroundings":        { start:233, end:241 },
+    "The National Electricity Supply System": { start:242, end:254 },
+    "Relationship of the Earth to the Sun":   { start:258, end:286 },
+    "Relationship of the Moon to the Earth":  { start:287, end:311 },
+    "Historical Development of Astronomy":    { start:312, end:330 }
+};
+
+const TOPIC_OVERVIEWS = {
+    "The Biosphere":                          { emoji:"&#x1F30D;", strand:"Strand 1", keywords:["biosphere","lithosphere","hydrosphere","atmosphere","organism","habitat","ecosystem","abiotic","biotic"] },
+    "Biodiversity":                           { emoji:"&#x1F43E;", strand:"Strand 1", keywords:["biodiversity","species","classification","adaptation","food web","vertebrate","invertebrate","amphibian","reptile","mammal","kingdom","phylum"] },
+    "Sexual Reproduction":                    { emoji:"&#x1F338;", strand:"Strand 1", keywords:["reproduction","pollination","fertilisation","germination","seed","pollen","flower","ovule","embryo"] },
+    "Variation":                              { emoji:"&#x1F9EC;", strand:"Strand 1", keywords:["variation","heredity","genetics","trait","inherited","offspring","characteristic"] },
+    "Properties of Materials":                { emoji:"&#x1F9F1;", strand:"Strand 2", keywords:["material","property","hardness","flexible","conductivity","natural","manufactured","conductor","insulator"] },
+    "Separating Mixtures":                    { emoji:"&#x1F52C;", strand:"Strand 2", keywords:["mixture","filtration","evaporation","distillation","solution","solute","solvent","dissolve","chromatography","sedimentation"] },
+    "Acids, Bases and Neutral Substances":    { emoji:"&#x1F9EA;", strand:"Strand 2", keywords:["acid","base","neutral","pH","indicator","litmus","alkali","neutralisation","corrosive"] },
+    "The Periodic Table of Elements":         { emoji:"&#x2697;",  strand:"Strand 2", keywords:["periodic table","element","atom","atomic number","symbol","metal","non-metal","proton","Mendeleev"] },
+    "Renewable and Non-renewable Energy":     { emoji:"&#x26A1;",  strand:"Strand 3", keywords:["renewable","non-renewable","fossil fuel","coal","solar","wind","biomass","Eskom","load shedding"] },
+    "Potential and Kinetic Energy":           { emoji:"&#x1F3C3;", strand:"Strand 3", keywords:["potential energy","kinetic energy","gravitational","elastic","joule","stored energy","movement"] },
+    "Heat: Energy Transfer":                  { emoji:"&#x1F321;", strand:"Strand 3", keywords:["conduction","convection","radiation","heat transfer","thermal","conductor","insulator","temperature"] },
+    "Heat Insulation and Energy Saving":      { emoji:"&#x1F3E0;", strand:"Strand 3", keywords:["insulation","heat loss","energy saving","efficiency","absorb","reflect","building"] },
+    "Energy Transfer to Surroundings":        { emoji:"&#x1F50A;", strand:"Strand 3", keywords:["energy transfer","sound","light","dissipate","conservation of energy","friction","vibration","wave"] },
+    "The National Electricity Supply System": { emoji:"&#x1F50C;", strand:"Strand 3", keywords:["generator","turbine","transformer","power station","national grid","Eskom","pylon","substation","voltage"] },
+    "Relationship of the Earth to the Sun":   { emoji:"&#x2600;",  strand:"Strand 4", keywords:["orbit","rotation","revolution","season","axis","tilt","solstice","equinox","day and night","time zone","hemisphere"] },
+    "Relationship of the Moon to the Earth":  { emoji:"&#x1F315;", strand:"Strand 4", keywords:["moon phases","lunar eclipse","solar eclipse","tide","crescent","full moon","new moon","gravity"] },
+    "Historical Development of Astronomy":    { emoji:"&#x1F52D;", strand:"Strand 4", keywords:["astronomy","telescope","Galileo","Copernicus","heliocentric","geocentric","SALT","MeerKAT","Karoo","ancient"] }
+};
+
+// Keyword -> topic routing table for fast lookup
+const KEYWORD_TOPIC = [];
+(function buildKeywordTable() {
+    const extras = {
+        "The Biosphere":                          ["biosphere","lithosphere","hydrosphere","atmosphere","abiotic","biotic","organism","habitat","ecosystem","environment","sustain","life processes","requirements for life","living things"],
+        "Biodiversity":                           ["biodiversity","species","classify","classification","vertebrate","invertebrate","amphibian","reptile","mammal","fish","bird","kingdom","phylum","aristotle","linnaeus","genus","binomial","food web","food chain","adaptation","five kingdoms","bacteria","fungi","protist"],
+        "Sexual Reproduction":                    ["reproduct","pollination","fertilisation","germination","seed","pollen","flower","ovule","embryo","zygote","stamen","pistil","carpel","sepal","petal","anther","filament","stigma","style","ovary","fruit","dispersal","wind pollination","insect pollination","self","cross","plant reproduction","animal reproduction","external fertilisation","internal fertilisation"],
+        "Variation":                              ["variation","heredity","genetics","trait","inherited","offspring","characteristic","continuous","discontinuous","gene","dna","chromosome"],
+        "Properties of Materials":                ["material","property","hardness","flexible","conductivity","natural","manufactured","conductor","insulator","strength","transparency","solubility","magnetism","thermal","electrical","density","texture"],
+        "Separating Mixtures":                    ["mixture","filtration","evaporation","distillation","solution","solute","solvent","dissolve","chromatography","sedimentation","saturated","decanting","magnetic separation","screening"],
+        "Acids, Bases and Neutral Substances":    ["acid","base","neutral","ph","indicator","litmus","alkali","neutralisation","corrosive","vinegar","lemon","sodium hydroxide","hydrochloric","sulfuric","universal indicator","colour change","taste"],
+        "The Periodic Table of Elements":         ["periodic table","element","atom","atomic number","symbol","metal","non-metal","proton","neutron","electron","mendeleev","periodic law","group","period","semi-metal","noble gas","transition metal","atomic mass","gold","silver","iron","copper","hydrogen","oxygen","carbon","nitrogen","sodium","calcium","aluminium"],
+        "Renewable and Non-renewable Energy":     ["renewable","non-renewable","fossil fuel","coal","solar","wind","biomass","eskom","load shedding","hydroelectric","geothermal","tidal","natural gas","petroleum","oil","energy source","energy crisis","environmental impact"],
+        "Potential and Kinetic Energy":           ["potential energy","kinetic energy","gravitational","elastic","joule","stored energy","movement","mechanical energy","height","mass","speed","velocity","spring","stretched","compressed","roller coaster","pendulum","catapult"],
+        "Heat: Energy Transfer":                  ["conduction","convection","radiation","heat transfer","thermal","conductor","insulator","temperature","infrared","convection current","land breeze","sea breeze","radiation from sun"],
+        "Heat Insulation and Energy Saving":      ["insulation","heat loss","energy saving","efficiency","absorb","reflect","colour","black","white","building","ceiling","cavity wall","double glazing","loft insulation","thermos"],
+        "Energy Transfer to Surroundings":        ["energy transfer","sound","light","dissipate","conservation of energy","friction","vibration","wave","useful energy","wasted energy","light energy","electrical energy","chemical energy"],
+        "The National Electricity Supply System": ["generator","turbine","transformer","power station","national grid","eskom","pylon","substation","voltage","current","step up","step down","transmission","distribution","consumer","coal fired","nuclear","hydroelectric power"],
+        "Relationship of the Earth to the Sun":   ["orbit","rotation","revolution","season","axis","tilt","solstice","equinox","day and night","time zone","hemisphere","summer","winter","spring","autumn","southern hemisphere","northern hemisphere","24 hours","365 days","leap year","tropic","capricorn","cancer"],
+        "Relationship of the Moon to the Earth":  ["moon","lunar","eclipse","tide","crescent","full moon","new moon","waxing","waning","gibbous","gravity","phases","spring tide","neap tide","umbra","penumbra","lunar cycle","28 days","month"],
+        "Historical Development of Astronomy":    ["astronomy","telescope","galileo","copernicus","heliocentric","geocentric","salt telescope","meerkat","karoo","ancient","ptolemy","kepler","newton","hubble","galaxy","universe","solar system","big bang","star","constellation","planet","mars","jupiter","saturn"]
+    };
+    Object.entries(extras).forEach(function(e) {
+        const topic = e[0]; const keys = e[1];
+        keys.forEach(function(k) { KEYWORD_TOPIC.push({ key:k, topic:topic }); });
+    });
+})();
+
+// ================================================================
+// STATE
+// ================================================================
+let pdfDocRef   = null;
+let pdfReady    = false;
+let pendingQuery = null;
+let lastTopic   = '';
+let lastPages   = [];
+let PAGE_CACHE  = {};
+let msgBox, sendBtn;
+
+// ================================================================
+// UTILS
+// ================================================================
+function bookPageToPdf(bp) { return bp + PDF_PAGE_OFFSET; }
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+const THINKING_MSGS = [
+    "Sho, let me check the textbook... &#x1F4D6;",
+    "Sharp, reading those pages now... &#x1F50D;",
+    "Yoh give me a sec chommie... &#x23F3;",
+    "Looking that up in the book... &#x1F4DA;",
+    "Aweh, scanning the textbook... &#x1F440;"
+];
+
+function addMessage(role, html) {
+    const d = document.createElement('div');
+    d.className = 'msg ' + role;
+    d.innerHTML = html;
+    msgBox.appendChild(d);
+    msgBox.scrollTop = msgBox.scrollHeight;
+    return d;
+}
+
+function addThinking(text) {
+    const d = document.createElement('div');
+    d.className = 'thinking';
+    d.innerHTML = text || rand(THINKING_MSGS);
+    msgBox.appendChild(d);
+    msgBox.scrollTop = msgBox.scrollHeight;
+    return d;
+}
+
+function showChips(topic) {
+    const row = document.createElement('div');
+    row.className = 'chip-row';
+    [
+        { l:'&#x1F4D6; Explain simply', a:'explain' },
+        { l:'&#x1F4A1; Give example',   a:'example' },
+        { l:'&#x1F50D; Go deeper',      a:'deeper'  },
+        { l:'&#x1F9EA; Quiz me',        a:'quiz'    }
+    ].forEach(function(c) {
+        const b = document.createElement('button');
+        b.className = 'chip';
+        b.innerHTML = c.l;
+        b.onclick = function() { chipAction(c.a, topic); };
+        row.appendChild(b);
+    });
+    msgBox.appendChild(row);
+    msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+function openZoom(src, label) {
+    document.getElementById('img-zoom-src').src = src;
+    document.getElementById('img-zoom-label').textContent = label || '';
+    document.getElementById('img-zoom-modal').classList.add('open');
+}
+function closeZoom(e) {
+    if (!e || e.target === document.getElementById('img-zoom-modal') || e.target === document.getElementById('img-zoom-close')) {
+        document.getElementById('img-zoom-src').src = '';
+        document.getElementById('img-zoom-modal').classList.remove('open');
+    }
+}
+
+// ================================================================
+// PDF LOADING
+// ================================================================
+async function renderPage(bookPage, scale) {
+    scale = scale || 1.8;
+    const cacheKey = bookPage + '_' + scale;
+    if (PAGE_CACHE[cacheKey]) return PAGE_CACHE[cacheKey];
+    if (!pdfDocRef) return null;
+    const pdfPage = bookPageToPdf(bookPage);
+    if (pdfPage < 1 || pdfPage > pdfDocRef.numPages) return null;
+    try {
+        const page   = await pdfDocRef.getPage(pdfPage);
+        const vp     = page.getViewport({ scale: scale });
+        const canvas = document.createElement('canvas');
+        canvas.width  = vp.width;
+        canvas.height = vp.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        PAGE_CACHE[cacheKey] = dataUrl;
+        return dataUrl;
+    } catch(e) {
+        console.warn('Render failed p.' + bookPage, e);
+        return null;
+    }
+}
+
+function showPageInChat(bookPage, label) {
+    if (!bookPage || !pdfDocRef) return;
+    const uid = 'pg' + bookPage + '_' + Date.now();
+    const lbl = 'Textbook p.' + bookPage + (label ? ' - ' + label : '');
+    const wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.innerHTML = '<div class="page-img-wrap" id="' + uid + '">' +
+        '<div class="page-img-label">&#x1F4C4; ' + lbl + '</div>' +
+        '<div style="padding:10px;color:#aaa;font-size:12px;">Loading page...</div>' +
+        '</div>';
+    msgBox.appendChild(wrap);
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    renderPage(bookPage, 1.8).then(function(dataUrl) {
+        const w = document.getElementById(uid);
+        if (!w) return;
+        if (dataUrl) {
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.className = 'page-img';
+            img.title = 'Tap to zoom';
+            var captured = dataUrl;
+            var capturedLbl = lbl;
+            img.onclick = function() { openZoom(captured, capturedLbl); };
+            w.innerHTML = '<div class="page-img-label">&#x1F4C4; ' + lbl + ' <span style="color:#10b981;font-size:11px;">&#x1F50D; tap to zoom</span></div>';
+            w.appendChild(img);
+        } else {
+            w.innerHTML = '<div style="color:#e55;padding:8px;font-size:12px;">&#x26A0; Could not render page ' + bookPage + '</div>';
+        }
+        msgBox.scrollTop = msgBox.scrollHeight;
+    });
+}
+
+async function loadPDF() {
+    const url = 'resources/logic7.pdf';
+    let pdf;
+    try {
+        pdf = await pdfjsLib.getDocument(url).promise;
+    } catch(e) {
+        addMessage('bot', '&#x26A0;&#xFE0F; Could not load <b>resources/logic7.pdf</b>. Make sure the file is in the right folder and the path is correct.');
+        return;
+    }
+    pdfDocRef = pdf;
+    pdfReady  = true;
+
+    // Background pre-render first page of each topic at low res
+    setTimeout(function() {
+        var topics = Object.values(TOPIC_PAGE_MAP);
+        topics.forEach(function(r, i) {
+            setTimeout(function() { renderPage(r.start, 1.0); }, i * 1000);
+        });
+    }, 4000);
+
+    // Ready message
+    const rm = document.createElement('div');
+    rm.className = 'msg bot';
+    rm.innerHTML =
+        'Sho! &#x1F4DA; Textbook ready! <b>' + pdf.numPages + ' pages</b> loaded. Tap a topic to start chommie!<br><br>' +
+        '<span data-action="menu"     class="chip" style="display:inline-block;margin:3px;">&#x1F4CB; Topic Menu</span>' +
+        '<span data-action="glossary" class="chip" style="display:inline-block;margin:3px;">&#x1F4DA; Glossary</span>' +
+        '<span data-action="quiz"     class="chip" style="display:inline-block;margin:3px;">&#x1F9EA; Quiz me</span>';
+    msgBox.appendChild(rm);
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    setTimeout(showTopicMenu, 700);
+
+    if (pendingQuery) {
+        var q = pendingQuery; pendingQuery = null;
+        setTimeout(function() { handlePDFQuery(q, 'answer'); }, 500);
+    }
+}
+
+// ================================================================
+// CLAUDE VISION API
+// ================================================================
+async function askClaude(question, pageNums, mode) {
+    mode = mode || 'answer';
+
+    var systemMap = {
+        answer:
+            'You are Maxi Pie, a warm and encouraging Grade 7 Natural Sciences tutor for South African learners. ' +
+            'The student has asked a question. Study the textbook page image(s) carefully and give a clear, accurate answer based on what is actually written and shown on the pages. ' +
+            'Format your response in HTML: use <b>bold</b> for key terms, <br> for line breaks, and &#x2022; for bullet points. ' +
+            'Write in a friendly South African style using words like "chommie", "lekker", "aweh", "sharp" naturally. ' +
+            'End with a short real-life South African example connecting the topic to SA (Karoo, Cape Town, Eskom, local wildlife, etc.). ' +
+            'Keep the total response under 220 words.',
+        deeper:
+            'You are Maxi Pie, a Grade 7 science tutor. Study these textbook pages carefully. ' +
+            'Give a DEEPER explanation: define all key terms you can see on the page, explain any diagrams, tables or figures shown, ' +
+            'and add extra scientific context beyond the basics. Use HTML formatting with <b>bold</b> for terms. ' +
+            'Under 300 words.',
+        explain:
+            'You are Maxi Pie, a Grade 7 science tutor. Study these textbook pages. ' +
+            'Explain this topic in the SIMPLEST possible language - as if the student has never heard of it before. ' +
+            'Use a short analogy or comparison to something familiar in everyday South African life. No jargon. ' +
+            'Under 150 words. Use <b>bold</b> for the most important idea only.',
+        example:
+            'You are Maxi Pie, a Grade 7 science tutor. Study these textbook pages. ' +
+            'Give 2-3 specific real-life South African examples of this concept. ' +
+            'Mention places, things or situations a Grade 7 learner in SA would know: Eskom, the Karoo, Cape Town, Johannesburg, local animals, rivers, sport, food, etc. ' +
+            'Under 160 words.',
+        quiz:
+            'You are Maxi Pie, a Grade 7 science tutor. Study these textbook pages carefully. ' +
+            'Create ONE good exam-style quiz question based on the actual content shown on the pages. ' +
+            'Format EXACTLY as: <b>Question:</b> [the question]<br><br><b>Answer:</b> [the correct answer directly from the textbook]<br><br><b>Hint:</b> [a one-sentence hint]. ' +
+            'Make it appropriate for a Grade 7 SA learner.'
+    };
+
+    // Render pages to images
+    var imageBlocks = [];
+    for (var i = 0; i < pageNums.length; i++) {
+        var pg = pageNums[i];
+        var dataUrl = await renderPage(pg, 1.8);
+        if (dataUrl) {
+            imageBlocks.push({
+                type: 'image',
+                source: { type: 'base64', media_type: 'image/jpeg', data: dataUrl.split(',')[1] }
+            });
+        }
+    }
+
+    if (imageBlocks.length === 0) {
+        return 'Eish &#x1F605; I could not render the textbook pages. Check that <b>resources/logic7.pdf</b> is correct and try again chommie!';
+    }
+
+    var content = imageBlocks.concat([{ type: 'text', text: question || 'Explain what is on these textbook pages.' }]);
+
+    try {
+        var response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1024,
+                system: systemMap[mode] || systemMap.answer,
+                messages: [{ role: 'user', content: content }]
+            })
+        });
+        var data = await response.json();
+        if (data.content && data.content[0] && data.content[0].text) {
+            return data.content[0].text;
+        }
+        if (data.error) {
+            console.error('API error:', data.error);
+            if (data.error.type === 'authentication_error') {
+                return '&#x1F511; <b>API key error.</b> Please check your Anthropic API key in the code. Get one free at <b>console.anthropic.com</b>';
+            }
+            return 'API error: ' + data.error.message;
+        }
+        return 'Eish &#x1F605; something went wrong. Try again chommie!';
+    } catch(e) {
+        console.error('Fetch error:', e);
+        return 'Eish, could not reach the AI &#x1F4F5; Check your internet connection and try again!';
+    }
+}
+
+// ================================================================
+// FIND PAGES FOR A QUERY
+// ================================================================
+function findPagesForQuery(q) {
+    var qLower = q.toLowerCase();
+
+    // Direct topic name match
+    for (var topic in TOPIC_PAGE_MAP) {
+        var tLower = topic.toLowerCase();
+        if (qLower.includes(tLower) || tLower.includes(qLower)) {
+            return { pages: [TOPIC_PAGE_MAP[topic].start, TOPIC_PAGE_MAP[topic].start + 1], topic: topic };
+        }
+    }
+
+    // Keyword table match (longest match wins)
+    var best = null;
+    var bestLen = 0;
+    for (var i = 0; i < KEYWORD_TOPIC.length; i++) {
+        var entry = KEYWORD_TOPIC[i];
+        if (qLower.includes(entry.key) && entry.key.length > bestLen) {
+            best = entry.topic;
+            bestLen = entry.key.length;
+        }
+    }
+    if (best) {
+        return { pages: [TOPIC_PAGE_MAP[best].start, TOPIC_PAGE_MAP[best].start + 1], topic: best };
+    }
+
+    return null;
+}
+
+// ================================================================
+// MAIN QUERY HANDLER
+// ================================================================
+async function handlePDFQuery(q, mode) {
+    mode = mode || 'answer';
+
+    if (!pdfReady || !pdfDocRef) {
+        if (!pendingQuery) pendingQuery = q;
+        addMessage('bot', "Eish, still loading the textbook &#x1F4DA; I'll answer as soon as it's ready chommie!");
+        return;
+    }
+
+    var found = findPagesForQuery(q);
+    if (!found) {
+        addMessage('bot',
+            "Eish &#x1F605; I'm not sure which part of the textbook covers that. Try asking about a specific topic like <b>biosphere</b>, <b>acids</b>, <b>periodic table</b>, <b>energy</b> or <b>biodiversity</b>. " +
+            "Or tap <b>Topic Menu</b> to browse all topics chommie!"
+        );
+        showChips(q);
+        return;
+    }
+
+    lastTopic = found.topic;
+    lastPages = found.pages;
+
+    // Show page images
+    found.pages.forEach(function(pg, idx) {
+        setTimeout(function() { showPageInChat(pg, found.topic); }, idx * 400);
+    });
+
+    // Thinking indicator
+    var thinkEl = addThinking();
+    sendBtn.disabled = true;
+
+    // Ask Claude
+    var answer = await askClaude(q, found.pages, mode);
+
+    thinkEl.remove();
+    sendBtn.disabled = false;
+
+    var ansDiv = document.createElement('div');
+    ansDiv.className = 'msg bot';
+    ansDiv.innerHTML =
+        '<div class="answer-box">' + answer + '</div>' +
+        '<div class="page-ref">&#x1F4C4; ' + found.topic + ' &nbsp;&#x2022;&nbsp; pp. ' + found.pages.join(', ') + '</div>';
+    msgBox.appendChild(ansDiv);
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    setTimeout(function() { showChips(q); }, 300);
+}
+
+// ================================================================
+// CHIP ACTIONS
+// ================================================================
+async function chipAction(action, topic) {
+    var labels = { explain:'Explain it simply', example:'Give a real-life example', deeper:'Go deeper', quiz:'Quiz me' };
+    addMessage('user', labels[action] || action);
+
+    if (action === 'quiz') { await doQuiz(); return; }
+
+    if (!lastTopic || lastPages.length === 0) {
+        addMessage('bot', "Eish &#x1F605; ask me a topic question first chommie, then I can do that!");
+        return;
+    }
+
+    sendBtn.disabled = true;
+    var thinkEl = addThinking();
+
+    var contextQ = 'Topic: ' + lastTopic;
+    var answer = await askClaude(contextQ, lastPages, action);
+
+    thinkEl.remove();
+    sendBtn.disabled = false;
+
+    addMessage('bot', '<div class="answer-box">' + answer + '</div>');
+    setTimeout(function() { showChips(topic); }, 300);
+}
+
+// ================================================================
+// QUIZ
+// ================================================================
+async function doQuiz() {
+    var topicForQuiz = lastTopic;
+    var pagesForQuiz = lastPages.slice();
+
+    if (!topicForQuiz) {
+        // Pick random topic
+        var topics = Object.keys(TOPIC_PAGE_MAP);
+        topicForQuiz = topics[Math.floor(Math.random() * topics.length)];
+        pagesForQuiz = [TOPIC_PAGE_MAP[topicForQuiz].start];
+    }
+
+    sendBtn.disabled = true;
+    var thinkEl = addThinking('Generating a quiz question from the textbook... &#x1F9EA;');
+    var answer = await askClaude('Create a quiz question about ' + topicForQuiz, pagesForQuiz, 'quiz');
+    thinkEl.remove();
+    sendBtn.disabled = false;
+
+    addMessage('bot', '<div class="answer-box">' + answer + '</div>');
+    setTimeout(function() { showChips(topicForQuiz); }, 300);
+}
+
+// ================================================================
+// TOPIC MENU
+// ================================================================
+function showTopicMenu() {
+    var strands = [
+        { label:'&#x1F33F; Strand 1 - Life and Living', color:'#e8f5e9', border:'#10b981',
+          topics:['The Biosphere','Biodiversity','Sexual Reproduction','Variation'] },
+        { label:'&#x1F9F1; Strand 2 - Matter and Materials', color:'#e3f2fd', border:'#2196f3',
+          topics:['Properties of Materials','Separating Mixtures','Acids, Bases and Neutral Substances','The Periodic Table of Elements'] },
+        { label:'&#x26A1; Strand 3 - Energy and Change', color:'#fff8e1', border:'#f59e0b',
+          topics:['Renewable and Non-renewable Energy','Potential and Kinetic Energy','Heat: Energy Transfer','Heat Insulation and Energy Saving','Energy Transfer to Surroundings','The National Electricity Supply System'] },
+        { label:'&#x1F30D; Strand 4 - Planet Earth and Beyond', color:'#f3e8ff', border:'#a855f7',
+          topics:['Relationship of the Earth to the Sun','Relationship of the Moon to the Earth','Historical Development of Astronomy'] }
+    ];
+
+    var html = '&#x1F4CB; <b>Grade 7 Science - Topic Menu</b><br><br>';
+    strands.forEach(function(s) {
+        html += '<div style="background:' + s.color + ';border-left:3px solid ' + s.border + ';padding:8px 12px;border-radius:8px;margin-bottom:8px;">';
+        html += '<b style="font-size:13px;">' + s.label + '</b><br>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;">';
+        s.topics.forEach(function(t) {
+            var pg = TOPIC_PAGE_MAP[t];
+            var ov = TOPIC_OVERVIEWS[t];
+            html += '<span onclick="handleTopicClick(\'' + t.replace(/'/g,"\\'") + '\')" ' +
+                'style="background:white;border:1px solid ' + s.border + ';border-radius:14px;padding:4px 10px;font-size:12px;cursor:pointer;color:#333;display:inline-flex;align-items:center;gap:4px;">' +
+                (ov ? ov.emoji + ' ' : '') + t +
+                (pg ? ' <span style="color:#aaa;font-size:11px;">p.' + pg.start + '</span>' : '') +
+                '</span>';
+        });
+        html += '</div></div>';
+    });
+    addMessage('bot', html);
+}
+
+// ================================================================
+// GLOSSARY
+// ================================================================
+function showGlossary() {
+    var letters = {};
+    Object.entries(TOPIC_OVERVIEWS).forEach(function(pair) {
+        var topic = pair[0]; var ov = pair[1];
+        ov.keywords.forEach(function(kw) {
+            var l = kw[0].toUpperCase();
+            if (!letters[l]) letters[l] = [];
+            if (!letters[l].find(function(e){ return e.kw === kw; })) {
+                letters[l].push({ kw:kw, topic:topic, page:TOPIC_PAGE_MAP[topic].start });
+            }
+        });
+    });
+
+    var sortedLetters = Object.keys(letters).sort();
+    var html = '&#x1F4DA; <b>Key Terms - Grade 7 Science</b><br><br>';
+
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">';
+    sortedLetters.forEach(function(l) {
+        html += '<span style="background:#e8f5f0;color:#0a6e50;border:1px solid #10b981;border-radius:10px;padding:3px 9px;font-size:12px;cursor:pointer;font-weight:600;">' + l + '</span>';
+    });
+    html += '</div>';
+
+    sortedLetters.forEach(function(l) {
+        html += '<b style="color:#10b981;font-size:14px;">' + l + '</b><br>';
+        letters[l].sort(function(a,b){ return a.kw.localeCompare(b.kw); }).forEach(function(e) {
+            html += '<span onclick="handleTopicClick(\'' + e.topic.replace(/'/g,"\\'") + '\')" ' +
+                'style="display:inline-block;padding:3px 10px;margin:2px 2px 2px 0;background:#f0f4f8;border-radius:10px;font-size:13px;cursor:pointer;color:#0a6e50;">' +
+                e.kw + ' <span style="color:#aaa;font-size:11px;">p.' + e.page + '</span></span>';
+        });
+        html += '<br>';
+    });
+    addMessage('bot', html);
+}
+
+// ================================================================
+// TOPIC CLICK
+// ================================================================
+async function handleTopicClick(topic) {
+    addMessage('user', topic);
+    var ov  = TOPIC_OVERVIEWS[topic];
+    var rng = TOPIC_PAGE_MAP[topic];
+    if (!ov || !rng) { handlePDFQuery(topic, 'answer'); return; }
+
+    // Show topic intro with clickable keywords
+    var html = ov.emoji + ' <b>' + topic + '</b> <span style="font-size:11px;color:#888;">' + ov.strand + '</span><br><br>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:5px;">';
+    ov.keywords.forEach(function(kw) {
+        html += '<span onclick="handlePDFQuery(\'' + kw.replace(/'/g,"\\'") + '\',\'answer\')" ' +
+            'style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:14px;padding:4px 11px;font-size:12px;cursor:pointer;font-weight:600;">' + kw + '</span>';
+    });
+    html += '</div>';
+    addMessage('bot', html);
+
+    lastTopic = topic;
+    lastPages = [rng.start, rng.start + 1];
+
+    // Show first page
+    showPageInChat(rng.start, topic);
+
+    sendBtn.disabled = true;
+    var thinkEl = addThinking('Reading the textbook about <b>' + topic + '</b>... &#x1F4D6;');
+
+    var answer = await askClaude(
+        'Give me a clear overview of ' + topic + ' as shown on these textbook pages. Include the main concepts and key terms.',
+        lastPages, 'answer'
+    );
+    thinkEl.remove();
+    sendBtn.disabled = false;
+
+    var ansDiv = document.createElement('div');
+    ansDiv.className = 'msg bot';
+    ansDiv.innerHTML = '<div class="answer-box">' + answer + '</div>';
+    msgBox.appendChild(ansDiv);
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    setTimeout(function() { showChips(topic); }, 300);
+}
+
+// ================================================================
+// CHAT HANDLER
+// ================================================================
+const SA_GREETINGS = ["hi","hello","hey","aweh","heita","howzit","sho","yo","sup"];
+const CHAT_WORDS   = new Set(["ok","okay","cool","nice","good","great","wow","sure","yes","no","nah","maybe","thanks","thank you","lol","haha","lekker","alright","yebo","sharp","eish","hayi","yoh","sho","ready","got it","makes sense","i see"]);
+
+const REPLIES_GREET   = ["Aweh chommie! &#x1F44B; What topic are we tackling today?","Heita! &#x1F60E; Ready to learn? Pick a topic from the menu!","Yoh sharp! &#x1F525; What are we studying today?","Howzit! &#x1F603; Brain switched on? Let's go!"];
+const REPLIES_HOWRU   = ["Sharp sharp! &#x1F4AA; Brain fully charged and ready!","Lekker chommie &#x1F60E; better than Eskom on a good day!","Yoh I'm buzzing &#x26A1; ready to help you smash this science!"];
+const REPLIES_CHAT    = ["Lekker! &#x1F4AA; Tap a topic from the menu above or ask me anything!","Sharp! &#x1F525; What topic shall we cover?","Aweh &#x1F60E; what are we learning today?"];
+
+function handleSend() {
+    var input = document.getElementById('userInput');
+    var query = input.value.trim();
+    if (!query || sendBtn.disabled) return;
+    input.value = '';
+    addMessage('user', query);
+
+    var ql = query.toLowerCase().trim();
+
+    // Menu / glossary / quiz
+    if (['menu','topics','topic menu','show topics','contents'].includes(ql)) { showTopicMenu(); return; }
+    if (['glossary','words','terms','terminology','show glossary'].includes(ql)) { showGlossary(); return; }
+    if (ql.includes('quiz') || ql.includes('test me') || ql.includes('ask me a question')) { doQuiz(); return; }
+
+    // Named people
+    if (ql.includes('leslee')) {
+        addMessage('bot', "Yoh &#x1F604; Leslee is the <b>visionary behind this whole platform</b> - Coach L Academy, this bot, all of it built from her belief that young people deserve better. &#x1F331;");
+        return;
+    }
+    if (ql.includes('linda'))              { addMessage('bot', "Yoh Linda &#x1F604; he's the one who'll remind you to focus! If you slack, he'll call you out &#x1F602;"); return; }
+    if (ql.includes('lexi')||ql.includes('alexis')) { addMessage('bot', "Lexi &#x1F604; sharp as anything - reads once and just <em>gets</em> it. First to finish, always helps the next person. Good energy! &#x26A1;"); return; }
+    if (ql.includes('sadee'))              { addMessage('bot', "Yoh Sadee &#x1F64F; spiritually grounded, deeply compassionate. Makes the whole room calmer. Sweet soul. &#x1F49B;"); return; }
+
+    // Greetings
+    if (SA_GREETINGS.some(function(g){ return ql === g || ql.startsWith(g+' ') || ql.startsWith(g+'!'); })) {
+        addMessage('bot', rand(REPLIES_GREET)); return;
+    }
+    if (ql.includes('how are you') || ql.includes("how's it") || ql === 'howzit') {
+        addMessage('bot', rand(REPLIES_HOWRU)); return;
+    }
+    if (CHAT_WORDS.has(ql)) {
+        addMessage('bot', rand(REPLIES_CHAT)); return;
+    }
+
+    // Science question - use Claude Vision
+    handlePDFQuery(query, 'answer');
+}
+
+// ================================================================
+// DELEGATION (data-action chips)
+// ================================================================
+document.addEventListener('click', function(e) {
+    var el = e.target;
+    for (var i = 0; i < 6; i++) {
+        if (!el || el === document.body) break;
+        if (el.dataset && el.dataset.action) {
+            if (el.dataset.action === 'menu')     { showTopicMenu(); return; }
+            if (el.dataset.action === 'glossary') { showGlossary();  return; }
+            if (el.dataset.action === 'quiz')     { doQuiz();        return; }
+        }
+        el = el.parentElement;
+    }
+});
+
+// ================================================================
+// OPEN / CLOSE
+// ================================================================
+function openChat() {
+    document.getElementById('chat-modal').style.display = 'flex';
+    document.getElementById('maxi-fab').classList.add('hidden');
+}
+function closeChat() {
+    document.getElementById('chat-modal').style.display = 'none';
+    document.getElementById('maxi-fab').classList.remove('hidden');
+    try { window.parent.postMessage('closeBot','*'); } catch(e) {}
+    if (window.self === window.top && window.history.length > 1) window.history.back();
+}
+
+// Android keyboard push-up
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function() {
+        var modal = document.getElementById('chat-modal');
+        var kbH = window.innerHeight - window.visualViewport.height;
+        if (kbH > 100) {
+            modal.style.height = window.visualViewport.height + 'px';
+            modal.style.top    = kbH + 'px';
+            msgBox.scrollTop   = msgBox.scrollHeight;
+        } else {
+            modal.style.height = '';
+            modal.style.top    = '0';
+        }
+    });
+}
+
+// ================================================================
+// BOOT
+// ================================================================
+(function init() {
+    msgBox  = document.getElementById('messages');
+    sendBtn = document.getElementById('sendBtn');
+
+    if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    }
+
+    document.getElementById('maxi-fab').classList.add('hidden');
+
+    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY.trim() === '') {
+        addMessage('bot',
+            '&#x26A0;&#xFE0F; <b>One quick setup step!</b><br><br>' +
+            'Open this HTML file in a text editor and find:<br>' +
+            '<code style="font-size:12px;background:#f0f0f0;padding:3px 8px;border-radius:4px;display:inline-block;margin:4px 0;">const ANTHROPIC_API_KEY = \'\';</code><br><br>' +
+            'Paste your API key between the quotes.<br>' +
+            'Get a free key at <b>console.anthropic.com</b> &#x1F511;<br><br>' +
+            'Once added, reload the page and everything works!'
+        );
+    }
+
+    loadPDF();
+})();
+</script>
+</body>
+</html>
