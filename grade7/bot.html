@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>Maxi Pie - Grade 7 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style>
+        .page-img { width:100%; border-radius:10px; margin-top:8px; border:1px solid #ddd; display:block; cursor:zoom-in; }
+        .page-img-wrap { position:relative; background:#f5f5f5; border-radius:10px; margin-top:8px; min-height:60px; }
+        .page-img-label { font-size:11px; color:#aaa; text-align:right; padding:2px 6px; }
+        #img-zoom-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:9999; justify-content:center; align-items:center; flex-direction:column; }
+        #img-zoom-modal.open { display:flex; }
+        #img-zoom-modal img { max-width:96%; max-height:85vh; border-radius:8px; object-fit:contain; touch-action:pinch-zoom; }
+        #img-zoom-close { position:absolute; top:16px; right:16px; background:#ef4444; color:white; border:none; border-radius:50%; width:40px; height:40px; font-size:20px; font-weight:bold; cursor:pointer; z-index:10000; }
+        #img-zoom-label { color:#ccc; font-size:13px; margin-top:10px; }
+    </style>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        html { height: 100%; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background:#0a1a33; height: 100%; margin:0; overflow:hidden; }
+
+        #maxi-fab { position:fixed; bottom:25px; left:25px; width:60px; height:60px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); z-index:999; border:3px solid #fff; transition:opacity 0.2s; }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit: cover; }
+        #maxi-fab.hidden { opacity:0; pointer-events:none; }
+
+        #chat-modal { display:flex; flex-direction:column; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(7, 7, 12, 0.95); z-index:1000; }
+        .chat-container { display:flex; flex-direction:column; flex:1; width:100%; max-width:500px; margin:0 auto; background:#f0f4f8; min-height:0; overflow:hidden; }
+
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; }
+        .chat-header img { width:45px; height:45px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left:auto; background:#ef4444; color:white; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer; }
+
+        .chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px; min-height:0; }
+        .msg { max-width:85%; padding:12px 16px; border-radius:18px; line-height:1.4; font-size:16px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        .bot { align-self:flex-start; background:white; color:#333; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+
+        .chat-input-area { padding:15px; background:white; display:flex; gap:10px; border-top:1px solid #ddd; flex-shrink:0; }
+        .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; font-size:16px; color:#333; background:#fff; -webkit-text-fill-color:#333; }
+        .send-btn { background:#10b981; color:white; border:none; padding:10px; height:45px; border-radius:25px; font-weight:bold; cursor:pointer; }
+
+        .chip-row { display:flex; flex-wrap:wrap; gap:8px; padding:6px 0 2px; }
+        .chip {
+            background:#e8f5f0; color:#0a6e50; border:1.5px solid #10b981;
+            border-radius:20px; padding:7px 16px; font-size:14px; font-weight:600;
+            cursor:pointer; transition:background 0.15s, transform 0.1s; white-space:nowrap;
+        }
+        .chip:hover { background:#10b981; color:white; transform:scale(1.04); }
+        .chip:active { transform:scale(0.97); }
+    </style>
+</head>
+<body>
+
+<div id="maxi-fab" onclick="openChat()"><img src="cat_full.png"></div>
+
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png">
+            <div><h3>Maxi Pie</h3><small style="color:#10b981">Grade 7 Science Chommie &#x1F1FF;&#x1F1E6;</small></div>
+            <button class="close-btn" onclick="closeChat()">&#x00D7;</button>
+        </div>
+        <div id="messages" class="chat-messages">
+            <div class="msg bot">Sho! I'm <strong>Maxi Pie</strong> &#x1F43E;, your Grade 7 science sidekick! Ask me about the biosphere, biodiversity, reproduction, acids, energy, electricity, and more!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask me something, chommie..."
+                onkeypress="if(event.key==='Enter') handleSend()"
+                onfocus="setTimeout(function(){ document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight; }, 400)">
+            <button onclick="handleSend()" class="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- Image zoom modal -->
+<div id="img-zoom-modal" onclick="closeZoom(event)">
+    <button id="img-zoom-close" onclick="closeZoom()">&#x00D7;</button>
+    <img id="img-zoom-src" src="">
+    <div id="img-zoom-label"></div>
+</div>
+
+<script>
+    function openZoom(src, label) {
+        document.getElementById('img-zoom-src').src = src;
+        document.getElementById('img-zoom-label').textContent = label || '';
+        document.getElementById('img-zoom-modal').classList.add('open');
+    }
+    function closeZoom(e) {
+        if (!e || e.target === document.getElementById('img-zoom-modal') || e.target === document.getElementById('img-zoom-close')) {
+            document.getElementById('img-zoom-src').src = '';
+            document.getElementById('img-zoom-modal').classList.remove('open');
+        }
+    }
+
+    function handleDelegatedTap(target) {
+        if (!target) return;
+        let el = target;
+        for (let i = 0; i < 5; i++) {
+            if (!el || el === document.body) break;
+            if (el.dataset) {
+                if (el.dataset.action) {
+                    if (el.dataset.action === 'menu')    { showTopicMenu(); return; }
+                    if (el.dataset.action === 'glossary'){ showGlossary(null); return; }
+                    if (el.dataset.action === 'quiz')    { startQuiz(); return; }
+                }
+                if (el.dataset.kwsearch) {
+                    addMessage('user', el.dataset.kwsearch);
+                    setTimeout(() => handlePDFQuery(el.dataset.kwsearch), 100);
+                    return;
+                }
+                if (el.dataset.term) {
+                    lookupTerm(el.dataset.term, parseInt(el.dataset.page) || 0);
+                    return;
+                }
+                if (el.dataset.zoompage) {
+                    const pg = parseInt(el.dataset.zoompage);
+                    const cached = PAGE_IMAGES[pg];
+                    if (cached) { openZoom(cached, el.dataset.zoomlabel || ''); }
+                    else { renderPageImage(pg).then(d => { if(d) openZoom(d, el.dataset.zoomlabel||''); }); }
+                    return;
+                }
+            }
+            el = el.parentElement;
+        }
+    }
+    document.addEventListener('click', function(e) { handleDelegatedTap(e.target); });
+    document.addEventListener('touchend', function(e) {
+        const touch = e.changedTouches && e.changedTouches[0];
+        if (!touch) return;
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (!el) return;
+        let node = el;
+        for (let i = 0; i < 5; i++) {
+            if (!node || node === document.body) break;
+            if (node.dataset && (node.dataset.kwsearch || node.dataset.term || node.dataset.zoompage)) {
+                e.preventDefault();
+                handleDelegatedTap(node);
+                return;
+            }
+            node = node.parentElement;
+        }
+    }, { passive: false });
+</script>
+
+<script>
+    let knowledgeBase = [];
+    let fuse = null;
+    let fuseFallback = null;
+    let personalInquiryCount = 0;
+    let pdfReady = false;
+    let pendingQuery = null;
+
+    const PAGE_IMAGES = {};
+    let pdfDocRef = null;
+
+    async function renderPageImage(pageNum) {
+        if (PAGE_IMAGES[pageNum]) return PAGE_IMAGES[pageNum];
+        if (!pdfDocRef) return null;
+        try {
+            const page = await pdfDocRef.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+            PAGE_IMAGES[pageNum] = dataUrl;
+            return dataUrl;
+        } catch(e) {
+            console.warn('Page render failed for page', pageNum, e);
+            return null;
+        }
+    }
+
+    function showPageImage(pageNum, label) {
+        if (!pageNum || pageNum < 1 || !pdfDocRef) return;
+        const uid = 'pg' + pageNum + '_' + Date.now();
+        const lbl = 'Textbook p.' + pageNum + (label ? ' - ' + label : '');
+
+        const div = document.createElement('div');
+        div.className = 'msg bot';
+        div.innerHTML = '<div class="page-img-wrap" id="' + uid + '">' +
+            '<div class="page-img-label">' + lbl + '</div>' +
+            '<div style="padding:10px;color:#aaa;font-size:13px;">&#x231B; Rendering p.' + pageNum + '...</div>' +
+            '</div>';
+        const box = document.getElementById('messages');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+
+        renderPageImage(pageNum).then(function(dataUrl) {
+            const wrap = document.getElementById(uid);
+            if (!wrap) return;
+            if (dataUrl) {
+                PAGE_IMAGES[pageNum] = dataUrl;
+                const imgEl = document.createElement('img');
+                imgEl.src = dataUrl;
+                imgEl.className = 'page-img';
+                imgEl.title = 'Tap to zoom';
+                imgEl.dataset.zoompage = pageNum;
+                imgEl.dataset.zoomlabel = 'p.' + pageNum + (label ? ' - ' + label : '');
+                wrap.innerHTML = '<div class="page-img-label">' + lbl + ' <span style="color:#10b981;font-size:11px;">tap to zoom</span></div>';
+                wrap.appendChild(imgEl);
+            } else {
+                wrap.innerHTML = '<div class="page-img-label" style="color:#e88;">' + lbl + ' - image unavailable</div>';
+            }
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    let lastQuery = '';
+    let lastRawAnswer = '';
+
+    function teacherExplain(rawText, query) {
+        const sections = extractTextbookSections(rawText);
+        let html = '<b>Let\'s break it down chommie &#x1F447;</b><br><br>';
+
+        const cleaned = rawText
+            .replace(/NatSci&Tech_Gr[0-9]+_Book\.indb[^\n]*/g, '')
+            .replace(/[a-z]{2,5}\/ph[a-z]{3,}\/[^\s]{8,}/g, '')
+            .replace(/ckg\/\w+\/[^\s]*/g, '')
+            .replace(/F1le:[^\s]*/g, '')
+            .replace(/Chapter [A-Za-z\s]+ \d+\.\s*/g, '')
+            .replace(/\s{2,}/g,' ');
+        const sentences = (cleaned.match(/[^.!?]{20,}[.!?]+/g)||[]).map(s=>s.trim());
+        const keywords = (query||lastQuery).toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>2);
+        const best = sentences.filter(s => {
+            const sl = s.toLowerCase();
+            const isJunk = /^(do you|can you|list|find|draw|write|look at|think about|describe|complete)/i.test(s);
+            return !isJunk && keywords.some(k => sl.includes(k));
+        }).slice(0, 4);
+
+        html += '&#x1F9E0; <b>What the textbook says:</b><br>' + best.map(s => '&#x1F4CC; ' + s).join('<br><br>') + '<br><br>';
+        html += '&#x1F4A1; <b>Simple version:</b> Strip away the big words - the key idea is what those sentences describe.<br><br>';
+
+        const tq = (query || lastQuery || '').toLowerCase();
+        const saTeach =
+              tq.includes('acid') || tq.includes('base') || tq.includes('ph')
+            ? "SA mines produce sulfuric acid from gold processing - your stomach uses hydrochloric acid. Acids are everywhere in SA life! &#x1F9EA;"
+            : tq.includes('biosphere') || tq.includes('atmosphere') ? "SA's 9 biomes show all three components of the biosphere - lithosphere, hydrosphere and atmosphere - working together! &#x1F30D;"
+            : tq.includes('biodiversity') ? "The Cape Floral Kingdom has more plant species per square km than the Amazon - SA biodiversity is world-class! &#x1F33A;"
+            : tq.includes('reproduct') || tq.includes('pollinat') ? "Cape sugarbirds pollinate fynbos - without them, hundreds of SA plant species would vanish! &#x1F338;"
+            : tq.includes('energy') || tq.includes('renewable') ? "SA's Eskom crisis shows why renewable energy matters - the Karoo has world-class solar and wind resources! &#x26A1;"
+            : tq.includes('heat') || tq.includes('conduction') ? "Joburg's Highveld thunderstorms - convection heating air rapidly, creating violent afternoon storms! &#x1F321;"
+            : tq.includes('periodic') || tq.includes('element') ? "SA mines gold (Au), platinum (Pt) and manganese (Mn) - periodic table elements from SA soil every day! &#x2697;"
+            : tq.includes('moon') || tq.includes('eclipse') || tq.includes('tide') ? "SA's coastlines experience tides twice daily - the Moon pulling the Indian and Atlantic Oceans! &#x1F315;"
+            : tq.includes('astronomy') || tq.includes('telescope') ? "SA's SALT telescope in Sutherland and MeerKAT in the Karoo make SA a world astronomy leader! &#x1F52D;"
+            : "In South Africa you can see this everywhere - from the Karoo to Soweto to the ocean. Science is all around us! &#x1F30D;";
+
+        html += '&#x1F440; <b>Real-life SA example:</b> ' + saTeach;
+
+        if (sections.keyQuestions.length > 0) {
+            html += '<br><br><div style="background:#fff8e1;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:8px;">';
+            html += '<strong>&#x1F511; Key Questions to Think About</strong><br>';
+            html += sections.keyQuestions.map(q => '&#x2022; ' + q).join('<br>');
+            html += '</div>';
+        }
+        if (sections.keyConcepts.length > 0) {
+            html += '<br><div style="background:#e8f5e9;border-left:3px solid #10b981;padding:10px 12px;border-radius:8px;">';
+            html += '<strong>&#x1F4A1; Key Concepts</strong><br>';
+            html += sections.keyConcepts.map(c => '&#x2022; ' + c).join('<br>');
+            html += '</div>';
+        }
+        if (sections.newWords.length > 0) {
+            html += buildNewWordsHTML(sections.newWords);
+        }
+        return html;
+    }
+
+    function buildNewWordsHTML(words) {
+        if (!words || words.length === 0) return '';
+        let html = '<br><div style="background:#f3e8ff;border-left:3px solid #a855f7;padding:10px 12px;border-radius:8px;margin-top:6px;">';
+        html += '<strong>&#x1F50D; New Words</strong><br><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">';
+        words.forEach(function(w) {
+            const entry = GLOSSARY[w] || GLOSSARY[w.toLowerCase()] || GLOSSARY[w.charAt(0).toUpperCase() + w.slice(1)];
+            const pg = entry ? entry.page : 0;
+            html += '<span data-term="' + w.replace(/"/g,'&quot;') + '" data-page="' + pg + '" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer;display:inline-block;">' + w + (pg ? '<span style="color:#10b981;font-size:11px;"> p.' + pg + '</span>' : '') + '</span>';
+        });
+        html += '</div></div>';
+        return html;
+    }
+
+    function showChips(topic) {
+        const chips = [
+            { label:'&#x1F4D6; Explain it simply', action:'explain' },
+            { label:'&#x1F4A1; Give an example',   action:'example' },
+            { label:'&#x1F50D; Go deeper',          action:'deeper'  },
+            { label:'&#x1F9EA; Quiz me on this',    action:'quiz'    }
+        ];
+        const box = document.getElementById('messages');
+        const row = document.createElement('div');
+        row.className = 'chip-row';
+        chips.forEach(function(c) {
+            const btn = document.createElement('button');
+            btn.className = 'chip';
+            btn.innerHTML = c.label;
+            btn.onclick = function() { chipAction(c.action, topic); };
+            row.appendChild(btn);
+        });
+        box.appendChild(row);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function chipAction(action, topic) {
+        const labels = { explain:'Explain it simply', example:'Give an example', deeper:'Go deeper', quiz:'Quiz me on this' };
+        addMessage('user', labels[action]);
+
+        setTimeout(function() {
+            if (action === 'quiz') { startQuiz(); return; }
+
+            if (!lastRawAnswer) {
+                addMessage('bot', "Eish &#x1F605; ask me a topic question first, then I can do that for you!");
+                setTimeout(function() { showChips(topic); }, 600);
+                return;
+            }
+
+            if (action === 'explain') {
+                addMessage('bot', teacherExplain(lastRawAnswer, lastQuery));
+
+            } else if (action === 'example') {
+                const lq = lastQuery.toLowerCase();
+                const saContext =
+                      lq.includes('acid') || lq.includes('base') || lq.includes('ph')
+                    ? "SA mines produce sulfuric acid processing gold and platinum ores - and your stomach uses hydrochloric acid to digest food! &#x1F9EA;"
+                    : lq.includes('biosphere') || lq.includes('atmosphere') || lq.includes('lithosphere')
+                    ? "SA has 9 biomes - from the lush Garden Route to the dry Karoo. The biosphere here is one of the richest on Earth! &#x1F30D;"
+                    : lq.includes('biodiversity') || lq.includes('adaptation') || lq.includes('species')
+                    ? "SA is a biodiversity hotspot - the Cape Floral Kingdom has more plant species per square km than the Amazon! &#x1F33A;"
+                    : lq.includes('reproduct') || lq.includes('pollinat') || lq.includes('fertilisa')
+                    ? "Cape sugarbirds and sunbirds pollinate fynbos flowers - without them, hundreds of SA plant species would go extinct! &#x1F338;"
+                    : lq.includes('energy') || lq.includes('renewable') || lq.includes('eskom') || lq.includes('coal')
+                    ? "SA gets 80% of its electricity from coal - but the Karoo has some of the best solar and wind energy resources on Earth! &#x26A1;"
+                    : lq.includes('kinetic') || lq.includes('potential')
+                    ? "The Gariep Dam converts gravitational potential energy into electricity - water falling 90m powers thousands of SA homes!"
+                    : lq.includes('heat') || lq.includes('conduction') || lq.includes('insulation')
+                    ? "SA's Highveld thunderstorms are convection at work - hot ground heats air rapidly, causing violent updrafts! &#x1F321;"
+                    : lq.includes('periodic') || lq.includes('element') || lq.includes('atom')
+                    ? "SA mines gold (Au), platinum (Pt) and manganese (Mn) - all real elements on the periodic table mined from SA soil! &#x2697;"
+                    : lq.includes('mixture') || lq.includes('separat') || lq.includes('filter')
+                    ? "SA's water treatment plants use filtration, sedimentation and chlorination to make safe drinking water from rivers! &#x1F52C;"
+                    : lq.includes('moon') || lq.includes('eclipse') || lq.includes('tide')
+                    ? "SA's coastlines experience tides twice daily - the Moon's gravity pulling the Indian and Atlantic Oceans! &#x1F315;"
+                    : lq.includes('sun') || lq.includes('season') || lq.includes('orbit')
+                    ? "SA experiences opposite seasons to Europe - when it's winter in London it's summer in Cape Town, because of Earth's tilted axis! &#x2600;"
+                    : lq.includes('astronomy') || lq.includes('telescope') || lq.includes('salt') || lq.includes('meerkat')
+                    ? "SA is a world astronomy leader - the <b>SALT telescope</b> in Sutherland and <b>MeerKAT</b> in the Karoo are among the most powerful on Earth! &#x1F52D;"
+                    : "In South Africa you can see science everywhere - from the Karoo to Soweto to the ocean. Science is all around us! &#x1F30D;";
+
+                const sections = extractTextbookSections(lastRawAnswer);
+                let html = '&#x1F4A1; <b>Real-life example - ' + lastQuery + '</b><br><br>&#x1F1FF;&#x1F1E6; <b>SA Connection:</b><br>' + saContext;
+                if (sections.questions.length > 0) {
+                    html += '<br><br><div style="background:#e8f0fe;border-left:3px solid #6366f1;padding:10px 12px;border-radius:8px;">';
+                    html += '<strong>&#x2753; Think About It</strong><br>';
+                    html += sections.questions.slice(0,3).map(function(q){ return '&#x2022; ' + q; }).join('<br>');
+                    html += '</div>';
+                }
+                addMessage('bot', html);
+
+            } else if (action === 'deeper') {
+                if (fuse) {
+                    const results = fuse.search(lastQuery, { limit: 6 });
+                    if (results.length > 0) {
+                        const rawText = results.map(function(r){ return r.item.text; }).join(' ');
+                        const deepAnswer = formatAnswer(lastQuery, rawText);
+                        addMessage('bot', '&#x1F50D; <b>Going deeper on "' + lastQuery + '" &#x1F447;</b><br><br>' + deepAnswer);
+                    } else {
+                        addMessage('bot', "Eish &#x1F605; I couldn't find more detail on that. Try rephrasing chommie!");
+                    }
+                }
+            }
+            setTimeout(function() { showChips(topic); }, 700);
+        }, 350);
+    }
+
+    // ---- PDF chunk search system ----
+    let PDF_CHUNKS = [];
+
+    const SYNONYMS = {
+        electricity: ["current","power","voltage","electric","electrical energy"],
+        rocks: ["stone","mineral","rock","geology","igneous","metamorphic"],
+        fossils: ["fossil","prehistoric","fossilized","fossilised","remains"],
+        skeleton: ["backbone","spine","skull","rib","vertebrae","endoskeleton"],
+        metal: ["iron","copper","steel","aluminium","gold","silver","zinc","rust"],
+        food: ["eat","feed","nutrition","diet","predator","prey"],
+        plant: ["tree","flower","leaf","photosynthesis","seed","root","stem"],
+        animal: ["creature","organism","mammal","reptile","bird","fish"],
+        circuit: ["electrical circuit","series circuit","parallel circuit","conductor","switch","bulb"],
+        fuel: ["coal","petrol","diesel","gas","fossil fuel","burn","combustion"],
+        structure: ["frame","shell","support","beam","column","strut","load"],
+        surface: ["crust","layer","mantle","core","ground","soil","lithosphere"],
+        sediment: ["sedimentary","sand","mud","gravel","deposit","compacted","layer"],
+        material: ["substance","raw material","processed","natural","manufactured"],
+        ligament: ["joint","tendon","connective","tissue","bone connection"],
+        amphibian: ["frog","toad","salamander","newt","tadpole","metamorphosis"],
+        reptile: ["snake","lizard","crocodile","tortoise","scales","cold blooded"],
+        photosynthesis: ["chlorophyll","sunlight","carbon dioxide","oxygen","glucose","leaves"],
+        producer: ["plant","photosynthesis","makes food","autotroph","green plant"],
+        consumer: ["herbivore","carnivore","omnivore","eats","feeds on","heterotroph"],
+        vertebrate: ["backbone","spine","fish","amphibian","reptile","bird","mammal"],
+        invertebrate: ["no backbone","insect","worm","crab","snail","spider"],
+        weathering: ["erosion","breaking down","wind","water","rock fragments"],
+        conductor: ["copper","metal","allows electricity","low resistance"],
+        insulator: ["rubber","plastic","wood","prevents electricity","high resistance"],
+        potential: ["stored energy","elastic","spring","compressed","stretched","catapult","movement energy"],
+        movement: ["kinetic energy","motion","speed","force","work","input","output"],
+        gravity: ["weight","mass","pull","fall","drop","earth pulls"],
+        lifecycle: ["egg","larva","pupa","adult","metamorphosis","reproduce","offspring"],
+        habitat: ["ecosystem","biome","environment","forest","ocean","grassland","species"],
+        season: ["summer","winter","spring","autumn","solstice","equinox","earth tilts"],
+        mantle: ["crust","core","lithosphere","tectonic","plate","lava","magma"],
+        subsoil: ["topsoil","bedrock","humus","soil layers","underground"],
+        biosphere: ["lithosphere","hydrosphere","atmosphere","habitat","ecosystem","organism","environment"],
+        biodiversity: ["species","classification","adaptation","food web","conservation","ecosystem","habitat"],
+        acid: ["base","neutral","pH","indicator","litmus","alkali","neutralisation","react","corrosive","vinegar"],
+        mixture: ["solution","solute","solvent","filtration","distillation","evaporation","chromatography","saturated"],
+        energy: ["renewable","non-renewable","fossil fuel","solar","wind","coal","Eskom","kinetic","potential","joule"],
+        kinetic: ["potential","gravitational","elastic","mechanical","joule","speed","mass","movement","height"],
+        heat: ["thermal","temperature","conduction","convection","radiation","transfer","insulator","conductor","absorb"],
+        moon: ["lunar","phase","eclipse","tide","orbit","gravity","new moon","full moon","crescent","wax","wane"],
+        earth: ["sun","orbit","rotation","revolution","season","axis","tilt","solstice","equinox","day","night"],
+        telescope: ["astronomy","SALT","MeerKAT","Karoo","Sutherland","Galileo","Copernicus","planet","star","galaxy"],
+        reproduction: ["pollination","fertilisation","seed","germination","ovule","pollen","embryo","zygote","sexual"],
+        periodic: ["element","atom","molecule","metal","non-metal","symbol","atomic number","proton","neutron"]
+    };
+
+    function normalizePDF(text) {
+        return text.toLowerCase().replace(/[^\w\s]/g, "").trim();
+    }
+
+    function getKeywords(q) {
+        const words = normalizePDF(q).split(" ").filter(w => w.length > 2);
+        const expanded = [...words];
+        words.forEach(w => {
+            if (SYNONYMS[w]) expanded.push(...SYNONYMS[w]);
+        });
+        return [...new Set(expanded)];
+    }
+
+    function scoreChunk(chunk, keywords) {
+        const text = normalizePDF(chunk);
+        const raw = chunk.toLowerCase();
+
+        const trimmed = chunk.trim();
+        if (trimmed.endsWith('?')) return -5;
+        if (/^(what |how |why |which |give |list |name |describe |explain |below is|now we are|show where|carefully study)/i.test(trimmed)) return -8;
+
+        const isJunk = /^(now give|do not tell|use the knife|tap gently|cut out|paste|tick|fill in|write the names|perhaps an adult|as such the|they are designed|enabling activities|learners will have|if possible combine|hint what other|indb 20)/i.test(trimmed);
+        if (isJunk) return -10;
+
+        let score = 0;
+        keywords.forEach(k => { if (text.includes(k)) score += 2; });
+
+        const joined = keywords.slice(0, 3).join(" ");
+        if (joined.length > 3 && text.includes(joined)) score += 5;
+
+        if (keywords.some(k => raw.startsWith(k))) score += 3;
+
+        if (/ is | are | means | refers to /i.test(chunk)) score += 2;
+
+        if (chunk.length > 60 && chunk.length < 300) score += 2;
+
+        if (/^[A-Z][a-z]+,\s|,\s[a-z]+ [a-z]+,/i.test(chunk)) score -= 3;
+
+        if (/teacher|learner|activity|exercise book|instruction|materials:|question:/i.test(raw)) score -= 3;
+
+        return score;
+    }
+
+    function searchPDFChunks(q) {
+        if (PDF_CHUNKS.length === 0) return null;
+        const keywords = getKeywords(q);
+        let bestScore = 0;
+        let bestIndex = 0;
+
+        PDF_CHUNKS.forEach((chunk, i) => {
+            const score = scoreChunk(chunk, keywords);
+            if (score > bestScore) { bestScore = score; bestIndex = i; }
+        });
+
+        if (bestScore === 0) return null;
+
+        return [
+            PDF_CHUNKS[bestIndex - 1] || "",
+            PDF_CHUNKS[bestIndex],
+            PDF_CHUNKS[bestIndex + 1] || ""
+        ].join(" ").trim();
+    }
+
+    function preparePDFChunks(fullText) {
+        PDF_CHUNKS = fullText
+            .split(/(?<=[.!?])\s+/)
+            .map(t => t.replace(/\s+/g, ' ').trim())
+            .filter(t => t.length > 40 && t.length < 600);
+    }
+
+    async function initResources() {
+        await initFromLearnerPDF();
+    }
+
+    let _loadStarted = false;
+    async function initFromLearnerPDF() {
+        if (_loadStarted) return;
+        _loadStarted = true;
+        const url = 'resources/logic7.pdf';
+        let pdf;
+        try {
+            pdf = await pdfjsLib.getDocument(url).promise;
+        } catch(e) {
+            console.error('PDF load failed:', e);
+            _loadStarted = false;
+            return;
+        }
+        pdfDocRef = pdf;
+
+        const totalPages = pdf.numPages;
+        let progressMsg = null;
+        for (let i = 1; i <= totalPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            // FIX: Better text joining that handles multi-column layouts
+            const text = textContent.items
+                .map(s => s.str)
+                .join(' ')
+                .replace(/([a-z])([A-Z])/g, '$1 $2')
+                .replace(/\s+/g, ' ');
+            knowledgeBase.push({ text: text, page: i });
+
+            if (i === 1) {
+                const box = document.getElementById('messages');
+                progressMsg = document.createElement('div');
+                progressMsg.className = 'msg bot';
+                progressMsg.id = 'pdf-progress';
+                progressMsg.innerHTML = '&#x1F4D6; Loading textbook... <b>0%</b>';
+                box.appendChild(progressMsg);
+                box.scrollTop = box.scrollHeight;
+            } else if (progressMsg && i % 15 === 0) {
+                const pct = Math.round((i / totalPages) * 100);
+                progressMsg.innerHTML = '&#x1F4D6; Loading textbook... <b>' + pct + '%</b> <span style="color:#aaa;font-size:12px;">(' + i + '/' + totalPages + ' pages)</span>';
+            }
+        }
+        if (progressMsg) progressMsg.remove();
+
+        fuse = new Fuse(knowledgeBase, { keys: ['text'], threshold: 0.3, ignoreLocation: true });
+        fuseFallback = new Fuse(knowledgeBase, { keys: ['text'], threshold: 0.6, ignoreLocation: true });
+        const fullText = knowledgeBase.map(p => p.text).join(' ');
+        preparePDFChunks(fullText);
+        pdfReady = true;
+        extractTOC();
+        buildGlossaryIndex();
+
+        if (pendingQuery) {
+            const q = pendingQuery;
+            pendingQuery = null;
+            setTimeout(function() {
+                const response = formatAnswer(q, knowledgeBase.map(p => p.text).join(' ').substring(0, 50000));
+                addMessage('bot', response);
+                setTimeout(function() { showChips(q); }, 600);
+            }, 300);
+        }
+
+        const box = document.getElementById('messages');
+        const readyMsg = document.createElement('div');
+        readyMsg.className = 'msg bot';
+        readyMsg.innerHTML = 'Sho! &#x1F4DA; Textbook loaded and ready chommie!<br><br>' +
+            '<span data-action="menu" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;display:inline-block;margin:4px 4px 4px 0;">&#x1F4CB; Topic Menu</span>' +
+            '<span data-action="glossary" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;display:inline-block;margin:4px;">&#x1F4DA; Glossary</span>' +
+            '<span data-action="quiz" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer;display:inline-block;margin:4px;">&#x1F9EA; Quiz me</span>';
+        box.appendChild(readyMsg);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    let tocChapters = [];
+
+    function extractTOC() {
+        tocChapters = [
+            "STRAND 1 - Life and Living",
+            "Unit 1: The Biosphere",
+            "Unit 2: Biodiversity",
+            "Unit 3: Sexual Reproduction",
+            "Unit 4: Variation",
+            "STRAND 2 - Matter and Materials",
+            "Unit 5: Properties of Materials",
+            "Unit 6: Separating Mixtures",
+            "Unit 7: Acids, Bases and Neutral Substances",
+            "Unit 8: The Periodic Table of Elements",
+            "STRAND 3 - Energy and Change",
+            "Unit 9: Renewable and Non-renewable Energy",
+            "Unit 10: Potential and Kinetic Energy",
+            "Unit 11: Heat: Energy Transfer",
+            "Unit 12: Heat Insulation and Energy Saving",
+            "Unit 13: Energy Transfer to Surroundings",
+            "Unit 14: The National Electricity Supply System",
+            "STRAND 4 - Planet Earth and Beyond",
+            "Unit 15: Relationship of the Earth to the Sun",
+            "Unit 16: Relationship of the Moon to the Earth",
+            "Unit 17: Historical Development of Astronomy"
+        ];
+    }
+
+    const SA_PERSONALITY = {
+        greetings: [
+            "Aweh chommie! &#x1F44B; What are we tackling today?",
+            "Yoh! Yoh! &#x1F604; You came ready hey - what topic?",
+            "Sharp sharp! &#x1F525; Let's get into some science!",
+            "Heita! &#x1F60E; Brain switched on or must I warm you up?"
+        ],
+        mood: [
+            "I'm buzzing like Eskom just came back on &#x1F604;&#x26A1;",
+            "Sharp chommie - brain fully charged &#x1F50B;",
+            "Yoh I'm ready! Let's go &#x1F525;",
+            "Better than a Friday after school &#x1F60E;"
+        ],
+        confusion: [
+            "Yoh chommie... that one flew over my head &#x1F605; Try again?",
+            "Eish &#x1F605; I didn't quite catch that - try saying it another way?",
+            "Hayi that's a tricky one... say it another way?",
+            "Yoh that's deep &#x1F440; break it down for me a bit"
+        ],
+        praise: [
+            "Sharp answer! &#x1F525; You're getting this!",
+            "Yoh you're clever hey &#x1F604;",
+            "Aweh that's solid thinking &#x1F4AA;",
+            "Even Leslee would nod at that one &#x1F60E;"
+        ],
+        encouragement: [
+            "Don't stress chommie, we build it step by step &#x1F4AA;",
+            "Even Lexi didn't get it first time &#x1F604;",
+            "Yoh this one confuses everyone at first &#x1F605;",
+            "You're close - just adjust it a bit &#x1F440;"
+        ],
+        jokes: [
+            "Yoh imagine asking Linda that &#x1F602; he'd say 'read properly!'",
+            "Lexi would already be on Google &#x1F606;",
+            "Sadee would guess and hope for the best &#x1F605;",
+            "Even Alexis would pause there hey &#x1F602;",
+            "Yoh this one would make the whole class quiet &#x1F636;"
+        ],
+        reactions: {
+            correct: ["&#x1F525; That's it!", "&#x1F4AF; Nailed it chommie!", "&#x2714; Perfect answer!"],
+            wrong: ["Eish not quite &#x1F605;", "Close but not there yet &#x1F440;", "Yoh almost chommie!"]
+        }
+    };
+
+    const SA_ULTRA_FLOW = {
+        greetings: [
+            "Aweh chommie! &#x1F44B; What are we tackling today?",
+            "Heita! &#x1F60E; Brain switched on or still loading?",
+            "Yoh! &#x1F604; You came ready hey - what topic?",
+            "Sharp sharp! &#x1F525; Let's get into it!",
+            "Howzit! &#x1F603; You ready or must I warm you up?",
+            "Aweh fam &#x1F60E; science vibes only today!",
+            "Yoh chommie, let's make your brain work &#x1F4AA;",
+            "Heita! Ready to flex that brain?",
+            "Aweh &#x1F604; let's cook some knowledge!",
+            "Yoh! Let's see what you've got &#x1F525;",
+            "Sharp! What are we learning today?",
+            "Aweh boss &#x1F60E; ready to go?",
+            "Yoh &#x1F603; let's build some brain power",
+            "Heita chommie! Let's go!",
+            "Aweh &#x1F604; ready when you are!"
+        ],
+        positive: [
+            "Lekker! &#x1F4AA; Let's go! Rocks, fossils or electricity?",
+            "Sharp! &#x1F525; I like that energy!",
+            "Aweh &#x1F60E; that's the spirit!",
+            "Let's do it! &#x1F4AF; What topic?",
+            "Yoh &#x1F604; I knew you were ready!",
+            "Lekker vibes! &#x1F525; let's learn!",
+            "Aweh chommie, we move!",
+            "Nice one! &#x1F4AA; pick a topic",
+            "Yoh that's energy &#x1F60E; let's go",
+            "Let's cook! &#x1F525;",
+            "Aweh &#x1F604; brain activated!",
+            "Sharp sharp! Let's start",
+            "Yoh &#x1F4AF; we're moving now!",
+            "Aweh! This is gonna be good",
+            "Let's go chommie!"
+        ],
+        negative: [
+            "Eish &#x1F605; not feeling it? Let's start small chommie",
+            "Yoh &#x1F603; okay okay, we'll go slow",
+            "No stress &#x1F60E; but your brain is waiting hey",
+            "Aweh, we can chill... but just one question?",
+            "Eish &#x1F605; don't run away from knowledge!",
+            "Yoh &#x1F604; just try one easy thing",
+            "Hayi &#x1F603; we'll keep it light",
+            "Aweh chommie, even 1 step counts",
+            "Eish &#x1F60E; let's warm up slowly",
+            "Yoh don't ghost science &#x1F602;"
+        ],
+        unsure: [
+            "Hayi &#x1F605; not sure? Let's test it together",
+            "Yoh &#x1F603; we'll figure it out step by step",
+            "Aweh &#x1F604; no stress, I'll guide you",
+            "Eish &#x1F60E; let's try something easy first",
+            "Yoh maybe turns into yes hey &#x1F604;"
+        ],
+        topics: [
+            "Pick one: <b>biosphere</b>, <b>biodiversity</b>, or <b>periodic table</b> &#x1F52C;",
+            "What are we doing - life and living, matter, energy or earth?",
+            "Choose your weapon &#x1F60E; pick a topic!",
+            "Yoh &#x1F604; what topic are we hitting?",
+            "Aweh &#x1F4AA; pick your topic chommie"
+        ],
+        subtopics: [
+            "Do you want <b>types</b> or <b>how it works</b>?",
+            "Theory or examples first?",
+            "Break it down or go deep?",
+            "Simple explanation or full detail?",
+            "Quick summary or deep dive?"
+        ],
+        praise: [
+            "&#x1F525; That's it!", "&#x1F4AF; Nailed it!", "Aweh &#x1F60E; you're sharp!",
+            "Yoh &#x1F604; clever thinking!", "Lekker &#x1F4AA; keep going!", "Eish &#x1F60E; you're getting this!",
+            "Aweh chommie, that's solid", "Yoh &#x1F525; impressive!", "Nice one!", "That's correct!",
+            "Sharp answer!", "Yoh &#x1F604; well done!", "Aweh &#x1F603; brain working!", "Lekker thinking!"
+        ],
+        encouragement: [
+            "Don't stress, we build step by step &#x1F4AA;", "Yoh &#x1F605; this one confuses everyone",
+            "Aweh &#x1F60E; you're close!", "Eish &#x1F603; adjust slightly", "Keep pushing!", "Almost there!",
+            "Try again chommie!", "You've got this!", "Yoh &#x1F604; don't give up",
+            "Aweh &#x1F60E; one more try", "Eish &#x1F4AA; keep going", "You're nearly there"
+        ],
+        jokes: [
+            "Yoh imagine asking Linda that &#x1F602; he'd say read properly!",
+            "Lexi would already be on Google &#x1F606;",
+            "Sadee would guess and hope &#x1F605;",
+            "Even Alexis would pause &#x1F602;",
+            "Whole class quiet &#x1F636;",
+            "Yoh &#x1F602; teacher would just stare",
+            "Aweh &#x1F606; tricky one hey",
+            "Eish &#x1F605; brain freeze moment"
+        ],
+        dynamicInsert: [
+            "Yoh &#x1F525; that's lekker thinking!",
+            "Aweh &#x1F604; keep it up chommie!",
+            "Eish &#x1F60E; you're smashing this!",
+            "Lekker hey! &#x1F4AA; I see the brain working.",
+            "Hayi &#x1F605; you're getting there, keep pushing!",
+            "Aweh &#x1F52C; science vibes strong!"
+        ]
+    };
+
+    // ---- GLOSSARY & INDEX SYSTEM ----
+    let GLOSSARY = {};
+    let TOPIC_INDEX = {};
+
+    const TOPIC_PAGE_MAP = {
+        "The Biosphere":                          { start: 2,   end: 16,  id: "U1" },
+        "Biodiversity":                           { start: 17,  end: 49,  id: "U2" },
+        "Sexual Reproduction":                    { start: 50,  end: 81,  id: "U3" },
+        "Variation":                              { start: 82,  end: 88,  id: "U4" },
+        "Properties of Materials":                { start: 94,  end: 111, id: "U5" },
+        "Separating Mixtures":                    { start: 112, end: 133, id: "U6" },
+        "Acids, Bases and Neutral Substances":    { start: 134, end: 147, id: "U7" },
+        "The Periodic Table of Elements":         { start: 148, end: 164, id: "U8" },
+        "Renewable and Non-renewable Energy":     { start: 168, end: 178, id: "U9" },
+        "Potential and Kinetic Energy":           { start: 179, end: 203, id: "U10" },
+        "Heat: Energy Transfer":                  { start: 204, end: 219, id: "U11" },
+        "Heat Insulation and Energy Saving":      { start: 220, end: 232, id: "U12" },
+        "Energy Transfer to Surroundings":        { start: 233, end: 241, id: "U13" },
+        "The National Electricity Supply System": { start: 242, end: 254, id: "U14" },
+        "Relationship of the Earth to the Sun":   { start: 258, end: 286, id: "U15" },
+        "Relationship of the Moon to the Earth":  { start: 287, end: 311, id: "U16" },
+        "Historical Development of Astronomy":    { start: 312, end: 330, id: "U17" }
+    };
+
+    function getTopicForPage(pageNum) {
+        for (const [topic, range] of Object.entries(TOPIC_PAGE_MAP)) {
+            if (pageNum >= range.start && pageNum <= range.end) return topic;
+        }
+        return "General";
+    }
+
+    function buildGlossaryIndex() {
+        GLOSSARY = {};
+        TOPIC_INDEX = {};
+
+        knowledgeBase.forEach(function({ text, page }) {
+            // FIX: Now detects both "New words" AND "Keywords" (used in Grade 7 textbook sidebars)
+            const nwMatch = text.match(/(?:New words?|Keywords?)\s*([\s\S]{0,400}?)(?=KEY|ACTIVITY|NatSci|Did you know|Take note|\d{3,}|$)/i);
+            if (nwMatch) {
+                const rawWords = nwMatch[1]
+                    .split(/[\n,*]+/)
+                    .map(w => w.replace(/[^a-zA-Z\s\-]/g, '').trim())
+                    .filter(w => w.length > 2 && w.length < 40 && !/NatSci/i.test(w) && /[a-zA-Z]/.test(w));
+                const topic = getTopicForPage(page);
+                rawWords.forEach(function(term) {
+                    if (!GLOSSARY[term]) {
+                        GLOSSARY[term] = { page, topic };
+                    }
+                    if (!TOPIC_INDEX[topic]) TOPIC_INDEX[topic] = [];
+                    if (!TOPIC_INDEX[topic].find(e => e.term === term)) {
+                        TOPIC_INDEX[topic].push({ term, page });
+                    }
+                });
+            }
+        });
+
+        // Manually curated terms to ensure good coverage
+        const manualTerms = [
+            { term: "biosphere",       page: 2,   topic: "The Biosphere" },
+            { term: "hydrosphere",     page: 5,   topic: "The Biosphere" },
+            { term: "atmosphere",      page: 5,   topic: "The Biosphere" },
+            { term: "lithosphere",     page: 6,   topic: "The Biosphere" },
+            { term: "biodiversity",    page: 17,  topic: "Biodiversity" },
+            { term: "adaptation",      page: 17,  topic: "Biodiversity" },
+            { term: "classification",  page: 17,  topic: "Biodiversity" },
+            { term: "food web",        page: 17,  topic: "Biodiversity" },
+            { term: "vertebrate",      page: 25,  topic: "Biodiversity" },
+            { term: "invertebrate",    page: 25,  topic: "Biodiversity" },
+            { term: "amphibian",       page: 25,  topic: "Biodiversity" },
+            { term: "reptile",         page: 25,  topic: "Biodiversity" },
+            { term: "pollination",     page: 50,  topic: "Sexual Reproduction" },
+            { term: "fertilisation",   page: 50,  topic: "Sexual Reproduction" },
+            { term: "germination",     page: 50,  topic: "Sexual Reproduction" },
+            { term: "variation",       page: 82,  topic: "Variation" },
+            { term: "heredity",        page: 82,  topic: "Variation" },
+            { term: "filtration",      page: 112, topic: "Separating Mixtures" },
+            { term: "distillation",    page: 112, topic: "Separating Mixtures" },
+            { term: "evaporation",     page: 112, topic: "Separating Mixtures" },
+            { term: "solution",        page: 112, topic: "Separating Mixtures" },
+            { term: "acid",            page: 134, topic: "Acids, Bases and Neutral Substances" },
+            { term: "base",            page: 134, topic: "Acids, Bases and Neutral Substances" },
+            { term: "neutral",         page: 134, topic: "Acids, Bases and Neutral Substances" },
+            { term: "pH",              page: 134, topic: "Acids, Bases and Neutral Substances" },
+            { term: "indicator",       page: 134, topic: "Acids, Bases and Neutral Substances" },
+            { term: "litmus",          page: 134, topic: "Acids, Bases and Neutral Substances" },
+            { term: "periodic table",  page: 148, topic: "The Periodic Table of Elements" },
+            { term: "element",         page: 148, topic: "The Periodic Table of Elements" },
+            { term: "atom",            page: 148, topic: "The Periodic Table of Elements" },
+            { term: "atomic number",   page: 148, topic: "The Periodic Table of Elements" },
+            { term: "symbol",          page: 148, topic: "The Periodic Table of Elements" },
+            { term: "kinetic energy",  page: 179, topic: "Potential and Kinetic Energy" },
+            { term: "potential energy",page: 179, topic: "Potential and Kinetic Energy" },
+            { term: "conduction",      page: 204, topic: "Heat: Energy Transfer" },
+            { term: "convection",      page: 204, topic: "Heat: Energy Transfer" },
+            { term: "radiation",       page: 204, topic: "Heat: Energy Transfer" },
+            { term: "insulation",      page: 220, topic: "Heat Insulation and Energy Saving" },
+            { term: "generator",       page: 242, topic: "The National Electricity Supply System" },
+            { term: "Eskom",           page: 242, topic: "The National Electricity Supply System" },
+            { term: "orbit",           page: 258, topic: "Relationship of the Earth to the Sun" },
+            { term: "rotation",        page: 258, topic: "Relationship of the Earth to the Sun" },
+            { term: "eclipse",         page: 287, topic: "Relationship of the Moon to the Earth" },
+            { term: "tide",            page: 287, topic: "Relationship of the Moon to the Earth" },
+            { term: "SALT",            page: 312, topic: "Historical Development of Astronomy" },
+            { term: "MeerKAT",         page: 312, topic: "Historical Development of Astronomy" },
+            { term: "telescope",       page: 312, topic: "Historical Development of Astronomy" }
+        ];
+        manualTerms.forEach(function({ term, page, topic }) {
+            if (!GLOSSARY[term]) GLOSSARY[term] = { page, topic };
+            if (!TOPIC_INDEX[topic]) TOPIC_INDEX[topic] = [];
+            if (!TOPIC_INDEX[topic].find(e => e.term === term)) {
+                TOPIC_INDEX[topic].push({ term, page });
+            }
+        });
+
+        console.log('Glossary built: ' + Object.keys(GLOSSARY).length + ' terms');
+    }
+
+    function showTopicIndex(topicName) {
+        const topicKey = Object.keys(TOPIC_INDEX).find(k => k.toLowerCase().includes(topicName.toLowerCase()))
+                      || Object.keys(TOPIC_PAGE_MAP).find(k => k.toLowerCase().includes(topicName.toLowerCase()));
+
+        if (!topicKey) {
+            addMessage('bot', 'Eish &#x1F605; I couldn\'t find an index for "<b>' + topicName + '</b>". Try typing the topic name more clearly chommie!');
+            return;
+        }
+
+        const entries = TOPIC_INDEX[topicKey] || [];
+        const pageRange = TOPIC_PAGE_MAP[topicKey];
+
+        let html = '&#x1F511; <b>Index: ' + topicKey + '</b>';
+        if (pageRange) html += ' <span style="color:#888;font-size:13px;">(pp. ' + pageRange.start + '-' + pageRange.end + ')</span>';
+        html += '<br><br>';
+
+        if (entries.length > 0) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">';
+            entries.forEach(function({ term, page }) {
+                html += '<span data-term="' + term.replace(/"/g,'&quot;') + '" data-page="' + page + '" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer;display:inline-block;">' + term + ' <span style="color:#10b981;font-size:11px;">p.' + page + '</span></span>';
+            });
+            html += '</div>';
+        } else {
+            html += '<em style="color:#888;">No terms found for this topic yet.</em><br>';
+        }
+
+        html += '<br><span onclick="handleTopicClick(\'' + topicKey.replace(/'/g,"\\'") + '\');" style="background:#0a1a33;color:white;border-radius:16px;padding:6px 14px;font-size:13px;cursor:pointer;display:inline-block;">&#x1F50D; Ask about ' + topicKey + '</span>';
+
+        addMessage('bot', html);
+    }
+
+    function lookupTerm(term, page) {
+        addMessage('user', 'Tell me about: ' + term);
+        const entry = GLOSSARY[term];
+        const pageHint = page || (entry ? entry.page : 0);
+        const topicHint = entry ? entry.topic : '';
+
+        if (pageHint && knowledgeBase.length > 0) {
+            const pageResults = knowledgeBase.filter(p =>
+                p.page >= pageHint - 1 && p.page <= pageHint + 3
+            );
+            if (pageResults.length > 0) {
+                const rawText = pageResults.map(p => p.text).join(' ');
+                lastQuery = term;
+                lastRawAnswer = rawText;
+                const answer = formatAnswer(term, rawText);
+                const actualPage = pageResults[0].page || pageHint;
+                const pageRef = '<div style="color:#888;font-size:12px;margin-bottom:4px;">&#x1F4C4; p.' + actualPage + (topicHint ? ' - ' + topicHint : '') + '</div>';
+                addMessage('bot', pageRef + answer);
+                setTimeout(function() { showPageImage(actualPage, term); }, 400);
+                setTimeout(function() { showChips(term); }, 700);
+                return;
+            }
+        }
+
+        if (fuse) {
+            const tLower = term.toLowerCase();
+            const results = fuse.search(tLower, { limit: 5 });
+            if (results.length > 0) {
+                const rawText = results.map(r => r.item.text).join(' ');
+                lastQuery = term;
+                lastRawAnswer = rawText;
+                const answer = formatAnswer(term, rawText);
+                const bestPage = results[0].item.page;
+                const pageRef = bestPage ? '<div style="color:#888;font-size:12px;margin-bottom:4px;">&#x1F4C4; p.' + bestPage + (topicHint ? ' - ' + topicHint : '') + '</div>' : '';
+                addMessage('bot', pageRef + answer);
+                if (bestPage) setTimeout(function() { showPageImage(bestPage, term); }, 400);
+                setTimeout(function() { showChips(term); }, 700);
+                return;
+            }
+        }
+
+        addMessage('bot', 'Eish &#x1F605; I couldn\'t find a definition for <b>' + term + '</b> in the textbook. Try typing it as a question like "What is ' + term + '?"');
+    }
+
+    function showGlossary(filter) {
+        const terms = Object.entries(GLOSSARY);
+        if (terms.length === 0) {
+            addMessage('bot', "Eish &#x1F605; still building the glossary. Try again in a sec chommie!");
+            return;
+        }
+
+        const filtered = filter
+            ? terms.filter(([t]) => t.toLowerCase().startsWith(filter.toLowerCase()))
+            : terms;
+
+        filtered.sort((a, b) => a[0].localeCompare(b[0]));
+
+        let html = '&#x1F4DA; <b>Glossary' + (filter ? ' - ' + filter.toUpperCase() : '') + '</b> <span style="color:#888;font-size:12px;">' + filtered.length + ' term' + (filtered.length !== 1 ? 's' : '') + '</span><br><br>';
+
+        const letters = [...new Set(Object.keys(GLOSSARY).map(t => t[0].toUpperCase()))].sort();
+        html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">';
+        letters.forEach(function(l) {
+            html += '<span onclick="showGlossary(\'' + l + '\')" style="background:#e8f5f0;color:#0a6e50;border:1px solid #10b981;border-radius:12px;padding:3px 10px;font-size:12px;cursor:pointer;font-weight:600;">' + l + '</span>';
+        });
+        html += '</div>';
+
+        filtered.slice(0, 30).forEach(function([term, data]) {
+            html += '<div style="padding:6px 0;border-bottom:1px solid #eee;">';
+            html += '<span data-term="' + term.replace(/"/g,'&quot;') + '" data-page="' + data.page + '" style="color:#0a6e50;font-weight:600;cursor:pointer;">' + term + '</span>';
+            html += ' <span style="color:#aaa;font-size:12px;">p.' + data.page + ' - ' + data.topic + '</span>';
+            html += '</div>';
+        });
+
+        if (filtered.length > 30) {
+            html += '<br><em style="color:#888;font-size:12px;">Showing 30 of ' + filtered.length + '. Use letter filter above to narrow down.</em>';
+        }
+
+        addMessage('bot', html);
+    }
+
+    // ---- Show full topic menu ----
+    // FIX: Renamed loop variable from 'term' to 'termItem' to avoid conflict with topicsByTerm keys
+    function showTopicMenu() {
+        let html = '&#x1F4CB; <b>Grade 7 Science - Topic Menu</b><br><br>';
+
+        const termItems = [
+            { termLabel: "Strand 1 - Life and Living",        label: "Life and Living / Technology",       color: "#e8f5e9", border: "#10b981" },
+            { termLabel: "Strand 2 - Matter and Materials",   label: "Matter and Materials / Energy",      color: "#e3f2fd", border: "#2196f3" },
+            { termLabel: "Strand 3 - Energy and Change",      label: "Energy and Change / Technology",     color: "#fff8e1", border: "#f59e0b" },
+            { termLabel: "Strand 4 - Planet Earth and Beyond",label: "Planet Earth and Beyond",            color: "#f3e8ff", border: "#a855f7" }
+        ];
+
+        const topicsByStrand = {
+            "Strand 1 - Life and Living": [
+                "The Biosphere","Biodiversity","Sexual Reproduction","Variation"
+            ],
+            "Strand 2 - Matter and Materials": [
+                "Properties of Materials","Separating Mixtures",
+                "Acids, Bases and Neutral Substances","The Periodic Table of Elements"
+            ],
+            "Strand 3 - Energy and Change": [
+                "Renewable and Non-renewable Energy","Potential and Kinetic Energy",
+                "Heat: Energy Transfer","Heat Insulation and Energy Saving",
+                "Energy Transfer to Surroundings","The National Electricity Supply System"
+            ],
+            "Strand 4 - Planet Earth and Beyond": [
+                "Relationship of the Earth to the Sun",
+                "Relationship of the Moon to the Earth",
+                "Historical Development of Astronomy"
+            ]
+        };
+
+        termItems.forEach(function({ termLabel, label, color, border }) {
+            html += '<div style="background:' + color + ';border-left:3px solid ' + border + ';padding:8px 12px;border-radius:8px;margin-bottom:8px;">';
+            html += '<strong>' + label + '</strong><br>';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">';
+            const topicsForStrand = topicsByStrand[termLabel] || [];
+            topicsForStrand.forEach(function(t) {
+                const pg = TOPIC_PAGE_MAP[t];
+                html += '<span onclick="handleTopicClick(\'' + t.replace(/'/g,"\\'") + '\');" style="background:white;border:1px solid ' + border + ';border-radius:14px;padding:4px 10px;font-size:13px;cursor:pointer;color:#333;">' + t + (pg ? ' <span style="color:#aaa;font-size:11px;">p.' + pg.start + '</span>' : '') + '</span>';
+            });
+            html += '</div></div>';
+        });
+
+        addMessage('bot', html);
+    }
+
+    function mergedRand(key) {
+        const base = SA_PERSONALITY[key] || [];
+        const ultra = SA_ULTRA_FLOW[key] || [];
+        const combined = [...base, ...ultra];
+        return combined[Math.floor(Math.random() * combined.length)];
+    }
+
+    function rand(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function deliverAnswer(answerText) {
+        addMessage('bot', answerText);
+        if (Math.random() < 0.4) {
+            setTimeout(function() { addMessage('bot', rand(SA_ULTRA_FLOW.jokes)); }, 800);
+        }
+    }
+
+    const SA_MEGA_FLOW = {
+        positive: [
+            { user:["yes","yep","sure","definitely","let's go","yebo"], bot:"Lekker! &#x1F4AA; Do you want to start with <b>biosphere</b>, <b>acids</b> or <b>energy</b> first?" },
+            { user:["okay","ok","cool","alright"], bot:"Aweh &#x1F604; nice one. Should we do a quick warm-up quiz or jump straight into content?" },
+            { user:["ready","let's do it"], bot:"Sharp! &#x1F525; I see you're ready. What topic first?" },
+            { user:["good","fine","lekker"], bot:"Yoh &#x1F604; that's lekker! Shall we dive into some cool science topics or warm up first?" }
+        ],
+        negative: [
+            { user:["not really","maybe later","not now","skip"], bot:"Yoh &#x1F60E; we can chill, but your brain might get bored &#x1F603; How about a quick fun fact?" },
+            { user:["not interested"], bot:"Yoh &#x1F60E; I feel you. But just one small fact could blow your mind &#x1F4A5; Biosphere, acids, or energy?" }
+        ],
+        unsure: [
+            { user:["maybe","not sure","perhaps","let's see","depends","could be","unsure"], bot:"Hayi &#x1F605; that's okay chommie. Do you want me to give a simple example first?" }
+        ],
+        topicFollowUp: [
+            { user:["how they form","formation"], bot:"Aweh &#x1F525; rocks form in cool ways! Igneous from lava, sedimentary from layers, metamorphic from heat and pressure. Want SA examples?" },
+            { user:["famous sites","fossil sites"], bot:"Yoh SA is packed with fossil sites like <b>Cradle of Humankind</b> and the <b>Karoo</b>. Want me to tell a wild story?" },
+            { user:["circuits","circuit"], bot:"Aweh &#x26A1; circuits are like roads for electrons. Want simple circuit types or a hands-on example?" }
+        ],
+        funFacts: [
+            { user:["fun fact","tell me something","something interesting"], bot:"Yoh &#x1F604; did you know the oldest rock on Earth is over 4 billion years old? &#x1F525; Wanna know more cool science?" },
+            { user:["wow","amazing"], bot:"Aweh &#x1F604; science is wild hey! Shall we dig deeper into one topic now?" }
+        ],
+        praiseInsert: [
+            { user:["got it","i understand","i see","makes sense"], bot:"Sharp! &#x1F525; You're getting this! Want to continue?" },
+            { user:["thanks","thank you"], bot:"Aweh &#x1F604; you're learning lekker! Next up - what topic?" }
+        ]
+    };
+
+    function handleMegaFlow(q) {
+        const steps = [
+            SA_MEGA_FLOW.positive, SA_MEGA_FLOW.negative, SA_MEGA_FLOW.unsure,
+            SA_MEGA_FLOW.topicFollowUp, SA_MEGA_FLOW.funFacts, SA_MEGA_FLOW.praiseInsert
+        ];
+        for (let step of steps) {
+            for (let obj of step) {
+                if (obj.user.some(u => q === u || q === u + '!' || q === u + '.')) {
+                    addMessage('bot', obj.bot);
+                    if (Math.random() < 0.35) {
+                        setTimeout(function() { addMessage('bot', rand(SA_ULTRA_FLOW.encouragement)); }, 750);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    let userState = { inLearningMode: false };
+
+    function isContentQuery(q) {
+        q = q.toLowerCase();
+        const contentKeywords = [
+            "what is","what are","what does","define","explain","how does","how do",
+            "how is","why does","why is","tell me about","describe","what causes",
+            "types of","examples of","name the","list the","difference between",
+            "biosphere","lithosphere","hydrosphere","atmosphere","organism","habitat",
+            "biodiversity","species","adaptation","classification","ecosystem","food web",
+            "reproduction","sexual","fertilisation","pollination","seed","germination",
+            "variation","heredity","genetics","trait","characteristic","inherited",
+            "material","property","properties","hardness","conductor","insulator",
+            "mixture","separate","filtration","distillation","evaporation","solution",
+            "solute","solvent","dissolve","saturated","chromatography","sedimentation",
+            "acid","base","neutral","pH","indicator","litmus","alkali","react",
+            "periodic table","element","atom","molecule","compound","metal","non-metal",
+            "energy","renewable","non-renewable","fossil fuel","solar","wind","coal",
+            "kinetic","potential","gravitational","elastic","mechanical","joule",
+            "heat","thermal","temperature","conduction","convection","radiation",
+            "insulation","electricity","current","voltage","circuit","power","generator","turbine",
+            "earth","sun","moon","solar system","planet","orbit","gravity","season",
+            "eclipse","tide","astronomy","telescope","star","galaxy","universe",
+            "rotation","revolution","axis","equinox","solstice",
+            "meerkat","eskom","variation","heredity",
+            "germination","pollination","fertilisation","food web","adaptation","species"
+        ];
+        return contentKeywords.some(k => q.includes(k));
+    }
+
+    function isLikelyLearningIntent(q) {
+        q = q.toLowerCase();
+        const questionStarters = ["what","how","why","when","where","which","name","list","define","explain","describe"];
+        const startsAsQuestion = questionStarters.some(s => q.startsWith(s));
+        if (!startsAsQuestion) return false;
+        if (q.split(' ').length < 2) return false;
+        return true;
+    }
+
+    // ---- PDF query handler ----
+    function handlePDFQuery(q) {
+        userState.inLearningMode = true;
+
+        if (!fuse) {
+            if (!pendingQuery) pendingQuery = q;
+            addMessage('bot', "Eish chommie, I'm still loading the textbook &#x1F4DA; Hold on - I'll answer that the moment it's ready! &#x1F504;");
+            setTimeout(function() {
+                if (!pdfReady) {
+                    addMessage('bot', "Still loading... &#x1F4D6; Hang tight chommie, big textbook! While you wait - try asking about <b>biosphere</b>, <b>acids</b>, or <b>energy</b> once I'm ready.");
+                }
+            }, 4000);
+            return;
+        }
+
+        const skipWords = new Set(['nice','good','ok','okay','cool','yes','no','wow','great','lol','haha','sure','thanks','fine','ready','go']);
+        if (q.split(' ').length <= 2 && skipWords.has(q.replace(/[^a-z]/g,''))) {
+            addMessage('bot', mergedRand('encouragement'));
+            return;
+        }
+
+        let response;
+        let results = [];
+        const qLower = q.toLowerCase();
+
+        // Strategy 1: exact phrase
+        const exact = knowledgeBase.filter(p => p.text.toLowerCase().includes(qLower));
+        if (exact.length > 0) results = exact.slice(0, 6).map(p => ({ item: p }));
+
+        // Strategy 2: all words on same page
+        if (results.length === 0) {
+            const words = qLower.split(/\s+/).filter(w => w.length > 3);
+            if (words.length > 1) {
+                const allWords = knowledgeBase.filter(p =>
+                    words.every(w => p.text.toLowerCase().includes(w))
+                );
+                results = allWords.slice(0, 6).map(p => ({ item: p }));
+            }
+        }
+
+        // Strategy 3: Fuse fuzzy
+        if (results.length === 0) results = fuse.search(q, { limit: 6 });
+
+        // Strategy 4: looser Fuse
+        if (results.length === 0 && fuseFallback) results = fuseFallback.search(q, { limit: 4 });
+
+        // Strategy 5: longest meaningful word
+        if (results.length === 0) {
+            const words = qLower.split(/\s+/).filter(w => w.length > 4);
+            const longest = words.sort((a,b) => b.length-a.length)[0];
+            if (longest) {
+                results = knowledgeBase
+                    .filter(p => p.text.toLowerCase().includes(longest))
+                    .slice(0, 4).map(p => ({ item: p }));
+            }
+        }
+
+        // Strategy 6: synonyms expansion
+        if (results.length === 0) {
+            const keywords = getKeywords(q);
+            keywords.forEach(function(kw) {
+                if (results.length > 0) return;
+                const found = knowledgeBase.filter(p => p.text.toLowerCase().includes(kw));
+                if (found.length > 0) results = found.slice(0, 4).map(p => ({ item: p }));
+            });
+        }
+
+        // Strategy 7: topic page range
+        if (results.length === 0) {
+            for (const [topic, range] of Object.entries(TOPIC_PAGE_MAP)) {
+                const topicLower = topic.toLowerCase();
+                const ov = TOPIC_OVERVIEWS[topic];
+                const keywords = ov ? ov.keywords : [];
+                if (topicLower.includes(qLower) || qLower.includes(topicLower.split(' ')[0]) ||
+                    keywords.some(kw => qLower.includes(kw.toLowerCase()) || kw.toLowerCase().includes(qLower))) {
+                    const pages = knowledgeBase.filter(p => p.page >= range.start && p.page <= Math.min(range.start + 5, range.end));
+                    if (pages.length > 0) {
+                        results = pages.slice(0, 4).map(p => ({ item: p }));
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (results.length > 0) {
+            const rawText = results.map(r => r.item.text).join(' ');
+            lastQuery = q;
+            lastRawAnswer = rawText;
+            response = formatAnswer(q, rawText);
+        } else {
+            lastRawAnswer = '';
+            response = mergedRand('confusion') + "<br><br>Try asking about <strong>biosphere</strong>, <strong>biodiversity</strong>, <strong>acids</strong>, <strong>periodic table</strong>, <strong>energy</strong> or <strong>the solar system</strong> &#x1F52C;";
+        }
+
+        addMessage('bot', response);
+
+        if (results.length > 0 && results[0].item) {
+            const bestPage = results[0].item.page;
+            if (bestPage) setTimeout(function() { showPageImage(bestPage, q); }, 500);
+        }
+
+        if (Math.random() < 0.35) {
+            setTimeout(function() { addMessage('bot', rand(SA_ULTRA_FLOW.praise)); }, 900);
+        }
+        if (Math.random() < 0.25) {
+            setTimeout(function() { addMessage('bot', rand(SA_ULTRA_FLOW.encouragement)); }, 1400);
+        }
+
+        setTimeout(function() { showChips(q); }, 1800);
+    }
+
+    // ---- Main router ----
+    const CHAT_PHRASES = new Set([
+        "i don't know","idk","i dont know","okay","ok","cool","nice","good","great",
+        "wow","amazing","sure","yes","no","nah","maybe","thanks","thank you",
+        "lol","haha","okay i will","call my mom","i will try","let's go","ready",
+        "not sure","i see","got it","makes sense","interesting","really","seriously",
+        "that was quick","that was fast","nice one","good one","sweet","lekker",
+        "alright","yebo","sharp","heita","aweh","sho","eish","hayi","yoh"
+    ]);
+
+    function ultraFlowResponse(q) {
+        if (handleMegaFlow(q.toLowerCase())) return;
+        const pos = ['yes','yep','sure','ok','okay','cool','lekker','alright','yebo','sharp'];
+        const neg = ['no','nah','not really','skip','not now'];
+        const qc = q.toLowerCase().trim();
+        if (pos.some(w => qc === w))           addMessage('bot', mergedRand('positive') || "Lekker! &#x1F4AA; What topic?");
+        else if (neg.some(w => qc.includes(w))) addMessage('bot', mergedRand('negative') || "Eish &#x1F605; shout when ready!");
+        else addMessage('bot', mergedRand('encouragement') || rand(SA_ULTRA_FLOW.unsure));
+    }
+
+    function routeQuery(q) {
+        const qClean = q.trim().toLowerCase();
+
+        if (qClean === 'explain it simply' || qClean === 'explain') { chipAction('explain', lastQuery); return; }
+        if (qClean === 'give an example'   || qClean === 'example') { chipAction('example', lastQuery); return; }
+        if (qClean === 'go deeper'         || qClean === 'deeper')  { chipAction('deeper',  lastQuery); return; }
+        if (qClean === 'quiz me on this'   || qClean === 'quiz me') { startQuiz(); return; }
+        if (qClean === 'menu' || qClean === 'topic menu' || qClean === 'topics' || qClean === 'topic' || qClean === 'index' || qClean === 'contents' || qClean === 'content') { showTopicMenu(); return; }
+        if (qClean === 'glossary' || qClean === 'terminology' || qClean === 'words') { showGlossary(null); return; }
+        if (qClean.startsWith('index ')) { showTopicIndex(qClean.replace('index ', '')); return; }
+
+        if (CHAT_PHRASES.has(qClean)) { ultraFlowResponse(q); return; }
+        if (qClean.split(' ').length <= 3 && !isContentQuery(qClean) && !isLikelyLearningIntent(qClean)) {
+            ultraFlowResponse(q); return;
+        }
+        if (isContentQuery(q) || isLikelyLearningIntent(q)) {
+            handlePDFQuery(q);
+        } else {
+            ultraFlowResponse(q);
+        }
+    }
+
+    function handleSend() {
+        const input = document.getElementById('userInput');
+        const query = input.value.trim();
+        if (!query) return;
+
+        addMessage('user', query);
+        input.value = '';
+
+        setTimeout(function() {
+            const q = query.toLowerCase();
+
+            const greetings = ["hi", "hello", "hey chommie", "aweh", "heita", "howzit"];
+            if (greetings.some(g => q === g || q.startsWith(g + ' ') || q.startsWith(g + '!'))) {
+                addMessage('bot', mergedRand('greetings'));
+                return;
+            }
+
+            if (q.includes("how are you") || q.includes("how's it going") || q.includes("howzit")) {
+                addMessage('bot', mergedRand('mood') + " You chommie? Feeling ready?");
+                return;
+            }
+
+            if (q.includes('what topics') || q.includes('what can i learn') || q.includes('what chapters') || q === 'topics' || q === 'topic' || q === 'index' || q === 'contents' || q === 'content' || q === 'menu' || q === 'show menu' || q === 'show topics') {
+                showTopicMenu();
+                return;
+            }
+
+            if (q.includes("leslee") || q.includes("who is leslee")) {
+                addMessage('bot', "Yoh &#x1F604; Leslee is not just anyone - she's the <b>visionary behind everything</b> you see here. This whole platform? Built from her belief that young people deserve better.");
+                setTimeout(function() { addMessage('bot', "She's the kind of person who doesn't just talk about change - she <em>builds</em> it. Coach L Academy, this bot, the radio station... all of it comes from that same heart. &#x1F4A1;"); }, 1000);
+                setTimeout(function() { addMessage('bot', "Leslee genuinely wants you to grow, learn, and walk taller than you did yesterday. She believes in people - especially the ones still figuring it out. &#x1F331;"); }, 2000);
+                setTimeout(function() {
+                    addMessage('bot',
+                        'Tune in and feel the vibe yourself &#x1F3A7;<br><br>' +
+                        '<a href="https://coach-l-radio.duckdns.org/public/coach-l-radio" target="_blank" style="display:flex;align-items:center;gap:10px;background:#0a1a33;color:white;text-decoration:none;padding:12px 14px;border-radius:12px;margin-bottom:8px;border:1px solid #10b981;">' +
+                        '<span style="font-size:22px;">&#x1F534;</span><div><div style="font-weight:700;font-size:15px;">Coach L Radio</div><div style="font-size:12px;color:#10b981;">Live - coach-l-radio.duckdns.org</div></div></a>' +
+                        '<a href="https://coach-l-radio.duckdns.org/public/coach-l-radio/podcasts" target="_blank" style="display:flex;align-items:center;gap:10px;background:#0a1a33;color:white;text-decoration:none;padding:12px 14px;border-radius:12px;border:1px solid #a855f7;">' +
+                        '<span style="font-size:22px;">&#x1F399;</span><div><div style="font-weight:700;font-size:15px;">Coach L Podcasts</div><div style="font-size:12px;color:#a855f7;">On demand - click to listen</div></div></a>'
+                    );
+                }, 3000);
+                return;
+            }
+            if (q.includes("who is linda") || q === "linda") {
+                addMessage('bot', "Yoh Linda &#x1F604; He's that one who will remind you to stay focused! If you slack, he'll definitely call you out hey &#x1F602;");
+                return;
+            }
+            if (q.includes("lexi") || q.includes("alexis")) {
+                addMessage('bot', "Lexi &#x1F604; She's sharp hey - like, genuinely quick! The kind of person who reads something once and just <em>gets</em> it.");
+                setTimeout(function() { addMessage('bot', "She's also resourceful &#x1F606; First one to find the answer, first one to finish the worksheet. Lexi moves fast! &#x26A1;"); }, 900);
+                setTimeout(function() { addMessage('bot', "But that's the thing about Lexi - she doesn't just do it for herself. She'll turn around and help the person next to her too. Good energy. &#x1F4AA;"); }, 1800);
+                return;
+            }
+            if (q.includes("sadee")) {
+                addMessage('bot', "Yoh Sadee &#x1F64F; She's not just a friend - she's the kind of person who makes the whole room feel calmer just by being there.");
+                setTimeout(function() { addMessage('bot', "Sadee is <b>spiritually grounded</b> and deeply compassionate. She sees the good in people even when they struggle to see it in themselves. &#x1F33F;"); }, 900);
+                setTimeout(function() { addMessage('bot', "If you're ever feeling down, Sadee's the one who will lift you up - not with noise, but with a quiet kind of strength that just makes sense. &#x1F49B;"); }, 1900);
+                setTimeout(function() { addMessage('bot', "Down to earth. Sweet soul. The real deal. &#x1F1FF;&#x1F1E6; We appreciate Sadee around here chommie &#x1F60C;"); }, 2800);
+                return;
+            }
+
+            if (q === 'menu' || q === 'topics' || q.includes('topic menu') || q.includes('show topics') || q.includes('show menu')) {
+                showTopicMenu(); return;
+            }
+            if (q === 'glossary' || q === 'words' || q === 'terms' || q.includes('show glossary') || q.includes('all terms') || q.includes('terminology')) {
+                showGlossary(null); return;
+            }
+            if (q.startsWith('glossary ') && q.length > 9) {
+                showGlossary(q.replace('glossary ', '').trim()); return;
+            }
+            if (q.startsWith('index ') && q.length > 6) {
+                showTopicIndex(q.replace('index ', '').trim()); return;
+            }
+            if (q === 'index' || q.includes('show index') || q.includes('topic index')) {
+                showTopicMenu(); return;
+            }
+            if (q.includes('quiz') || q.includes('test me') || q.includes('ask me a question') || q.includes('assessment')) {
+                startQuiz(); return;
+            }
+
+            if (quizMode && currentQuiz) {
+                const qText = currentQuiz.question;
+                const aText = currentQuiz.answer;
+                quizMode = false;
+                currentQuiz = null;
+                addMessage('bot', rand(SA_ULTRA_FLOW.praise) + " Here's what the textbook says:<br><br><strong>Q: " + qText + "</strong><br><br>" + aText + "<br><br>Say <strong>quiz me</strong> for another one!");
+                return;
+            }
+
+            routeQuery(q);
+
+        }, 400);
+    }
+
+    let quizMode = false;
+    let currentQuiz = null;
+
+    function startQuiz() {
+        if (!knowledgeBase.length) {
+            addMessage('bot', "Eish, still loading the textbook! &#x1F605; Try again in a sec.");
+            return;
+        }
+
+        const qaPairs = [];
+        knowledgeBase.forEach(function(chunk) {
+            const text = chunk.text;
+            const matches = text.match(/([A-Z][^?]{15,}[?])\s*([^?]{30,}[.!])/g);
+            if (matches) {
+                matches.forEach(function(m) {
+                    const parts = m.match(/^([^?]+[?])\s*(.+)$/s);
+                    if (parts && parts[1] && parts[2]) {
+                        const q = parts[1].trim();
+                        const a = parts[2].trim().substring(0, 400);
+                        const skip = /^(Do you|Can you|Look at|Think about|Draw|After you|Consider|Which cheek|Which direction|Stand facing|Turn to your|ACTIVITY|NatSci)/i.test(q);
+                        const hasContent = q.length > 20 && a.length > 30;
+                        if (!skip && hasContent) {
+                            qaPairs.push({ question: q, answer: a });
+                        }
+                    }
+                });
+            }
+        });
+
+        if (qaPairs.length === 0) {
+            addMessage('bot', "Eish, I couldn't pull a question right now. &#x1F605; Try asking me a topic!");
+            return;
+        }
+
+        const pick = qaPairs[Math.floor(Math.random() * qaPairs.length)];
+        quizMode = true;
+        currentQuiz = pick;
+        addMessage('bot', '&#x1F9E0; Quiz time chommie!<br><br><strong>' + pick.question + '</strong><br><br>Type your answer - then I\'ll show you what the textbook says!');
+    }
+
+    // ---- Extract structured textbook sections from raw PDF text ----
+    function extractTextbookSections(rawText) {
+        const sections = { keyQuestions: [], keyConcepts: [], questions: [], newWords: [] };
+
+        // Pattern 1: KEY CONCEPTS header
+        const kcMatch1 = rawText.match(/KEY CONCEPTS\s*([\s\S]*?)(?=KEY QUESTIONS|ACTIVITY|NatSci|Keywords|\n\n\n|$)/i);
+        if (kcMatch1) {
+            const items = kcMatch1[1].split(/[*\n]/).map(s => s.trim()).filter(s => s.length > 8 && !/^(NatSci|\d+\.)/.test(s));
+            sections.keyConcepts.push(...items);
+        }
+
+        // Pattern 2: Keywords box (Grade 7 textbook uses this in sidebars)
+        const kwMatch = rawText.match(/Keywords?\s*([\s\S]*?)(?=KEY QUESTIONS|ACTIVITY|NatSci|Did you know|Take note|\n\n\n|$)/i);
+        if (kwMatch) {
+            const items = kwMatch[1].split(/[\n*]/).map(s => s.replace(/[^a-zA-Z\s\-]/g,'').trim()).filter(s => s.length > 2 && s.length < 40 && !/^(NatSci|\d)/.test(s) && /[a-zA-Z]/.test(s));
+            sections.newWords.push(...items);
+        }
+
+        // Pattern 3: Did you know? and Take note boxes
+        const dykMatch = rawText.match(/Did you know\??[\s\S]*?(?=\n\n|\n[A-Z]|$)/i);
+        if (dykMatch) {
+            const text = dykMatch[0].replace(/Did you know\??/i, '').trim();
+            if (text.length > 20) sections.keyConcepts.push(text.substring(0, 250));
+        }
+        const takeNoteMatch = rawText.match(/Take note[\s\S]*?(?=\n\n|\n[A-Z]|$)/i);
+        if (takeNoteMatch) {
+            const text = takeNoteMatch[0].replace(/Take note/i, '').trim();
+            if (text.length > 20) sections.keyConcepts.push(text.substring(0, 250));
+        }
+
+        // Pattern 4: Key questions
+        const kqMatch = rawText.match(/Key questions?\s*([\s\S]*?)(?=KEY CONCEPTS|Keywords|ACTIVITY|NatSci|\n\n\n|$)/i);
+        if (kqMatch) {
+            const items = kqMatch[1].split(/[*\n]/).map(s => s.replace(/^\d+[\.\)]\s*/, '').trim()).filter(s => s.length > 8 && s.endsWith('?'));
+            sections.keyQuestions.push(...items);
+        }
+
+        // Pattern 5: Numbered questions
+        const numbered = rawText.match(/^\d+\.\s+[A-Z][^?]{15,}\?/gm) || [];
+        sections.questions.push(...numbered.map(s => s.replace(/^\d+\.\s+/, '').trim()).filter(s => s.length > 15));
+
+        // Pattern 6: New words section
+        const nwMatch = rawText.match(/New words?\s*([\s\S]*?)(?=NatSci|KEY|Did you|\n\n|$)/i);
+        if (nwMatch) {
+            const items = nwMatch[1].split(/[*\n]/).map(s => s.trim()).filter(s => s.length > 2 && s.length < 40 && !/NatSci/i.test(s));
+            sections.newWords.push(...items);
+        }
+
+        sections.keyConcepts = [...new Set(sections.keyConcepts)].slice(0, 6);
+        sections.keyQuestions = [...new Set(sections.keyQuestions)].slice(0, 4);
+        sections.newWords     = [...new Set(sections.newWords)].slice(0, 8);
+
+        return sections;
+    }
+
+    function formatAnswer(query, rawText) {
+        const q = query.toLowerCase();
+
+        const sections = extractTextbookSections(rawText);
+
+        const cleaned = rawText
+            .replace(/NatSci&Tech_Gr[0-9]+_Book\.indb[^\n]*/g, '')
+            .replace(/NatSci&Tech_Gr[0-9]+_TG_Book\.indb[^\n]*/g, '')
+            .replace(/(Life and living|Matter and materials|Energy and change|Planet Earth and beyond|Systems and control)[^\d]*\d+/g, '')
+            .replace(/Chapter \d+:[^.!?\d]{3,60}/g, '')
+            .replace(/KEY (CONCEPTS|QUESTIONS|WORDS?)[^.!?]*/g, '')
+            .replace(/ACTIVITY \d+\.\d+[^.!?]*/g, '')
+            .replace(/QUESTIONS?[^.!?]{0,10}(?=\s)/g, '')
+            .replace(/REVISION[^.!?]*/g, '')
+            .replace(/INSTRUCTIONS?:[^.!?]*/g, '')
+            .replace(/New words[^.!?]*/g, '')
+            .replace(/indb \d{4}[^.!?]*/g, '')
+            .replace(/[a-z]{2,5}\/ph[a-z]{3,}\/[^\s]{8,}/g, '')
+            .replace(/ihm\/[a-z]+\/[^\s]*/g, '')
+            .replace(/com\/photos\/[^\s]*/g, '')
+            .replace(/ckg\/\w+\/[^\s]*/g, '')
+            .replace(/F1le:[^\s]*/g, '')
+            .replace(/Chapter [A-Za-z\s]+ \d+\.\s*/g, '')
+            .replace(/\b[a-z]{2,3}\/[a-z]{4,}\/[a-z0-9_]{4,}\b/g, '')
+            .replace(/Glossary [A-Z][a-z]+ To [^.!?]+[.!?]/g, '')
+            .replace(/\bGlossary\b[^.!?]{0,200}/g, '')
+            .replace(/\b\d{2,3}\b/g, '')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
+
+        const sentences = (cleaned.match(/[^.!?]{15,}[.!?]+/g) || []).map(s => s.trim());
+        const keywords = q.replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+
+        const scored = sentences.map(function(s) {
+            const sl = s.toLowerCase();
+            const st = s.trim();
+            const isJunk = /^(do you|can you|list|find|identify|complete|use the|look at|write|draw|think about|give two|give an|now we|show where|carefully|below is|label|choose the|fill in|cut out|paste|tick|using a|you will need|in this activity|copy the|study the following|answer the following)/i.test(st);
+            const isFileRef = /F1le:|ckg\/|atuo_|Rcyal|_%28|\.jpg|\.png|indb \d|ihm\/|phctco|pphtho|\/photos\//i.test(st);
+            if (isJunk || isFileRef) return { s, score: -10 };
+
+            let score = 0;
+            const kwScore = keywords.reduce((n, kw) => n + (sl.includes(kw) ? 3 : 0), 0);
+            score += kwScore;
+            if (/ is | are | means | refers to | defined as | consists of /i.test(s)) score += 4;
+            if (st.match(/^[A-Z][a-z]+ (is|are|was|were) /)) score += 3;
+            if (s.length > 40 && s.length < 400) score += 1;
+            if (st.endsWith('?')) score -= 3;
+            if (score === 0 && s.length > 50 && s.length < 300) score = 1;
+
+            return { s, score };
+        });
+
+        const top = scored
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 5)
+            .map(x => x.s);
+
+        if (top.length === 0) {
+            const anyDecent = sentences.filter(s =>
+                s.length > 35 && s.length < 400 &&
+                !/^(do you|can you|list|find|identify|complete|use the|look at|write|draw|think about|give two|now we|show where|carefully|below is|label|choose|fill in|cut out|paste|tick|copy|study the following)/i.test(s) &&
+                !/F1le:|ckg\/|indb \d|phctco/i.test(s)
+            ).slice(0, 4);
+            top.push(...anyDecent);
+            sections.keyConcepts.forEach(function(c) { if (!top.includes(c) && top.length < 5) top.push(c); });
+            if (top.length === 0) {
+                return 'The textbook page is shown above - tap the image to zoom in and read the full explanation. Then ask me something specific like <b>"what is ' + q + '?"</b> and I\'ll help explain it!';
+            }
+        }
+        if (top.length < 3 && sections.keyConcepts.length > 0) {
+            sections.keyConcepts.forEach(function(c) { if (!top.includes(c) && top.length < 5) top.push(c); });
+        }
+
+        const emoji = q.includes('rock') || q.includes('sediment') ? '&#x1FAA8;'
+                    : q.includes('fossil') ? '&#x1F995;'
+                    : q.includes('electr') || q.includes('circuit') || q.includes('batter') ? '&#x26A1;'
+                    : q.includes('metal') ? '&#x1F529;'
+                    : q.includes('plant') || q.includes('food chain') || q.includes('photosyn') ? '&#x1F33F;'
+                    : q.includes('animal') ? '&#x1F43E;'
+                    : q.includes('skeleton') || q.includes('bone') ? '&#x1F9B4;'
+                    : q.includes('earth') || q.includes('season') || q.includes('planet') ? '&#x1F30D;'
+                    : q.includes('energy') || q.includes('fuel') || q.includes('coal') ? '&#x1F525;'
+                    : q.includes('water') || q.includes('cloud') || q.includes('rain') ? '&#x1F4A7;'
+                    : q.includes('struct') ? '&#x1F3D7;'
+                    : q.includes('material') ? '&#x1F9F1;'
+                    : q.includes('amphibian') || q.includes('reptile') ? '&#x1F438;'
+                    : q.includes('producer') || q.includes('consumer') ? '&#x1F33F;'
+                    : q.includes('acid') || q.includes('base') || q.includes('ph') ? '&#x1F9EA;'
+                    : q.includes('periodic') || q.includes('element') || q.includes('atom') ? '&#x2697;'
+                    : q.includes('moon') || q.includes('eclipse') ? '&#x1F315;'
+                    : q.includes('sun') || q.includes('solar') ? '&#x2600;'
+                    : q.includes('telescope') || q.includes('astronomy') ? '&#x1F52D;'
+                    : '&#x1F52C;';
+
+        let html = 'Sho chommie! ' + emoji + ' Here\'s what the textbook says:<br><br>';
+        html += top.map(s => '&#x1F4CC; ' + s).join('<br><br>');
+
+        if (sections.keyQuestions.length > 0) {
+            html += '<br><br><div style="background:#fff8e1;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:8px;margin-top:6px;">';
+            html += '<strong>&#x1F511; Key Questions</strong><br>';
+            html += sections.keyQuestions.map(function(q){ return '&#x2022; ' + q; }).join('<br>');
+            html += '</div>';
+        }
+
+        if (sections.keyConcepts.length > 0) {
+            html += '<br><div style="background:#e8f5e9;border-left:3px solid #10b981;padding:10px 12px;border-radius:8px;margin-top:6px;">';
+            html += '<strong>&#x1F4A1; Key Concepts</strong><br>';
+            html += sections.keyConcepts.map(function(c){ return '&#x2022; ' + c; }).join('<br>');
+            html += '</div>';
+        }
+
+        if (sections.questions.length > 0) {
+            html += '<br><div style="background:#e8f0fe;border-left:3px solid #6366f1;padding:10px 12px;border-radius:8px;margin-top:6px;">';
+            html += '<strong>&#x2753; Think About It</strong><br>';
+            html += sections.questions.slice(0, 3).map(function(q){ return '&#x2022; ' + q; }).join('<br>');
+            html += '</div>';
+        }
+
+        if (sections.newWords.length > 0) {
+            html += buildNewWordsHTML(sections.newWords);
+        }
+
+        return html;
+    }
+
+    // ---- Topic Overviews ----
+    const TOPIC_OVERVIEWS = {
+        "The Biosphere": {
+            emoji:"&#x1F30D;", strand:"Strand 1",
+            intro:"The biosphere is the part of Earth where all living things are found - this unit explores the <b>three components of the biosphere</b>.",
+            learn:["The lithosphere (land)","The hydrosphere (water)","The atmosphere (air)","How organisms depend on all three components"],
+            keywords:["biosphere","lithosphere","hydrosphere","atmosphere","organism","habitat","ecosystem","environment","living","non-living"]
+        },
+        "Biodiversity": {
+            emoji:"&#x1F43E;", strand:"Strand 1",
+            intro:"Biodiversity means the variety of life on Earth - this unit explores how organisms are <b>classified and how they depend on each other</b>.",
+            learn:["Classification of organisms","Vertebrates and invertebrates","Food webs and food chains","Adaptation and survival"],
+            keywords:["biodiversity","species","classification","adaptation","food web","food chain","vertebrate","invertebrate","ecosystem","habitat","amphibian","reptile"]
+        },
+        "Sexual Reproduction": {
+            emoji:"&#x1F338;", strand:"Strand 1",
+            intro:"Sexual reproduction is how most organisms produce offspring - this unit covers <b>pollination, fertilisation and germination</b> in plants and reproduction in animals.",
+            learn:["Parts of a flower and pollination","Fertilisation and seed formation","Germination of seeds","Reproduction in animals"],
+            keywords:["reproduction","sexual","pollination","fertilisation","germination","seed","pollen","ovule","embryo","flower","insect","wind"]
+        },
+        "Variation": {
+            emoji:"&#x1F9EC;", strand:"Strand 1",
+            intro:"No two individuals are exactly the same - this unit explores <b>variation, heredity and genetics</b>.",
+            learn:["What variation means","Inherited and environmental variation","Heredity - passing traits to offspring","Genetics basics"],
+            keywords:["variation","heredity","genetics","trait","characteristic","inherited","environment","offspring","parent","gene"]
+        },
+        "Properties of Materials": {
+            emoji:"&#x1F9F1;", strand:"Strand 2",
+            intro:"Everything is made of materials - this unit explores <b>the properties of different materials</b> and how we choose them.",
+            learn:["Properties like hardness, flexibility and conductivity","Comparing natural and manufactured materials","Choosing materials for a purpose","Conductors and insulators"],
+            keywords:["material","property","properties","hardness","flexible","conductor","insulator","natural","manufactured","metal","non-metal","plastic"]
+        },
+        "Separating Mixtures": {
+            emoji:"&#x1F52C;", strand:"Strand 2",
+            intro:"Mixtures are everywhere in daily life - this unit explores <b>how to separate different types of mixtures</b>.",
+            learn:["What mixtures are","Filtration - separating solids from liquids","Evaporation - separating solutions","Distillation and chromatography"],
+            keywords:["mixture","filtration","evaporation","distillation","solution","solute","solvent","dissolve","saturated","chromatography","sedimentation"]
+        },
+        "Acids, Bases and Neutral Substances": {
+            emoji:"&#x1F9EA;", strand:"Strand 2",
+            intro:"Acids and bases are everywhere in daily life - this unit explores <b>how to identify them</b> and what happens when they react.",
+            learn:["Properties of acids, bases and neutral substances","The pH scale - measuring acidity","Indicators: litmus, universal indicator","Neutralisation reactions"],
+            keywords:["acid","base","neutral","pH","indicator","litmus","alkali","neutralisation","react","hydrochloric","sulfuric","sodium hydroxide"]
+        },
+        "The Periodic Table of Elements": {
+            emoji:"&#x2697;", strand:"Strand 2",
+            intro:"All matter is made of elements - this unit introduces the <b>periodic table</b> and the elements it contains.",
+            learn:["What elements and atoms are","How the periodic table is organised","Metals and non-metals","Common elements and their symbols"],
+            keywords:["periodic table","element","atom","molecule","metal","non-metal","symbol","atomic number","proton","neutron","electron"]
+        },
+        "Renewable and Non-renewable Energy": {
+            emoji:"&#x26A1;", strand:"Strand 3",
+            intro:"Energy powers everything - this unit explores the <b>difference between renewable and non-renewable energy sources</b>.",
+            learn:["What energy is and why we need it","Non-renewable: coal, oil, natural gas","Renewable: solar, wind, water, biomass","SA's energy challenges"],
+            keywords:["energy","renewable","non-renewable","fossil fuel","coal","solar","wind","biomass","Eskom","load shedding","environment"]
+        },
+        "Potential and Kinetic Energy": {
+            emoji:"&#x1F3C3;", strand:"Strand 3",
+            intro:"Energy comes in two key mechanical forms - this unit explores <b>potential and kinetic energy</b> and how they convert.",
+            learn:["Potential energy - stored energy","Kinetic energy - energy of movement","The joule as unit of energy","Conversion between potential and kinetic energy"],
+            keywords:["potential energy","kinetic energy","gravitational","elastic","mechanical","joule","stored","movement","convert","speed","height","mass"]
+        },
+        "Heat: Energy Transfer": {
+            emoji:"&#x1F321;", strand:"Strand 3",
+            intro:"Heat moves from hot to cold - this unit explores <b>the three methods of heat transfer</b>.",
+            learn:["Conduction - heat through solids","Convection - heat through fluids","Radiation - heat through space","Conductors and insulators of heat"],
+            keywords:["heat","thermal","temperature","conduction","convection","radiation","transfer","conductor","insulator","absorb","emit","infrared"]
+        },
+        "Heat Insulation and Energy Saving": {
+            emoji:"&#x1F3E0;", strand:"Strand 3",
+            intro:"Keeping heat in or out is crucial - this unit explores <b>insulation</b> and how to save energy in everyday life.",
+            learn:["How insulation reduces heat loss","Materials used for insulation","Energy efficiency in homes","SA's energy-saving challenges"],
+            keywords:["insulation","insulator","energy saving","heat loss","efficiency","absorb","reflect","colour","surface","building"]
+        },
+        "Energy Transfer to Surroundings": {
+            emoji:"&#x1F50A;", strand:"Strand 3",
+            intro:"Energy always moves to the surroundings - this unit explores <b>how energy spreads out</b> in different situations.",
+            learn:["Sound as energy transfer","Light energy transfer","How energy dissipates","Conservation of energy principle"],
+            keywords:["energy transfer","surroundings","sound","light","dissipate","conservation","friction","waste heat","vibration","wave"]
+        },
+        "The National Electricity Supply System": {
+            emoji:"&#x1F50C;", strand:"Strand 3",
+            intro:"Electricity powers modern SA - this unit explores <b>how electricity is generated and delivered</b> to homes and businesses.",
+            learn:["How power stations generate electricity","Transformers and power lines","The national grid in South Africa","Eskom and load shedding"],
+            keywords:["electricity","generator","turbine","transformer","power station","national grid","Eskom","pylon","substation","voltage","current","supply"]
+        },
+        "Relationship of the Earth to the Sun": {
+            emoji:"&#x2600;", strand:"Strand 4",
+            intro:"Earth orbits the Sun - this unit explores how that relationship creates <b>seasons, day and night, and time zones</b>.",
+            learn:["Earth's rotation and revolution","Why we have day and night","Seasons - caused by Earth's tilted axis","Time zones and the international date line"],
+            keywords:["earth","sun","orbit","rotation","revolution","season","axis","tilt","day","night","solstice","equinox","time zone","hemisphere"]
+        },
+        "Relationship of the Moon to the Earth": {
+            emoji:"&#x1F315;", strand:"Strand 4",
+            intro:"The Moon affects life on Earth in many ways - this unit explores <b>lunar phases, eclipses and tides</b>.",
+            learn:["Phases of the Moon and why they occur","Solar and lunar eclipses","How the Moon causes ocean tides","The Moon's surface features"],
+            keywords:["moon","lunar","phase","eclipse","solar eclipse","lunar eclipse","tide","orbit","gravity","new moon","full moon","crescent","surface"]
+        },
+        "Historical Development of Astronomy": {
+            emoji:"&#x1F52D;", strand:"Strand 4",
+            intro:"Humans have studied the sky for thousands of years - this unit traces <b>the history of astronomy</b> from ancient times to modern SA telescopes.",
+            learn:["Ancient astronomers and their discoveries","The geocentric vs heliocentric debate","Galileo, Copernicus and Kepler","SA's SALT telescope and MeerKAT array"],
+            keywords:["astronomy","telescope","Galileo","Copernicus","heliocentric","geocentric","SALT","MeerKAT","Karoo","planet","star","galaxy","universe"]
+        }
+    };
+
+    function handleTopicClick(topic) {
+        addMessage('user', topic);
+
+        const ov = TOPIC_OVERVIEWS[topic];
+        if (ov) {
+            let html = ov.emoji + ' <b>' + topic + '</b><br><br>';
+            html += ov.intro + '<br><br>';
+            html += '<div style="background:#fff8e1;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:8px;margin-bottom:8px;">';
+            html += '<strong>&#x1F4DA; What you will learn:</strong><br>';
+            html += ov.learn.map(function(l){ return '&#x2022; ' + l; }).join('<br>');
+            html += '</div>';
+
+            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">';
+            ov.keywords.forEach(function(kw) {
+                html += '<span data-kwsearch="' + kw.replace(/"/g,'&quot;') + '" style="background:#e8f5f0;color:#0a6e50;border:1.5px solid #10b981;border-radius:16px;padding:5px 12px;font-size:13px;font-weight:600;cursor:pointer;display:inline-block;">' + kw + '</span>';
+            });
+            html += '</div>';
+
+            addMessage('bot', html);
+
+            function tryLoadTopic(attempts) {
+                const topicRange = TOPIC_PAGE_MAP[topic];
+                let rawText = '';
+                if (knowledgeBase.length > 0 && topicRange) {
+                    const pages = knowledgeBase.filter(p => p.page >= topicRange.start && p.page <= topicRange.end);
+                    rawText = pages.map(p => p.text).join(' ');
+                }
+                if (rawText.length < 100 && TOPIC_OVERVIEWS[topic]) {
+                    const kws = TOPIC_OVERVIEWS[topic].keywords.slice(0, 4);
+                    const pages = knowledgeBase.filter(p => kws.some(kw => p.text.toLowerCase().includes(kw.toLowerCase())));
+                    rawText = pages.slice(0, 8).map(p => p.text).join(' ');
+                }
+                if (rawText.length < 100 && fuse) {
+                    rawText = fuse.search(topic, { limit: 5 }).map(r => r.item.text).join(' ');
+                }
+                if (rawText.length > 100) {
+                    lastQuery = topic;
+                    lastRawAnswer = rawText;
+                    const topicKw = (TOPIC_OVERVIEWS[topic] && TOPIC_OVERVIEWS[topic].keywords[0]) || topic;
+                    addMessage('bot', formatAnswer(topicKw, rawText));
+                    if (topicRange) setTimeout(function() { showPageImage(topicRange.start, topic); }, 300);
+                    setTimeout(function() { showChips(topic); }, 1000);
+                } else if (attempts > 0) {
+                    setTimeout(function() { tryLoadTopic(attempts - 1); }, 1500);
+                } else {
+                    addMessage('bot', "Eish &#x1F605; couldn't load that chapter content right now. Try a keyword from the chips above!");
+                    setTimeout(function() { showChips(topic); }, 500);
+                }
+            }
+            setTimeout(function() { tryLoadTopic(3); }, 500);
+
+        } else {
+            handlePDFQuery(topic);
+        }
+    }
+
+    function addMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = 'msg ' + role;
+        div.innerHTML = text;
+        const box = document.getElementById('messages');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function openChat() {
+        document.getElementById('chat-modal').style.display = 'block';
+        document.getElementById('maxi-fab').classList.add('hidden');
+    }
+    function closeChat() {
+        document.getElementById('chat-modal').style.display = 'none';
+        document.getElementById('maxi-fab').classList.remove('hidden');
+        try { window.parent.postMessage('closeBot', '*'); } catch(e) {}
+        if (window.self === window.top) {
+            if (window.history.length > 1) window.history.back();
+        }
+    }
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', function() {
+            const modal = document.getElementById('chat-modal');
+            const vvHeight = window.visualViewport.height;
+            const windowHeight = window.innerHeight;
+            const keyboardHeight = windowHeight - vvHeight;
+            if (keyboardHeight > 100) {
+                modal.style.height = vvHeight + 'px';
+                modal.style.top = (windowHeight - vvHeight) + 'px';
+                const box = document.getElementById('messages');
+                if (box) box.scrollTop = box.scrollHeight;
+            } else {
+                modal.style.height = '';
+                modal.style.top = '0';
+            }
+        });
+        window.visualViewport.addEventListener('scroll', function() {
+            const modal = document.getElementById('chat-modal');
+            modal.style.top = window.visualViewport.offsetTop + 'px';
+        });
+    }
+
+    (function startLoading() {
+        const fab = document.getElementById('maxi-fab');
+        if (fab) fab.classList.add('hidden');
+        if (typeof pdfjsLib !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
+        initResources();
+    })();
+    document.addEventListener('DOMContentLoaded', function() { if (!pdfReady && !pdfDocRef) initResources(); });
+    window.addEventListener('load', function() { if (!pdfReady && !pdfDocRef) initResources(); });
+    setTimeout(function() { if (!pdfReady && !pdfDocRef) initResources(); }, 2000);
+</script>
+
+</body>
+</html>
