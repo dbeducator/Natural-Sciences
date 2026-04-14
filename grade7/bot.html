@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maxi Pie - Grade 7 Science Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background:#0a1a33; height: 100vh; overflow: hidden; }
+
+        #maxi-fab { position:fixed; bottom:25px; right:25px; width:75px; height:75px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); z-index:999; border:4px solid #fff; }
+        #maxi-fab img { width:85%; height:85%; border-radius:50%; object-fit: cover; }
+
+        #chat-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(7,7,12,0.95); z-index:1000; }
+        .chat-container { display:flex; flex-direction:column; height:100%; width:100%; max-width:500px; margin:0 auto; background:#f0f4f8; }
+
+        .chat-header { background:#0a1a33; padding:15px; display:flex; align-items:center; gap:12px; color:white; border-bottom:3px solid #10b981; }
+        .chat-header img { width:45px; height:45px; border-radius:50%; border:2px solid #10b981; }
+        .close-btn { margin-left:auto; background:#ef4444; color:white; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer; font-size:18px; }
+
+        .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+        .msg { max-width:88%; padding:12px 16px; border-radius:18px; line-height:1.5; font-size:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+        .bot { align-self:flex-start; background:white; color:#333; border-bottom-left-radius:2px; }
+        .user { align-self:flex-end; background:#10b981; color:white; border-bottom-right-radius:2px; }
+
+        .chat-input-area { padding:12px; background:white; display:flex; gap:8px; border-top:1px solid #ddd; flex-shrink:0; }
+        .chat-input-area input { flex:1; padding:12px; border-radius:25px; border:1px solid #ccc; outline:none; font-size:16px; color:#333; }
+        .send-btn { background:#10b981; color:white; border:none; padding:10px 18px; height:45px; border-radius:25px; font-weight:bold; cursor:pointer; font-size:15px; }
+
+        .chip { display:inline-block; background:#e8f5f0; color:#0a6e50; border:1.5px solid #10b981; border-radius:16px; padding:6px 14px; font-size:13px; font-weight:600; cursor:pointer; margin:3px; }
+        .chip-row { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+
+        .zoom-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; flex-direction:column; }
+        .zoom-modal.open { display:flex; }
+        .zoom-modal img { max-width:96%; max-height:85vh; border-radius:8px; object-fit:contain; }
+        .zoom-close { position:absolute; top:16px; right:16px; background:#ef4444; color:white; border:none; border-radius:50%; width:40px; height:40px; font-size:20px; font-weight:bold; cursor:pointer; z-index:2001; }
+
+        .page-img-wrap { margin-top:8px; border-radius:8px; overflow:hidden; cursor:pointer; border:1px solid #ddd; }
+        .page-img-label { font-size:11px; color:#888; padding:3px 8px; }
+    </style>
+</head>
+<body>
+
+<div id="maxi-fab" onclick="openChat()"><img src="cat_full.png"></div>
+
+<div id="chat-modal">
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="cat_full.png">
+            <div>
+                <h3>Maxi Pie</h3>
+                <small style="color:#10b981">Grade 7 Science Chommie 🇿🇦</small>
+            </div>
+            <button class="close-btn" onclick="closeChat()">×</button>
+        </div>
+        <div id="messages" class="chat-messages">
+            <div class="msg bot">Sho! I'm <strong>Maxi Pie</strong> 🐾, your Grade 7 science sidekick! Ask me about the biosphere, biodiversity, reproduction, acids, energy, electricity, and more!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask me something, chommie..." onkeydown="if(event.key==='Enter') handleSend()">
+            <button onclick="handleSend()" class="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- Zoom modal -->
+<div id="zoom-modal" class="zoom-modal" onclick="closeZoom()">
+    <button class="zoom-close" onclick="closeZoom()">×</button>
+    <img id="zoom-img" src="">
+</div>
+
+<script>
+    // ── State ─────────────────────────────────────────────────────────────
+    let knowledgeBase = [];
+    let fuse = null;
+    let pdfReady = false;
+    let PAGE_IMAGES = {};
+    let pdfDocRef = null;
+
+    // ── PDF Loading ───────────────────────────────────────────────────────
+    async function initResources() {
+        try {
+            const pdf = await pdfjsLib.getDocument('resources/logic7.pdf').promise;
+            pdfDocRef = pdf;
+            const total = pdf.numPages;
+
+            for (let i = 1; i <= total; i++) {
+                const page = await pdf.getPage(i);
+                const tc = await page.getTextContent();
+                const text = tc.items.map(s => s.str).join(' ').replace(/\s+/g, ' ');
+                knowledgeBase.push({ text, page: i });
+
+                // Progress every 30 pages
+                if (i === 1 || i % 30 === 0 || i === total) {
+                    showProgress(Math.round(i / total * 100), i, total);
+                }
+            }
+
+            fuse = new Fuse(knowledgeBase, { keys: ['text'], threshold: 0.3, ignoreLocation: true });
+            pdfReady = true;
+            showReady();
+        } catch (e) {
+            addMessage('bot', 'Eish 😅 problem loading the textbook. Make sure logic7.pdf is in resources/');
+            console.error('PDF load error:', e);
+        }
+    }
+
+    function showProgress(pct, cur, total) {
+        const box = document.getElementById('messages');
+        let prog = document.getElementById('progress-msg');
+        if (!prog) {
+            prog = document.createElement('div');
+            prog.id = 'progress-msg';
+            prog.className = 'msg bot';
+            box.appendChild(prog);
+        }
+        prog.textContent = `📖 Loading textbook... ${pct}% (${cur}/${total} pages)`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function showReady() {
+        const prog = document.getElementById('progress-msg');
+        if (prog) prog.remove();
+
+        const div = document.createElement('div');
+        div.className = 'msg bot';
+        div.innerHTML = `Sho! 📚 Textbook loaded and ready chommie!<br><br>
+<div class="chip-row">
+  <span class="chip" onclick="showTopicMenu()">📋 Topic Menu</span>
+  <span class="chip" onclick="showGlossary()">📚 Glossary</span>
+  <span class="chip" onclick="startQuiz()">🧪 Quiz me</span>
+</div>`;
+        document.getElementById('messages').appendChild(div);
+        document.getElementById('messages').scrollTop = 99999;
+
+        // Auto-show topics after 1s
+        setTimeout(showTopicMenu, 1000);
+    }
+
+    // ── Page image rendering ──────────────────────────────────────────────
+    async function renderPage(pageNum) {
+        if (PAGE_IMAGES[pageNum]) return PAGE_IMAGES[pageNum];
+        if (!pdfDocRef) return null;
+        try {
+            const page = await pdfDocRef.getPage(pageNum);
+            const vp = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            canvas.width = vp.width; canvas.height = vp.height;
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+            const url = canvas.toDataURL('image/jpeg', 0.85);
+            PAGE_IMAGES[pageNum] = url;
+            return url;
+        } catch { return null; }
+    }
+
+    function showPageImage(pageNum, label) {
+        if (!pageNum || !pdfDocRef) return;
+        const box = document.getElementById('messages');
+        const wrap = document.createElement('div');
+        wrap.className = 'msg bot page-img-wrap';
+        wrap.innerHTML = `<div class="page-img-label">📄 Textbook p.${pageNum}${label ? ' · ' + label : ''} 🔍 tap to zoom</div><div style="text-align:center;padding:8px;color:#aaa;font-size:13px;">Loading page...</div>`;
+        box.appendChild(wrap);
+        box.scrollTop = box.scrollHeight;
+
+        renderPage(pageNum).then(url => {
+            if (!url) return;
+            wrap.innerHTML = `<div class="page-img-label">📄 Textbook p.${pageNum}${label ? ' · ' + label : ''} 🔍 tap to zoom</div><img src="${url}" style="width:100%;display:block;cursor:zoom-in;" onclick="openZoom('${url}')">`;
+        });
+    }
+
+    function openZoom(src) {
+        document.getElementById('zoom-img').src = src;
+        document.getElementById('zoom-modal').classList.add('open');
+    }
+    
+    function closeZoom() {
+        document.getElementById('zoom-modal').classList.remove('open');
+        document.getElementById('zoom-img').src = '';
+    }
+
+    // ── Topic Menu ────────────────────────────────────────────────────────
+    const TOPICS = [
+        { name: "The Biosphere", page: 2, strand: "Strand 1", keywords: ["biosphere", "lithosphere", "hydrosphere", "atmosphere", "organism"] },
+        { name: "Biodiversity", page: 17, strand: "Strand 1", keywords: ["biodiversity", "classification", "species", "adaptation", "food web"] },
+        { name: "Sexual Reproduction", page: 50, strand: "Strand 1", keywords: ["reproduction", "pollination", "fertilisation", "germination", "seed"] },
+        { name: "Variation", page: 82, strand: "Strand 1", keywords: ["variation", "heredity", "inherited", "trait", "offspring"] },
+        { name: "Properties of Materials", page: 94, strand: "Strand 2", keywords: ["material", "property", "hardness", "conductor", "insulator"] },
+        { name: "Separating Mixtures", page: 112, strand: "Strand 2", keywords: ["mixture", "filtration", "distillation", "evaporation", "solution"] },
+        { name: "Acids, Bases and Neutral Substances", page: 134, strand: "Strand 2", keywords: ["acid", "base", "neutral", "pH", "indicator", "litmus"] },
+        { name: "The Periodic Table of Elements", page: 148, strand: "Strand 2", keywords: ["periodic table", "element", "atom", "metal", "non-metal", "symbol"] },
+        { name: "Renewable and Non-renewable Energy", page: 168, strand: "Strand 3", keywords: ["energy", "renewable", "non-renewable", "coal", "solar", "wind"] },
+        { name: "Potential and Kinetic Energy", page: 179, strand: "Strand 3", keywords: ["kinetic energy", "potential energy", "joule", "gravitational"] },
+        { name: "Heat: Energy Transfer", page: 204, strand: "Strand 3", keywords: ["heat", "conduction", "convection", "radiation", "thermal"] },
+        { name: "Heat Insulation and Energy Saving", page: 220, strand: "Strand 3", keywords: ["insulation", "insulator", "energy saving", "heat loss"] },
+        { name: "Energy Transfer to Surroundings", page: 233, strand: "Strand 3", keywords: ["energy transfer", "surroundings", "sound", "light", "dissipate"] },
+        { name: "The National Electricity Supply System", page: 242, strand: "Strand 3", keywords: ["electricity", "generator", "turbine", "transformer", "Eskom"] },
+        { name: "Relationship of the Earth to the Sun", page: 258, strand: "Strand 4", keywords: ["earth", "sun", "orbit", "rotation", "season", "axis"] },
+        { name: "Relationship of the Moon to the Earth", page: 287, strand: "Strand 4", keywords: ["moon", "eclipse", "tide", "lunar", "phase"] },
+        { name: "Historical Development of Astronomy", page: 312, strand: "Strand 4", keywords: ["astronomy", "telescope", "Galileo", "MeerKAT", "SALT", "Copernicus"] }
+    ];
+
+    function showTopicMenu() {
+        const strands = {};
+        TOPICS.forEach(t => {
+            if (!strands[t.strand]) strands[t.strand] = [];
+            strands[t.strand].push(t);
+        });
+
+        let html = '<b>📋 Grade 7 Science — Topic Menu</b><br><br>';
+        const colors = { 'Strand 1': '#e8f5e9', 'Strand 2': '#e3f2fd', 'Strand 3': '#fff8e1', 'Strand 4': '#f3e8ff' };
+
+        Object.entries(strands).forEach(([strand, topics]) => {
+            html += `<div style="font-weight:700;color:#0a1a33;margin:8px 0 4px;">${strand}</div>`;
+            topics.forEach(t => {
+                html += `<div style="background:${colors[strand] || '#f5f5f5'};border-radius:8px;padding:6px 10px;margin:2px 0;cursor:pointer;" onclick="lookupTopic('${t.name.replace(/'/g,"\\'")}')">
+                    <span style="font-size:13px;font-weight:600;color:#0a1a33;">${t.name}</span>
+                    <span style="font-size:11px;color:#888;margin-left:6px;">p.${t.page}</span>
+                </div>`;
+            });
+        });
+        addMessage('bot', html);
+    }
+
+    function lookupTopic(name) {
+        const topic = TOPICS.find(t => t.name === name);
+        if (!topic) return;
+        addMessage('user', name);
+
+        if (!pdfReady || knowledgeBase.length === 0) {
+            addMessage('bot', 'Eish, still loading the textbook! Try again in a moment.');
+            return;
+        }
+
+        // Pull pages from this topic's range
+        const next = TOPICS[TOPICS.indexOf(topic) + 1];
+        const endPage = next ? next.page - 1 : topic.page + 20;
+
+        const relevantTexts = knowledgeBase.filter(k => k.page >= topic.page && k.page <= endPage);
+        
+        relevantTexts.forEach(k => {
+            addMessage('bot', `<div><strong>Page ${k.page}</strong>: ${k.text}</div>`);
+        });
+        
+        if (relevantTexts.length === 0) {
+            addMessage('bot', "Eish 😅 I couldn't find info on that.");
+        }
+    }
+
+    function addMessage(sender, content) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `msg ${sender}`;
+        msgDiv.innerHTML = content;
+        document.getElementById('messages').appendChild(msgDiv);
+        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    }
+
+    function openChat() {
+        document.getElementById('chat-modal').style.display = 'flex';
+        initResources();
+    }
+
+    function closeChat() {
+        document.getElementById('chat-modal').style.display = 'none';
+    }
+
+    function handleSend() {
+        const userInput = document.getElementById('userInput').value;
+        if (userInput.trim()) {
+            addMessage('user', userInput);
+            document.getElementById('userInput').value = '';
+            lookupTopic(userInput); // Assuming user input corresponds to topic name
+        }
+    }
+</script>
+</body>
+</html>
