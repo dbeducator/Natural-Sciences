@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mzilikazi Kingdom</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+
+body{background:#000;overflow-x:hidden;}
+
+/* HEADER */
+.topbar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:18px;
+background:white;
+position:sticky;
+top:0;
+z-index:1000;
+}
+.topbar img{height:38px;}
+.topbar h2{font-size:16px;color:#1f3c2f;}
+
+/* PAGE */
+.page{
+display:none;
+min-height:100vh;
+padding:15px;
+position:relative;
+}
+.page.active{display:block;}
+
+/* BACKGROUND */
+.bg{
+position:absolute;
+inset:0;
+background-size:cover;
+background-position:center;
+z-index:0;
+}
+
+/* OVERLAY */
+.page::after{
+content:"";
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.18);
+z-index:1;
+pointer-events:none;
+}
+
+.content{
+position:relative;
+z-index:2;
+}
+
+/* CARD */
+.card{
+background:rgba(0,0,0,0.25);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,0.1);
+padding:15px;
+border-radius:16px;
+margin-bottom:12px;
+color:#fff;
+}
+.card h3{font-size:15px;margin-bottom:5px;}
+.card p{font-size:13px;opacity:0.85;}
+
+/* INPUT */
+input,textarea{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:10px;
+border:1px solid rgba(255,255,255,0.2);
+background:rgba(0,0,0,0.2);
+color:#fff;
+}
+
+/* BUTTON */
+.btn{
+margin-top:10px;
+padding:10px;
+width:100%;
+border-radius:10px;
+border:none;
+background:#1f3c2f;
+color:white;
+font-size:14px;
+}
+
+/* NAV */
+.nav{
+position:fixed;
+bottom:0;
+width:100%;
+display:flex;
+background:white;
+border-top:1px solid #ddd;
+z-index:2000;
+}
+.nav div{
+flex:1;
+text-align:center;
+padding:14px;
+font-size:13px;
+color:#6b7280;
+cursor:pointer;
+}
+.nav div.active{
+color:#1f3c2f;
+font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="topbar">
+<img src="logo.png">
+<h2>Mzilikazi Kingdom</h2>
+</div>
+
+<!-- HOME -->
+<div class="page active" id="home">
+<div class="bg" style="background-image:url('back1.jpg')"></div>
+<div class="content">
+
+<div class="card">
+<h3>Mining Projects</h3>
+<p>Industrial extraction and resource development pipeline.</p>
+<button class="btn" onclick="location.href='index2.html'">Open</button>
+</div>
+
+<div class="card">
+<h3>Smart City Program</h3>
+<p>Urban infrastructure and modernization framework.</p>
+<button class="btn" onclick="location.href='index3.html'">Open</button>
+</div>
+
+<div class="card">
+<h3>Royal Marketplace</h3>
+<p>Export goods, crafts and trade systems.</p>
+<button class="btn" onclick="location.href='index4.html'">Open</button>
+</div>
+
+<div class="card">
+<h3>Agricultural Projects (Siyatshala)</h3>
+<p>Crop production and land utilisation.</p>
+<button class="btn" onclick="location.href='index7.html'">Open</button>
+</div>
+
+<div class="card">
+<h3>Farming Projects (Siyafuya)</h3>
+<p>Livestock and farming systems.</p>
+<button class="btn" onclick="location.href='index8.html'">Open</button>
+</div>
+
+<div class="card">
+<h3>Training Academy</h3>
+<p>Skills, entrepreneurship and technical training.</p>
+
+<button class="btn" onclick="location.href='academy1.html'">Skills Development</button>
+<button class="btn" onclick="location.href='academy2.html'">Business & Entrepreneurship</button>
+<button class="btn" onclick="location.href='academy3.html'">Technical Training</button>
+</div>
+
+</div>
+</div>
+
+<!-- SUBMIT -->
+<div class="page" id="submit">
+<div class="bg" style="background-image:url('back2.jpg')"></div>
+<div class="content">
+
+<div class="card">
+<h3>Submit Project</h3>
+
+<input id="pname" placeholder="Project Name">
+<input id="psector" placeholder="Sector">
+<textarea id="pdesc" placeholder="Description"></textarea>
+<input id="pfund" placeholder="Funding Required">
+<input type="file" id="pfile" multiple>
+
+<button class="btn" onclick="submitProject()">Submit</button>
+</div>
+
+</div>
+</div>
+
+<!-- CITIZEN -->
+<div class="page" id="citizen">
+<div class="bg" style="background-image:url('back3.jpg')"></div>
+<div class="content">
+
+<div class="card">
+<h3>Digital Citizenship</h3>
+<p>Register and participate in the ecosystem.</p>
+<button class="btn" onclick="location.href='index5.html'">Global Citizenship</button>
+</div>
+
+</div>
+</div>
+
+<!-- INVEST -->
+<div class="page" id="investor">
+<div class="bg" style="background-image:url('back4.jpg')"></div>
+<div class="content">
+
+<div class="card">
+<h3>Investor Portal</h3>
+<p>Access investment opportunities.</p>
+<button class="btn" onclick="location.href='index6.html'">Enter Portal</button>
+</div>
+
+</div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+<div class="active" onclick="go('home',this)">Home</div>
+<div onclick="go('submit',this)">Submit</div>
+<div onclick="go('citizen',this)">Citizen</div>
+<div onclick="go('investor',this)">Invest</div>
+</div>
+
+<!-- NAV SCRIPT -->
+<script>
+function go(id,el){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+
+document.querySelectorAll('.nav div').forEach(n=>n.classList.remove('active'));
+el.classList.add('active');
+}
+</script>
+
+<!-- 🔥 FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDXe_JMJm4obj7q3A713WYSWf9VUXDBQyY",
+  authDomain: "mzilikazi-kingdom-c42eb.firebaseapp.com",
+  projectId: "mzilikazi-kingdom-c42eb",
+  storageBucket: "mzilikazi-kingdom-c42eb.firebasestorage.app",
+  messagingSenderId: "842222516788",
+  appId: "1:842222516788:web:e2e392c38763ec45e3e861"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function submitProject(){
+const name = document.getElementById("pname").value;
+const sector = document.getElementById("psector").value;
+const desc = document.getElementById("pdesc").value;
+const funding = document.getElementById("pfund").value;
+
+db.collection("projects").add({
+name:name,
+sector:sector,
+description:desc,
+funding:funding,
+status:"submitted",
+createdAt:new Date()
+})
+.then(()=>alert("Project submitted successfully"))
+.catch(err=>alert(err.message));
+}
+</script>
+
+</body>
+</html>
